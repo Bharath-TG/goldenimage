@@ -1,6 +1,6 @@
 ---
 - name: Create nodeexporter user
-  hosts: rocky_servers # This can be changed to target specific hosts or groups
+  hosts: localhost
   become: true  # Make sure to use sudo/privileged access to create users
 
   tasks:
