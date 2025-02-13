@@ -1,0 +1,61 @@
+---
+- name: Install NGINX Prometheus Exporter on rocky_servers
+  hosts: rocky_servers  # Replace with your target host(s) or group
+  become: true
+
+  tasks:
+    - name: Ensure system is up to date
+      dnf:
+        name: "*"
+        state: latest
+
+    - name: Download nginx-prometheus-exporter tarball
+      get_url:
+        url: "https://github.com/nginx/nginx-prometheus-exporter/releases/download/v1.3.0/nginx-prometheus-exporter_1.3.0_linux_amd64.tar.gz"
+        dest: "/tmp/nginx-prometheus-exporter.tar.gz"
+
+    - name: Extract nginx-prometheus-exporter tarball
+      unarchive:
+        src: "/tmp/nginx-prometheus-exporter.tar.gz"
+        dest: "/tmp/"
+        remote_src: yes
+
+    - name: Move nginx-prometheus-exporter binary to /usr/local/bin
+      command: mv /tmp/nginx-prometheus-exporter /usr/local/bin/
+#      creates: /usr/local/bin/nginx-prometheus-exporter
+
+    - name: Create systemd service file for nginx-prometheus-exporter
+      copy:
+        dest: "/etc/systemd/system/nginx-prometheus-exporter.service"
+        content: |
+          [Unit]
+          Description=NGINX Prometheus Exporter
+          After=network.target
+         
+          [Service]
+          User=nodeexporter
+          Group=nodeexporter
+          ExecStart=/usr/local/bin/nginx-prometheus-exporter -nginx.scrape-uri=http://localhost:8080/stub_status
+          Restart=always
+          RestartSec=10
+          TimeoutStartSec=200
+          TimeoutStopSec=100
+          
+          [Install]
+          WantedBy=multi-user.target
+
+    - name: Reload systemd to apply new service
+      systemd:
+        daemon_reload: yes
+
+    - name: Start and enable nginx-prometheus-exporter service
+      systemd:
+        name: nginx-prometheus-exporter
+        state: started
+        enabled: yes
+
+    - name: Clean up the nginx-prometheus-exporter tarball
+      file:
+        path: "/tmp/nginx-prometheus-exporter.tar.gz"
+        state: absent
+

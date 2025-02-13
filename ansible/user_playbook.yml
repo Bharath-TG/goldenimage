@@ -1,0 +1,13 @@
+---
+- name: Create nodeexporter user
+  hosts: rocky_servers # This can be changed to target specific hosts or groups
+  become: true  # Make sure to use sudo/privileged access to create users
+
+  tasks:
+    - name: Create the nodeexporter user
+      user:
+        name: nodeexporter
+        comment: "User for running exporters"
+        create_home: no   # Prevents creating a home directory for the user
+        shell: /sbin/nologin  # Prevents login for this user
+        state: present   # Ensures the user exists

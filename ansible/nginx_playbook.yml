@@ -1,0 +1,25 @@
+---
+- name: Install NGINX on Rocky Linux
+  hosts: rocky_servers
+  become: yes
+  tasks:
+    - name: Update all packages
+      dnf:
+        name: '*'
+        state: latest
+
+    - name: Install EPEL repository
+      dnf:
+        name: epel-release
+        state: present
+
+    - name: Install NGINX
+      dnf:
+        name: nginx
+        state: present
+
+    - name: Start NGINX service
+      systemd:
+        name: nginx
+        state: started
+        enabled: yes
