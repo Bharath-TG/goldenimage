@@ -1,6 +1,6 @@
 ---
 - name: Install NGINX Prometheus Exporter on rocky_servers
-  hosts: rocky_servers  # Replace with your target host(s) or group
+  hosts: localhost
   become: true
 
   tasks:
