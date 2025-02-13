@@ -1,6 +1,6 @@
 ---
 - name: Install NGINX on Rocky Linux
-  hosts: rocky_servers
+  hosts: localhost
   become: yes
   tasks:
     - name: Update all packages
