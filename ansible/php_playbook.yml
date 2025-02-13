@@ -1,6 +1,6 @@
 ---
 - name: Install PHP 8.2 on Rocky Linux 9
-  hosts: rocky_servers
+  hosts: localhost
   become: true
   tasks:
 
