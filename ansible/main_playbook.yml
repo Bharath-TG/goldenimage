@@ -1,6 +1,6 @@
 ---
 - name: Run multiple playbooks from one main playbook
-  hosts: rocky_servers
+  hosts: localhost
   tasks:
     - ansible.builtin.debug:
         msg: "Main Playbook"
