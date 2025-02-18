@@ -1,6 +1,8 @@
 ---
 - name: Run multiple playbooks from one main playbook
   hosts: localhost
+  gather_facts: no
+  become: true 
   tasks:
     - ansible.builtin.debug:
         msg: "Main Playbook"
