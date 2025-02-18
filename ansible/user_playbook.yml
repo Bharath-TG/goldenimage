@@ -1,7 +1,9 @@
 ---
 - name: Create nodeexporter user
   hosts: localhost
+  gather_facts: no
   become: true  # Make sure to use sudo/privileged access to create users
+  become_user: root
 
   tasks:
     - name: Create the nodeexporter user
