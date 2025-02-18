@@ -1,0 +1,73 @@
+pipeline {
+    agent any
+
+    environment {
+        // GitHub repository URL
+        GIT_REPO = 'https://github.com/Bharath-TG/goldenimage.git'  // Replace with your actual repo URL
+        PACKER_VERSION = '1.11.2'  // Packer version to install
+    }
+
+    stages {
+        stage('Clean Workspace') {
+            steps {
+                cleanWs()  // Cleans the workspace to ensure no old files are left
+            }
+        }
+        
+        stage('Clone Repository') {
+            steps {
+                script {
+                    // Clone the repository without any credentials, as it's public
+                    echo "Cloning the public GitHub repository..."
+                    git url: "${GIT_REPO}", branch: 'main'  // Use 'main' if that's your default branch
+                }
+            }
+        }
+        
+        stage('Install Packer') {
+            steps {
+                script {
+                    echo "Checking if Packer is installed..."
+
+                    // Check if Packer is already installed
+                    def packerInstalled = sh(script: 'command -v packer', returnStatus: true)
+                    
+                    if (packerInstalled != 0) {
+                        echo "Packer not found, installing version ${PACKER_VERSION}..."
+
+                        // Download and install Packer
+                        sh """
+                        curl -LO https://releases.hashicorp.com/packer/${PACKER_VERSION}/packer_${PACKER_VERSION}_linux_amd64.zip
+                        unzip packer_${PACKER_VERSION}_linux_amd64.zip
+                        sudo mv packer /usr/local/bin/
+                        """
+
+                        // Verify the installation of Packer
+                        sh 'packer --version'
+                    } else {
+                        sh 'packer --version'
+                        echo "Packer is already installed."
+                    }
+                }
+            }
+        }
+
+        stage('Validate and Build Packer HCL File') {
+            steps {
+                script {
+                    echo "Validating and Build Packer HCL file..."
+
+                    // Change to the packer directory
+                    dir('ansible') {
+                        // Validate the Packer HCL file
+                        sh 'ls -l'
+                        sh 'packer init .'
+                        sh 'packer validate packer.pkr.hcl'
+                        sh 'packer build packer.pkr.hcl'
+                    }
+                }
+            }
+        }
+        
+    }
+}
