@@ -52,12 +52,12 @@ pipeline {
                 script {
                     echo "Validating Packer HCL file..."
 
-                    // Change to the ansible directory
+                    // Change to the config directory
                     dir('config') {
                         // Validate the Packer HCL file
                         sh 'ls -l'
                         sh 'packer init .'
-                        sh 'packer validate packer.pkr.hcl'
+                        sh 'packer validate config_update_packer.pkr.hcl'
                     }
                 }
             }
@@ -67,11 +67,11 @@ pipeline {
                 script {
                     echo "Build Packer HCL file..."
 
-                    // Change to the ansible directory
+                    // Change to the config directory
                     dir('config') {
                         // Validate the Packer HCL file
                         sh 'ls -l'
-                        sh 'packer build packer.pkr.hcl | tee packer_output.log'
+                        sh 'packer build config_update_packer.pkr.hcl | tee packer_output.log'
                     }
                 }
             }
