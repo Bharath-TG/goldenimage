@@ -35,10 +35,12 @@ build {
   sources = [
     "source.amazon-ebs.rocky-linux"
   ]
-
+  provisioner "shell" {
+    inline = [
+      "echo 'rocky ALL=(ALL) NOPASSWD:ALL' | sudo tee -a /etc/sudoers"
+    ]
   provisioner "ansible" {
     playbook_file = "/etc/ansible/main_playbook.yml"  # Master playbook that includes others
     extra_arguments = ["-u", "rocky"]
   }
-  
 }
