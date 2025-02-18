@@ -2,24 +2,19 @@ pipeline {
     agent any
 
     environment {
-        // GitHub repository URL
-        GIT_REPO = 'https://github.com/Bharath-TG/goldenimage.git'  // Replace with your actual repo URL
-        PACKER_VERSION = '1.11.2'  // Packer version to install
+        GIT_REPO = 'https://github.com/Bharath-TG/goldenimage.git'
+        GITHUB_CREDENTIALS_ID = 'github-token'
+        BRANCH_NAME = 'main'
+        PACKER_VERSION = '1.11.2'
     }
 
     stages {
-        stage('Clean Workspace') {
-            steps {
-                cleanWs()  // Cleans the workspace to ensure no old files are left
-            }
-        }
-        
         stage('Clone Repository') {
             steps {
                 script {
                     // Clone the repository without any credentials, as it's public
                     echo "Cloning the public GitHub repository..."
-                    git url: "${GIT_REPO}", branch: 'main'  // Use 'main' if that's your default branch
+                    git credentialsId: "${GITHUB_CREDENTIALS_ID}", url: "${GIT_REPO}", branch: "${BRANCH_NAME}"
                 }
             }
         }
@@ -41,7 +36,7 @@ pipeline {
                         unzip packer_${PACKER_VERSION}_linux_amd64.zip
                         sudo mv packer /usr/local/bin/
                         """
-
+                        
                         // Verify the installation of Packer
                         sh 'packer --version'
                     } else {
@@ -51,23 +46,57 @@ pipeline {
                 }
             }
         }
-
-        stage('Validate and Build Packer HCL File') {
+        
+        stage('Validate Packer HCL File') {
             steps {
                 script {
-                    echo "Validating and Build Packer HCL file..."
+                    echo "Validating Packer HCL file..."
 
-                    // Change to the packer directory
+                    // Change to the ansible directory
                     dir('ansible') {
                         // Validate the Packer HCL file
                         sh 'ls -l'
                         sh 'packer init .'
                         sh 'packer validate packer.pkr.hcl'
-                        sh 'packer build packer.pkr.hcl'
+                    }
+                }
+            }
+        }
+        stage('Build Packer HCL File') {
+            steps {
+                script {
+                    echo "Build Packer HCL file..."
+
+                    // Change to the ansible directory
+                    dir('ansible') {
+                        // Validate the Packer HCL file
+                        sh 'ls -l'
+                        sh 'packer build packer.pkr.hcl | tee packer_output.log'
                     }
                 }
             }
         }
         
+    }
+    post {
+        success {
+            script {
+                
+                def output = sh(script: 'tail -n 1 ansible/packer_output.log | awk -F": " \'{print $2, $3}\'', returnStdout: true).trim()
+                def (region, amiId) = output.split()
+
+                echo "Build successful!"
+                echo "Region: ${region}, AMI: ${amiId}"
+
+                // Sending success message to Slack (if configured)
+                slackSend(channel: SLACK_CHANNEL, color: 'good', message: "Packer build successful! Region: ${region}, AMI: ${amiId}")
+            }
+        }
+        failure {
+            script {
+                // In case of failure, send the failure message to Slack
+                slackSend(channel: SLACK_CHANNEL, color: 'danger', message: "Packer build failed!")
+            }
+        }
     }
 }
