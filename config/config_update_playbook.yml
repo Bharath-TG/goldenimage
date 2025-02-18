@@ -1,0 +1,38 @@
+- name: Deploy configuration files from GitHub
+  hosts: localhost
+  become: true
+  tasks:
+
+    - name: Copy nginx.conf to the server
+      copy:
+        src: nginx.conf
+        dest: /etc/nginx/nginx.conf
+        owner: root
+        group: root
+        mode: '0644'
+
+    - name: Copy filebeat.yml to the server
+      copy:
+        src: filebeat.yml
+        dest: /etc/filebeat/filebeat.yml
+        owner: root
+        group: root
+        mode: '0644'
+
+    - name: Copy logrotate config for nginx
+      copy:
+        src: nginx
+        dest: /etc/logrotate.d/nginx
+        owner: root
+        group: root
+        mode: '0644'
+
+    - name: Restart NGINX to apply configuration
+      systemd:
+        name: nginx
+        state: reloaded
+
+    - name: Restart Filebeat to apply configuration
+      systemd:
+        name: filebeat
+        state: restarted
