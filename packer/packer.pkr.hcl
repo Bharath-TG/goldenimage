@@ -21,10 +21,6 @@ source "amazon-ebs" "rocky-linux" {
   ami_regions     = [
     "us-east-2"
   ]
-  user_data = <<-EOF
-              #!/bin/bash
-              echo "rocky ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
-              EOF
 }
 
 # Build configuration to install, configure, and provision
