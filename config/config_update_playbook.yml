@@ -21,8 +21,8 @@
 
     - name: Copy logrotate config for nginx
       copy:
-        src: nginx
-        dest: /etc/logrotate.d/nginx
+        src: logrotate.conf
+        dest: /etc/logrotate.conf
         owner: root
         group: root
         mode: '0644'
