@@ -1,1 +1,11 @@
-
+---
+- name: Update only security and bugfix updates on Rocky Linux
+  hosts: all  # Replace with your host or group name
+  become: yes                 # Ensure root privileges to perform package management
+  tasks:
+    - name: Install only security and bugfix updates
+      dnf:
+        name: "*"
+        state: latest         
+        security: yes         # For security updates
+        update_only: yes      # For bugfix updates
