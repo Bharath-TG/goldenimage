@@ -23,8 +23,9 @@ source "amazon-ebs" "rocky-linux" {
   ]
   user_data = <<-EOF
               #!/bin/bash
+              sleep 30
               echo "rocky ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
-              cat /etc/sudoers
+              sudo cat /etc/sudoers
               EOF
 }
 
