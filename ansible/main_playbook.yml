@@ -6,6 +6,9 @@
   tasks:
     - ansible.builtin.debug:
         msg: "Main Playbook"
+    - name: Pause for 10 minutes
+      ansible.builtin.pause:
+          minutes: 10
 
 - name: import user playbook
   ansible.builtin.import_playbook: user_playbook.yml
