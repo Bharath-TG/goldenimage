@@ -1,5 +1,5 @@
 ---
-- name: Install NGINX on Rocky Linux
+- name: install nginx
   hosts: localhost
   become: yes
   tasks:
