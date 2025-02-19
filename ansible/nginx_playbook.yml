@@ -1,7 +1,9 @@
 ---
 - name: install nginx
   hosts: localhost
-  become: yes
+  gather_facts: no
+  become_user: root
+  become_method: sudo
   tasks:
     - name: Update all packages
       dnf:
