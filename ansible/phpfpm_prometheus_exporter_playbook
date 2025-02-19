@@ -1,0 +1,59 @@
+- name: install phpfpm prometheus exporter
+  hosts: localhost
+  become: true
+
+  tasks:
+    - name: Ensure system is up to date
+      dnf:
+        name: "*"
+        state: latest
+
+    - name: Download phpfpm-exporter tarball
+      get_url:
+        url: "https://github.com/Lusitaniae/phpfpm_exporter/releases/download/v0.5.0/phpfpm_exporter-0.5.0.linux-amd64.tar.gz"
+        dest: "/tmp/phpfpm_exporter.tar.gz"
+
+    - name: Extract phpfpm-exporter tarball
+      unarchive:
+        src: "/tmp/phpfpm_exporter.tar.gz"
+        dest: "/tmp/"
+        remote_src: yes
+
+    - name: Move phpfpm-exporter binary to /usr/local/bin
+      command: mv /tmp/phpfpm_exporter-0.5.0.linux-amd64/phpfpm_exporter /usr/local/bin/
+      # creates: /usr/local/bin/phpfpm_exporter
+
+    - name: Create systemd service file for phpfpm-exporter
+      copy:
+        dest: "/etc/systemd/system/phpfpm-exporter.service"
+        content: |
+          [Unit]
+          Description=PHP-FPM Prometheus Exporter
+          After=network.target
+         
+          [Service]
+          User=nodeexporter
+          Group=nodeexporter
+          ExecStart=/usr/local/bin/phpfpm_exporter --phpfpm.status-path=http://localhost/status
+          Restart=always
+          RestartSec=10
+          TimeoutStartSec=200
+          TimeoutStopSec=100
+          
+          [Install]
+          WantedBy=multi-user.target
+
+    - name: Reload systemd to apply new service
+      systemd:
+        daemon_reload: yes
+
+    - name: Start and enable phpfpm-exporter service
+      systemd:
+        name: phpfpm-exporter
+        state: started
+        enabled: yes
+
+    - name: Clean up the phpfpm-exporter tarball
+      file:
+        path: "/tmp/phpfpm_exporter.tar.gz"
+        state: absent
