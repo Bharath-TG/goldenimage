@@ -28,7 +28,7 @@ pipeline {
                     def packerInstalled = sh(script: 'command -v packer', returnStatus: true)
                     
                     if (packerInstalled != 0) {
-                        echo "Packer not found, installing version ${PACKER_VERSION}..."
+                        echo "Packer not found, installing packer..."
 
                         // Download and install Packer
                         sh """
@@ -42,6 +42,33 @@ pipeline {
                     } else {
                         sh 'packer --version'
                         echo "Packer is already installed."
+                    }
+                }
+            }
+        }
+
+        stage('Install Ansible') {
+            steps {
+                script {
+                    echo "Checking if Ansible is installed..."
+
+                    // Check if Ansible is already installed
+                    def ansibleInstalled = sh(script: 'command -v ansible', returnStatus: true)
+                    
+                    if (ansibleInstalled != 0) {
+                        echo "Ansible not found, installing ansible..."
+
+                        // Install Ansible on Rocky Linux 9
+                        sh """
+                        sudo dnf install -y epel-release
+                        sudo dnf install -y ansible
+                        """
+                        
+                        // Verify the installation of Ansible
+                        sh 'ansible --version'
+                    } else {
+                        sh 'ansible --version'
+                        echo "Ansible is already installed."
                     }
                 }
             }
