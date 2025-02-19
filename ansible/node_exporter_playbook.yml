@@ -1,5 +1,5 @@
 ---
-- name: Install node_exporter on rocky_servers
+- name: install node_exporter
   hosts: localhost
   become: true
 
@@ -22,7 +22,6 @@
 
     - name: Move node_exporter binary to /usr/local/bin
       command: mv /tmp/node_exporter-1.6.1.linux-amd64/node_exporter /usr/local/bin/
-#      creates: /usr/local/bin/node_exporter
 
     - name: Create systemd service file for node_exporter
       copy:
