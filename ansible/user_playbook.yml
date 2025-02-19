@@ -1,15 +1,13 @@
 ---
 - name: Create nodeexporter user
   hosts: localhost
-  gather_facts: no
-  become: true  # Make sure to use sudo/privileged access to create users
-  become_user: root
+  become: true  
 
   tasks:
     - name: Create the nodeexporter user
       user:
         name: nodeexporter
         comment: "User for running exporters"
-        create_home: no   # Prevents creating a home directory for the user
-        shell: /sbin/nologin  # Prevents login for this user
-        state: present   # Ensures the user exists
+        create_home: no  
+        shell: /sbin/nologin  
+        state: present   
