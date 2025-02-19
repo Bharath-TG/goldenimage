@@ -1,14 +1,9 @@
 ---
-- name: Run multiple playbooks from one main playbook
+- name: main playbook
   hosts: localhost
-  gather_facts: no
-  become: true 
   tasks:
     - ansible.builtin.debug:
-        msg: "Main Playbook"
-    - name: Pause for 10 minutes
-      ansible.builtin.pause:
-          minutes: 10
+        msg: "Start Main Playbook"
 
 - name: import user playbook
   ansible.builtin.import_playbook: user_playbook.yml
@@ -24,4 +19,9 @@
 
 - name: Import nginx_prometheus_exporter playbook 
   ansible.builtin.import_playbook: nginx_prometheus_exporter_playbook.yml
-    
+
+- name: Import filebeat playbook 
+  ansible.builtin.import_playbook: filebeat_playbook.yml
+
+- name: Import phpfpm prometheus exporter playbook 
+  ansible.builtin.import_playbook: phpfpm_prometheus_exporter_playbook.yml
