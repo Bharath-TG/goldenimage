@@ -1,5 +1,5 @@
 ---
-- name: Install NGINX Prometheus Exporter on rocky_servers
+- name: install nginx prometheus exporter
   hosts: localhost
   become: true
 
@@ -22,7 +22,6 @@
 
     - name: Move nginx-prometheus-exporter binary to /usr/local/bin
       command: mv /tmp/nginx-prometheus-exporter /usr/local/bin/
-#      creates: /usr/local/bin/nginx-prometheus-exporter
 
     - name: Create systemd service file for nginx-prometheus-exporter
       copy:
@@ -58,4 +57,3 @@
       file:
         path: "/tmp/nginx-prometheus-exporter.tar.gz"
         state: absent
-
