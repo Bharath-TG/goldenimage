@@ -7,7 +7,7 @@
 
   tasks:
     - name: Disable SELinux enforcement
-      command: setenforce 0
+      command: sudo setenforce 0
       ignore_errors: true  # Optional: Ignore errors if SELinux is not installed or not enforceable
       
     - name: Create the nodeexporter user
