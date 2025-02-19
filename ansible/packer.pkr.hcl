@@ -21,6 +21,13 @@ source "amazon-ebs" "rocky-linux" {
   ami_regions     = [
     "us-east-2"
   ]
+  user_data = <<-EOF
+              #!/bin/bash
+              sleep 30
+              # Allow the rocky user to run sudo without a password
+              echo "rocky ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
+              sudo cat /etc/sudoers
+              EOF
 }
 
 # Build configuration to install, configure, and provision
