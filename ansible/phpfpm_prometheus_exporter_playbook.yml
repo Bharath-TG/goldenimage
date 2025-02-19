@@ -1,6 +1,8 @@
 - name: install phpfpm prometheus exporter
   hosts: localhost
-  become: true
+  gather_facts: no
+  become_user: root
+  become_method: sudo
 
   tasks:
     - name: Ensure system is up to date
