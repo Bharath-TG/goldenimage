@@ -21,12 +21,6 @@ source "amazon-ebs" "rocky-linux" {
   ami_regions     = [
     "us-east-2"
   ]
-  user_data = <<-EOF
-              #!/bin/bash
-              sleep 30
-              echo "rocky ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
-              sudo cat /etc/sudoers
-              EOF
 }
 
 # Build configuration to install, configure, and provision
@@ -35,11 +29,7 @@ build {
   sources = [
     "source.amazon-ebs.rocky-linux"
   ]
-  provisioner "shell" {
-    inline = [
-      "echo 'rocky ALL=(ALL) NOPASSWD:ALL' | sudo tee -a /etc/sudoers"
-    ]
-  }
+
   provisioner "ansible" {
     playbook_file = "main_playbook.yml"  # Master playbook that includes others
     extra_arguments = ["-u", "rocky"]
