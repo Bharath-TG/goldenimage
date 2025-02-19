@@ -2,6 +2,7 @@
 - name: Install Filebeat 7
   hosts: localhost
   gather_facts: no
+  become: true
   become_user: root
   become_method: sudo
   tasks:
