@@ -1,7 +1,9 @@
 ---
 - name: Create nodeexporter user
   hosts: localhost
-  become: true  
+  gather_facts: no
+  become_user: root
+  become_method: sudo 
 
   tasks:
     - name: Disable SELinux enforcement
