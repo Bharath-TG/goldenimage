@@ -2,6 +2,7 @@
 - name: install node_exporter
   hosts: localhost
   gather_facts: no
+  become: true
   become_user: root
   become_method: sudo
 
