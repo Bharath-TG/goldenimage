@@ -3,6 +3,10 @@
   hosts: localhost
   become: yes
   tasks:
+    - name: Install compat-openssl11
+      dnf:
+        name: compat-openssl11
+        state: present
 
     - name: Add the Elastic GPG key
       rpm_key:
