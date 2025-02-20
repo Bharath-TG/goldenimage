@@ -79,7 +79,7 @@ pipeline {
                 script {
                     echo "Validating Packer HCL file..."
 
-                    // Change to the ansible directory
+                    // Change to the "base_image" directory
                     dir('base_image') {
                         // Validate the Packer HCL file
                         sh 'ls -l'
@@ -94,7 +94,7 @@ pipeline {
                 script {
                     echo "Build Packer HCL file..."
 
-                    // Change to the base_image directory
+                    // Change to the "base_image" directory
                     dir('base_image') {
                         // Validate the Packer HCL file
                         sh 'ls -l'
