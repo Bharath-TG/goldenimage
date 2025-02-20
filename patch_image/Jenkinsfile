@@ -28,7 +28,7 @@ pipeline {
                     def packerInstalled = sh(script: 'command -v packer', returnStatus: true)
                     
                     if (packerInstalled != 0) {
-                        echo "Packer not found, installing version ${PACKER_VERSION}..."
+                        echo "Packer not found, installing packer..."
 
                         // Download and install Packer
                         sh """
@@ -46,18 +46,45 @@ pipeline {
                 }
             }
         }
+
+        stage('Install Ansible') {
+            steps {
+                script {
+                    echo "Checking if Ansible is installed..."
+
+                    // Check if Ansible is already installed
+                    def ansibleInstalled = sh(script: 'command -v ansible', returnStatus: true)
+                    
+                    if (ansibleInstalled != 0) {
+                        echo "Ansible not found, installing ansible..."
+
+                        // Install Ansible on Rocky Linux 9
+                        sh """
+                        sudo dnf install -y epel-release
+                        sudo dnf install -y ansible
+                        """
+                        
+                        // Verify the installation of Ansible
+                        sh 'ansible --version'
+                    } else {
+                        sh 'ansible --version'
+                        echo "Ansible is already installed."
+                    }
+                }
+            }
+        }
         
         stage('Validate Packer HCL File') {
             steps {
                 script {
                     echo "Validating Packer HCL file..."
 
-                    // Change to the patch_image directory
-                    dir('patch_image') {
+                    // Change to the ansible directory
+                    dir('ansible') {
                         // Validate the Packer HCL file
                         sh 'ls -l'
                         sh 'packer init .'
-                        sh 'packer validate patch_packer.pkr.hcl'
+                        sh 'packer validate ansible_packer.pkr.hcl'
                     }
                 }
             }
@@ -67,11 +94,11 @@ pipeline {
                 script {
                     echo "Build Packer HCL file..."
 
-                    // Change to the patch_image directory
-                    dir('patch_image') {
+                    // Change to the ansible directory
+                    dir('ansible') {
                         // Validate the Packer HCL file
                         sh 'ls -l'
-                        sh 'packer build patch_packer.pkr.hcl | tee packer_output.log'
+                        sh 'packer build ansible_packer.pkr.hcl | tee packer_output.log'
                     }
                 }
             }
@@ -82,7 +109,7 @@ pipeline {
         success {
             script {
                 
-                def output = sh(script: 'tail -n 1 patch_image/packer_output.log | awk -F": " \'{print $2, $3}\'', returnStdout: true).trim()
+                def output = sh(script: 'tail -n 1 ansible/packer_output.log | awk -F": " \'{print $2, $3}\'', returnStdout: true).trim()
                 def (region, amiId) = output.split()
 
                 echo "Build successful!"
