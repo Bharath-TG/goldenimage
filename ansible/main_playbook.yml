@@ -4,9 +4,6 @@
   tasks:
     - ansible.builtin.debug:
         msg: "Start Main Playbook"
-    - name: Copy files from /tmp/playbook to /tmp/packer
-      shell: |
-        cp -r /tmp/playbook/* /tmp/packer-provisioner-ansible-local/{{ ansible_playbook_name }}/
 
 - name: import user playbook
   ansible.builtin.import_playbook: /tmp/playbook/user_playbook.yml
