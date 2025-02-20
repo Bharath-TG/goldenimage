@@ -38,7 +38,7 @@ build {
   ]
 
   provisioner "ansible" {
-    playbook_file = "main_playbook.yml"  # Master playbook that includes others
+    playbook_file = "nginx_playbook.yml"  # Master playbook that includes others
     extra_arguments = ["-u", "root"]
   }
 }
