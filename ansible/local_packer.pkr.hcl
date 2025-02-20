@@ -62,7 +62,7 @@ build {
   }
 
   provisioner "ansible-local" {
-    playbook_file = "main_playbook.yml.yml"
+    playbook_file = "main_playbook.yml"
   }
 
   provisioner "shell" {
