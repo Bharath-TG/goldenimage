@@ -30,31 +30,31 @@ build {
 
   provisioner "file" {
     source      = "user_playbook.yml"
-    destination = "/tmp/packer-provisioner-ansible-local/{{ ansible_playbook_name }}/user_playbook.yml"
+    destination = "/tmp/playbook/user_playbook.yml"
   }
   provisioner "file" {
     source      = "nginx_playbook.yml"
-    destination = "/tmp/packer-provisioner-ansible-local/{{ ansible_playbook_name }}/nginx_playbook.yml"
+    destination = "/tmp/playbook/nginx_playbook.yml"
   }
   provisioner "file" {
     source      = "php_playbook.yml"
-    destination = "/tmp/packer-provisioner-ansible-local/{{ ansible_playbook_name }}/php_playbook.yml"
+    destination = "/tmp/playbook/php_playbook.yml"
   }
   provisioner "file" {
     source      = "node_exporter_playbook.yml"
-    destination = "/tmp/packer-provisioner-ansible-local/{{ ansible_playbook_name }}/node_exporter_playbook.yml"
+    destination = "/tmp/playbook/node_exporter_playbook.yml"
   }
   provisioner "file" {
     source      = "nginx_prometheus_exporter_playbook.yml"
-    destination = "/tmp/packer-provisioner-ansible-local/{{ ansible_playbook_name }}/nginx_prometheus_exporter_playbook.yml"
+    destination = "/tmp/playbook/nginx_prometheus_exporter_playbook.yml"
   }
   provisioner "file" {
     source      = "filebeat_playbook.yml"
-    destination = "/tmp/packer-provisioner-ansible-local/{{ ansible_playbook_name }}/filebeat_playbook.yml"
+    destination = "/tmp/playbook/filebeat_playbook.yml"
   }
   provisioner "file" {
     source      = "phpfpm_prometheus_exporter_playbook.yml"
-    destination = "/tmp/packer-provisioner-ansible-local/{{ ansible_playbook_name }}/phpfpm_prometheus_exporter_playbook.yml"
+    destination = "/tmp/playbook/phpfpm_prometheus_exporter_playbook.yml"
   }
 
   provisioner "shell" {
