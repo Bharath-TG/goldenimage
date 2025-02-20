@@ -79,12 +79,12 @@ pipeline {
                 script {
                     echo "Validating Packer HCL file..."
 
-                    // Change to the ansible directory
-                    dir('ansible') {
+                    // Change to the patch_image directory
+                    dir('patch_image') {
                         // Validate the Packer HCL file
                         sh 'ls -l'
                         sh 'packer init .'
-                        sh 'packer validate ansible_packer.pkr.hcl'
+                        sh 'packer validate patch_packer.pkr.hcl'
                     }
                 }
             }
@@ -94,11 +94,11 @@ pipeline {
                 script {
                     echo "Build Packer HCL file..."
 
-                    // Change to the ansible directory
-                    dir('ansible') {
+                    // Change to the patch_image directory
+                    dir('patch_image') {
                         // Validate the Packer HCL file
                         sh 'ls -l'
-                        sh 'packer build ansible_packer.pkr.hcl | tee packer_output.log'
+                        sh 'packer build patch_packer.pkr.hcl | tee packer_output.log'
                     }
                 }
             }
@@ -109,7 +109,7 @@ pipeline {
         success {
             script {
                 
-                def output = sh(script: 'tail -n 1 ansible/packer_output.log | awk -F": " \'{print $2, $3}\'', returnStdout: true).trim()
+                def output = sh(script: 'tail -n 1 patch_image/packer_output.log | awk -F": " \'{print $2, $3}\'', returnStdout: true).trim()
                 def (region, amiId) = output.split()
 
                 echo "Build successful!"
