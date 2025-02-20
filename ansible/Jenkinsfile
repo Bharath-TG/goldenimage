@@ -84,7 +84,7 @@ pipeline {
                         // Validate the Packer HCL file
                         sh 'ls -l'
                         sh 'packer init .'
-                        sh 'packer validate packer.pkr.hcl'
+                        sh 'packer validate anible_packer.pkr.hcl'
                     }
                 }
             }
@@ -98,7 +98,7 @@ pipeline {
                     dir('ansible') {
                         // Validate the Packer HCL file
                         sh 'ls -l'
-                        sh 'packer build packer.pkr.hcl | tee packer_output.log'
+                        sh 'packer build anible_packer.pkr.hcl | tee packer_output.log'
                     }
                 }
             }
