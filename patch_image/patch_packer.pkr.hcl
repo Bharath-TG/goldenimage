@@ -4,30 +4,21 @@ packer {
       version = ">= 0.0.2"
       source  = "github.com/hashicorp/amazon"
     }
-    ansible = {
-      version = "~> 1"
-      source = "github.com/hashicorp/ansible"
-    }
   }
 }
 
 # Using a Rocky Linux AMI as the base
 source "amazon-ebs" "rocky-linux" {
-  region          = "us-east-2"  # Ohio region
+  region          = "us-east-2"  # ohio region
   ami_name        = "rocky-ami-version-1-{{timestamp}}"
   instance_type   = "t2.small"    # Instance type (can adjust as needed)
-  source_ami      = "ami-00a7648b97d06bf34"  # Replace with the correct Rocky Linux AMI ID
+  source_ami      = "ami-0f21a8af23757e873"  # Replace with the correct Rocky Linux AMI ID
   ssh_username    = "rocky"  # Default SSH username for Rocky Linux
   ami_regions     = [
     "us-east-2"
   ]
-  user_data = <<-EOF
-              #!/bin/bash
-              sleep 30
-              # Allow the rocky user to run sudo without a password
-              echo "rocky ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
-              sudo cat /etc/sudoers
-              EOF
+ # ssh_keypair_name  = "bharath_tg"
+ # ssh_private_key_file = "/etc/ansible/bharath_tg.pem"
 }
 
 # Build configuration to install, configure, and provision
@@ -38,13 +29,15 @@ build {
   ]
   
   provisioner "shell" {
-    inline = [
-      "echo 'rocky ALL=(ALL) NOPASSWD:ALL' | sudo tee -a /etc/sudoers"
-    ]
+    script= "ansible.sh"
   }
 
-  provisioner "ansible" {
-    playbook_file = "patch_playbook.yml"  # Master playbook that includes others
-    extra_arguments = ["-u", "rocky"]
+  provisioner "ansible-local" {
+    playbook_file = "patch_playbook.yml"
   }
+
+  provisioner "shell" {
+    script= "cleanup.sh"
+  }
+
 }
