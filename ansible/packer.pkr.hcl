@@ -36,7 +36,11 @@ build {
   sources = [
     "source.amazon-ebs.rocky-linux"
   ]
-
+  provisioner "shell" {
+    inline = [
+      "sudo dnf install -y python3"
+    ]
+  }
   provisioner "ansible" {
     playbook_file = "nginx_playbook.yml"  # Master playbook that includes others
     extra_arguments = ["-u", "root"]
