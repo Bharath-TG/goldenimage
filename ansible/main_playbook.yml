@@ -6,22 +6,22 @@
         msg: "Start Main Playbook"
 
 - name: import user playbook
-  ansible.builtin.import_playbook: /tmp/playbook/user_playbook.yml
+  ansible.builtin.import_playbook: user_playbook.yml
 
 - name: import nginx playbook
-  ansible.builtin.import_playbook: /tmp/playbook/nginx_playbook.yml
+  ansible.builtin.import_playbook: nginx_playbook.yml
 
 - name: Import php playbook 
-  ansible.builtin.import_playbook: /tmp/playbook/php_playbook.yml
+  ansible.builtin.import_playbook: php_playbook.yml
 
 - name: Import node_exporter playbook 
-  ansible.builtin.import_playbook: /tmp/playbook/node_exporter_playbook.yml
+  ansible.builtin.import_playbook: node_exporter_playbook.yml
 
 - name: Import nginx_prometheus_exporter playbook 
-  ansible.builtin.import_playbook: /tmp/playbook/nginx_prometheus_exporter_playbook.yml
+  ansible.builtin.import_playbook: nginx_prometheus_exporter_playbook.yml
 
 - name: Import filebeat playbook 
-  ansible.builtin.import_playbook: /tmp/playbook/filebeat_playbook.yml
+  ansible.builtin.import_playbook: filebeat_playbook.yml
 
 - name: Import phpfpm prometheus exporter playbook 
-  ansible.builtin.import_playbook: /tmp/playbook/phpfpm_prometheus_exporter_playbook.yml
+  ansible.builtin.import_playbook: phpfpm_prometheus_exporter_playbook.yml
