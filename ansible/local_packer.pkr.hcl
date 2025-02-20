@@ -28,12 +28,41 @@ build {
     "source.amazon-ebs.rocky-linux"
   ]
 
+  provisioner "file" {
+    source      = "user_playbook.yml"
+    destination = "/tmp/packer-provisioner-ansible-local/user_playbook.yml"
+  }
+  provisioner "file" {
+    source      = "nginx_playbook.yml"
+    destination = "/tmp/packer-provisioner-ansible-local/nginx_playbook.yml"
+  }
+  provisioner "file" {
+    source      = "php_playbook.yml"
+    destination = "/tmp/packer-provisioner-ansible-local/php_playbook.yml"
+  }
+  provisioner "file" {
+    source      = "node_exporter_playbook.yml"
+    destination = "/tmp/packer-provisioner-ansible-local/node_exporter_playbook.yml"
+  }
+  provisioner "file" {
+    source      = "nginx_prometheus_exporter_playbook.yml"
+    destination = "/tmp/packer-provisioner-ansible-local/nginx_prometheus_exporter_playbook.yml"
+  }
+  provisioner "file" {
+    source      = "filebeat_playbook.yml"
+    destination = "/tmp/packer-provisioner-ansible-local/filebeat_playbook.yml"
+  }
+  provisioner "file" {
+    source      = "phpfpm_prometheus_exporter_playbook.yml"
+    destination = "/tmp/packer-provisioner-ansible-local/phpfpm_prometheus_exporter_playbook.yml"
+  }
+
   provisioner "shell" {
     script= "ansible.sh"
   }
 
   provisioner "ansible-local" {
-    playbook_file = "user_playbook.yml"
+    playbook_file = "main_playbook.yml.yml"
   }
 
   provisioner "shell" {
