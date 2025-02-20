@@ -60,7 +60,3 @@
       file:
         path: "/tmp/phpfpm_exporter.tar.gz"
         state: absent
-        
-    - name: pause for 30 mins
-      pause:
-        minutes: 30
