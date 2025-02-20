@@ -6,22 +6,22 @@
         msg: "Start Main Playbook"
 
 - name: import user playbook
-  ansible.builtin.import_playbook: /tmp/packer-provisioner-ansible-local/user_playbook.yml
+  ansible.builtin.import_playbook: /tmp/packer-provisioner-ansible-local/{{ ansible_playbook_name }}/user_playbook.yml
 
 - name: import nginx playbook
-  ansible.builtin.import_playbook: /tmp/packer-provisioner-ansible-local/nginx_playbook.yml
+  ansible.builtin.import_playbook: /tmp/packer-provisioner-ansible-local/{{ ansible_playbook_name }}/nginx_playbook.yml
 
 - name: Import php playbook 
-  ansible.builtin.import_playbook: /tmp/packer-provisioner-ansible-local/php_playbook.yml
+  ansible.builtin.import_playbook: /tmp/packer-provisioner-ansible-local/{{ ansible_playbook_name }}/php_playbook.yml
 
 - name: Import node_exporter playbook 
-  ansible.builtin.import_playbook: /tmp/packer-provisioner-ansible-local/node_exporter_playbook.yml
+  ansible.builtin.import_playbook: /tmp/packer-provisioner-ansible-local/{{ ansible_playbook_name }}/node_exporter_playbook.yml
 
 - name: Import nginx_prometheus_exporter playbook 
-  ansible.builtin.import_playbook: /tmp/packer-provisioner-ansible-local/nginx_prometheus_exporter_playbook.yml
+  ansible.builtin.import_playbook: /tmp/packer-provisioner-ansible-local/{{ ansible_playbook_name }}/nginx_prometheus_exporter_playbook.yml
 
 - name: Import filebeat playbook 
-  ansible.builtin.import_playbook: /tmp/packer-provisioner-ansible-local/filebeat_playbook.yml
+  ansible.builtin.import_playbook: /tmp/packer-provisioner-ansible-local/{{ ansible_playbook_name }}/filebeat_playbook.yml
 
 - name: Import phpfpm prometheus exporter playbook 
-  ansible.builtin.import_playbook: /tmp/packer-provisioner-ansible-local/phpfpm_prometheus_exporter_playbook.yml
+  ansible.builtin.import_playbook: /tmp/packer-provisioner-ansible-local/{{ ansible_playbook_name }}/phpfpm_prometheus_exporter_playbook.yml
