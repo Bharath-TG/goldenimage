@@ -33,17 +33,7 @@ build {
   }
 
   provisioner "ansible-local" {
-    playbook_file = "main_playbook.yml"
-    files = [
-    "main_playbook.yml",
-    "user_playbook.yml",  # Ensure this is included if it's needed
-    "phpfpm_prometheus_exporter_playbook.yml",
-    "php_playbook.yml",
-    "node_exporter_playbook.yml",
-    "nginx_prometheus_exporter_playbook.yml",
-    "nginx_playbook.yml",
-    "filebeat_playbook.yml"
-  ]
+    playbook_file = "user_playbook.yml"
   }
 
   provisioner "shell" {
