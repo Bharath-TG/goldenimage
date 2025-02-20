@@ -56,7 +56,13 @@ build {
     source      = "phpfpm_prometheus_exporter_playbook.yml"
     destination = "/tmp/playbook/phpfpm_prometheus_exporter_playbook.yml"
   }
-
+  provisioner "shell" {
+    inline = [
+      "echo 'Listing files in /tmp/playbook directory'",
+      "ls -l /tmp/playbook"
+    ]
+  }
+  
   provisioner "shell" {
     script= "ansible.sh"
   }
