@@ -39,6 +39,6 @@ build {
 
   provisioner "ansible" {
     playbook_file = "main_playbook.yml"  # Master playbook that includes others
-    extra_arguments = ["-u", "rocky"]
+    extra_arguments = ["-u", "root"]
   }
 }
