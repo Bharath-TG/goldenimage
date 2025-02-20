@@ -56,6 +56,9 @@ build {
   provisioner "ansible-local" {
     playbook_file = "initial_packages_playbook.yml"
   }
+  provisioner "ansible-local" {
+    playbook_file = "update_config_playbook.yml"
+  }
 
   provisioner "shell" {
     script= "cleanup.sh"
