@@ -33,17 +33,27 @@ build {
   }
 
   provisioner "ansible-local" {
-    playbook_file = "main_playbook.yml"
-    "extra_files": [
-        "nginx_prometheus_exporter_playbook.yml",
-        "nginx_playbook.yml",
-        "user_playbook.yml",
-        "php_playbook.yml",
-        "node_exporter_playbook.yml",
-        "filebeat_playbook.yml",
-        "phpfpm_prometheus_exporter_playbook.yml"
-      ]
+    playbook_file = "user_playbook.yml"
   }
+  provisioner "ansible-local" {
+    playbook_file = "nginx_playbook.yml"
+  }
+  provisioner "ansible-local" {
+    playbook_file = "php_playbook.yml"
+  }
+  provisioner "ansible-local" {
+    playbook_file = "nginx_prometheus_exporter_playbook.yml"
+  }
+  provisioner "ansible-local" {
+    playbook_file = "node_exporter_playbook.yml"
+  }
+  provisioner "ansible-local" {
+    playbook_file = "phpfpm_prometheus_exporter_playbook.yml"
+  }
+  provisioner "ansible-local" {
+    playbook_file = "filebeat_playbook.yml"
+  }
+
 
   provisioner "shell" {
     script= "cleanup.sh"
