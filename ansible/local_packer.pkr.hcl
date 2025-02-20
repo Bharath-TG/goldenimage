@@ -17,8 +17,8 @@ source "amazon-ebs" "rocky-linux" {
   ami_regions     = [
     "us-east-2"
   ]
-  ssh_keypair_name  = "bharath_tg"
-  ssh_private_key_file = "/etc/ansible/bharath_tg.pem"
+ # ssh_keypair_name  = "bharath_tg"
+ # ssh_private_key_file = "/etc/ansible/bharath_tg.pem"
 }
 
 # Build configuration to install, configure, and provision
