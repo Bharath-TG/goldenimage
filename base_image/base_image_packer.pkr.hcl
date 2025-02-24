@@ -28,10 +28,15 @@ build {
     "source.amazon-ebs.rocky-linux"
   ]
   
+  provisioner "file" {
+  source      = "fstab"  
+  destination = "/etc/fstab" 
+  }
+
   provisioner "shell" {
     script= "ansible.sh"
   }
-
+  
   provisioner "ansible-local" {
     playbook_file = "user_playbook.yml"
   }
