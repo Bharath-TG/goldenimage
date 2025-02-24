@@ -6,10 +6,8 @@
   become_user: root
   become_method: sudo
   tasks:
-    - name: Install compat-openssl11
-      dnf:
-        name: compat-openssl11
-        state: present
+    - name: Set crypto policy back to LEGACY
+      command: update-crypto-policies --set LEGACY
 
     - name: Add the Elastic GPG key
       rpm_key:
@@ -41,3 +39,6 @@
       systemd:
         name: filebeat
         state: started
+        
+    - name: Set crypto policy back to default (SHA-256 or higher) 
+      command: update-crypto-policies --set DEFAULT
