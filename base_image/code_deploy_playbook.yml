@@ -20,6 +20,11 @@
       dnf:
         name: wget
         state: present
+        
+    - name: Install chkconfig (for compatibility or managing services)
+      dnf:
+        name: chkconfig
+        state: present
 
     - name: Download CodeDeploy install script
       get_url:
