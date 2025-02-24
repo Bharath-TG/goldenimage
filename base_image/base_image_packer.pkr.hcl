@@ -30,7 +30,11 @@ build {
   
   provisioner "file" {
   source      = "fstab"  
-  destination = "/etc/fstab" 
+  destination = "/tmp/fstab" 
+  }
+
+  provisioner "shell" {
+  inline  = [ "sudo mv /tmp/fstab /etc/fstab" ]
   }
 
   provisioner "shell" {
