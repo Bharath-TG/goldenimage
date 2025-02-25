@@ -20,7 +20,7 @@
         content: |
           #
           /dev/xvda1               /       xfs     defaults,noatime      1       1
-          /dev/xvdb1               /twid	 xfs	   defaults,nofail       0       2
+          /dev/xvdb1        /twid	 xfs	   defaults,nofail       0       2
 #         fs-0d128686506baa805:/   /data   efs     defaults,_netdev      0       0
 
     - name: Create swap
