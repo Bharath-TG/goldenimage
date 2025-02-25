@@ -27,15 +27,6 @@ build {
   sources = [
     "source.amazon-ebs.rocky-linux"
   ]
-  
-  provisioner "file" {
-  source      = "fstab"  
-  destination = "/tmp/fstab" 
-  }
-
-  provisioner "shell" {
-  inline  = [ "sudo mv /tmp/fstab /etc/fstab" ]
-  }
 
   provisioner "shell" {
     script= "ansible.sh"
