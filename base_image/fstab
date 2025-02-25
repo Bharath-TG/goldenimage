@@ -1,5 +1,0 @@
-#
-UUID=f33e7d3b-6786-4f40-875a-90f0f7e6b9a8     /           xfs    defaults,noatime  1   1
-UUID=cc6b78ab-0c96-4478-9795-eaf042dffca2   /twid	xfs	defaults,nofail 0 2
-/swapfile1      swap    swap    defaults        0       0
-fs-0d128686506baa805:/  /data   efs     defaults,_netdev        0       0
