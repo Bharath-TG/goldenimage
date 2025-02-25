@@ -23,6 +23,21 @@
           /swapfile1      swap    swap    defaults        0       0
           fs-0d128686506baa805:/  /data   efs     defaults,_netdev        0       0
 
+    - name: updating codedeploy config
+      copy:
+        dest: "/etc/codedeploy-agent/conf/codedeployagent.yml"
+        content: |
+          ---
+          :log_aws_wire: false
+          :log_dir: '/var/log/aws/codedeploy-agent/'
+          :pid_dir: '/opt/codedeploy-agent/state/.pid/'
+          :program_name: codedeploy-agent
+          :root_dir: '/opt/codedeploy-agent/deployment-root'
+          :verbose: false
+          :wait_between_runs: 1
+          :proxy_uri: 'http://172.31.21.180:3128/'
+          :max_revisions: 5
+
     - name: updating configuration nginx.conf
       copy:
         dest: "/etc/nginx/nginx.conf"
