@@ -13,14 +13,22 @@
         content: |
           SELINUX=permissive
           SELINUX=disabled
-#    - name: updating partition
-#      copy:
-#        dest: "/etc/fstab"
-#        content: |
-#          #
-#          UUID=f33e7d3b-6786-4f40-875a-90f0f7e6b9a8     /           xfs    defaults,noatime  1   1
-#          UUID=cc6b78ab-0c96-4478-9795-eaf042dffca2   /twid	xfs	defaults,nofail 0 2
-#          /swapfile1      swap    swap    defaults        0       0
+
+    - name: Create swap
+      shell: |
+        dd if=/dev/zero of=/swapfile1 bs=1M count=1024 && \
+        chmod 600 /swapfile1 && \
+        mkswap /swapfile1 && \
+        swapon /swapfile1 && \
+        echo '/swapfile1 swap swap defaults 0 0' >> /etc/fstab
+    
+    - name: updating partition
+      copy:
+        dest: "/etc/fstab"
+        content: |
+          #
+          /dev/xvda1   /           xfs    defaults,noatime  1   1
+          /dev/xvdb1   /twid	      xfs	   defaults,nofail 0 2
 #          fs-0d128686506baa805:/  /data   efs     defaults,_netdev        0       0
 
     - name: updating codedeploy config
