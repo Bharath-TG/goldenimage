@@ -111,9 +111,9 @@
 
 
           }
-    - name: updating configuration filebeat.yml
+    - name: updating configuration php.ini
       copy:
-        dest: "/etc/filebeat/filebeat.yml"
+        dest: "/etc/php.ini"
         content: |
           [PHP]
           engine = On
