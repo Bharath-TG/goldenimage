@@ -19,7 +19,9 @@
         create_home: yes
         shell: /bin/bash
         state: present
-    
+    - name: Creating .ssh directory
+      command: sudo mkdir /home/kushal/.ssh
+
     - name: Updating kushal's ssh keys
       copy:
         dest: "/home/kushal/.ssh/authorized_keys"
@@ -37,6 +39,10 @@
         create_home: yes
         shell: /bin/bash
         state: present
+
+    - name: Creating .ssh directory
+      command: sudo mkdir /home/john.zacharia/.ssh
+
     - name: Updating john.zacharia's ssh keys
       copy:
         dest: "/home/john.zacharia/.ssh/authorized_keys"
@@ -54,7 +60,10 @@
         create_home: yes
         shell: /bin/bash
         state: present
-        
+    
+    - name: Creating .ssh directory
+      command: sudo mkdir /home/avinash/.ssh
+
     - name: Updating avinash's ssh keys
       copy:
         dest: "/home/avinash/.ssh/authorized_keys"
