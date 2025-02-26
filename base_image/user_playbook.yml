@@ -12,3 +12,24 @@
         create_home: no  
         shell: /sbin/nologin  
         state: present   
+        
+    - name: Create the kushal user
+      user:
+        name: kushal
+        create_home: yes
+        shell: /bin/bash
+        state: present
+        
+    - name: Create the john.zacharia user
+      user:
+        name: john.zacharia
+        create_home: yes
+        shell: /bin/bash
+        state: present
+
+    - name: Create the avinash user
+      user:
+        name: avinash
+        create_home: yes
+        shell: /bin/bash
+        state: present
