@@ -57,4 +57,9 @@
           - php-process
           - php-soap
           - php-xml
+          - php-zip
+          - php-pear           
+          - php-igbinary       
+          - php-redis         
+          - php-apcu
         state: present
