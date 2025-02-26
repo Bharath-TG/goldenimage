@@ -3,8 +3,6 @@
   hosts: localhost
   gather_facts: no
   become: true
-  become_user: root
-  become_method: sudo
   tasks:
     - name: Set crypto policy back to LEGACY
       command: update-crypto-policies --set LEGACY
