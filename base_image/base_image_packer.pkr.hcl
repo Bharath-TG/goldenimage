@@ -17,8 +17,15 @@ source "amazon-ebs" "rocky-linux" {
   ami_regions     = [
     "us-east-2" #, "us-east-1"
   ]
- # ssh_keypair_name  = "keypair"
- # ssh_private_key_file = "/etc/ansible/keypair.pem"
+  # ssh_keypair_name  = "keypair"
+  # ssh_private_key_file = "/etc/ansible/keypair.pem"
+  # Adding a 200GB EBS volume
+  ebs_block_device {
+    device_name           = "/dev/xvda"  # Device name (e.g., /dev/sdh or /dev/xvdf depending on your instance)
+    volume_size           = 200         # Size in GB
+    volume_type           = "gp3"       # General Purpose SSD (can be modified to gp3, io1, etc. if needed)
+    delete_on_termination = true        # Automatically delete the volume when the instance is terminated
+  }
 }
 
 # Build configuration to install, configure, and provision
