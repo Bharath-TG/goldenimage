@@ -3,8 +3,6 @@
   hosts: localhost
   gather_facts: no
   become: true
-  become_user: root
-  become_method: sudo
 
   tasks:
     - name: Ensure system is up to date
