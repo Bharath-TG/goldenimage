@@ -19,6 +19,17 @@
         create_home: yes
         shell: /bin/bash
         state: present
+    
+    - name: Updating kushal's ssh keys
+      copy:
+        dest: "/home/kushal/.ssh/authorized_keys"
+        content: |
+          ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDZYJSrjCvnxLTuHDY164cKJ5i9qOAQEGkQ5lDjEvS5y1WRiu76ptmo2XJj3ktkJXMXjdulMc0nUKvf0cVtFZcwA7RBkGgN+/1TEFoSejctYKznX2I5KUgFN32+S/6wWm1bQ7Xak0lpWsS8BS0MCmaQG4Ex90aDkAUb2Q4yF7vxsl6Dlu0kQCOMas9tw4UGTb6WuG0yFwJas9aFR+6sp32fFXL8Re6rYwV9FWqHPt1nKjYmyRg3+7KxHSDwm9N1wJmxGUNo22LlQB/jXnrDIhYWwMPW6Y5EFFN89oecwOyQGOmOdDvSGHEF4QxZ5WBlBsV0MrmJ1StWbqxpVKiRtP/P kushal@bastion
+    
+    - name: Updating kushal's keys permissions  
+      file:
+        path: "/home/kushal/.ssh/authorized_keys"
+        mode: '0600'
         
     - name: Create the john.zacharia user
       user:
@@ -26,6 +37,16 @@
         create_home: yes
         shell: /bin/bash
         state: present
+    - name: Updating john.zacharia's ssh keys
+      copy:
+        dest: "/home/john.zacharia/.ssh/authorized_keys"
+        content: |
+          ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDRQp+DB50vHjswXV9CrixF3cvDy7XR1o4e8jFwkuFtnuk4A4R+QygTsxdTITSU0tlpRjVlTo7rp6MvHth/Mjrr2EJxsN6gw6JwYiSH6jqpn9VjIpgpwES+7yr8fE6m/PCGjAkbUt78ZFECU08UofR831qFF1dIL3S74EuyhX3lI47AR/RbaXNr33fgFp868NWWyz1755E05e+lXl2B28tsnTh+EVQRpLIC9IGhq1HKW5SwCxtCEnoJ8OjdUAVJfwr7I/SwZAXdUgOODvhjUKrbWuyigdmkgJM5K+p2sd4gKFp2Ad4hPIRPfmLd8s2K7/ZXKu6XNXXzfTJluIWZNIEr john.zacharia@elk.twidpay.com
+    
+    - name: Updating john.zacharia's keys permissions  
+      file:
+        path: "/home/john.zacharia/.ssh/authorized_keys"
+        mode: '0600'
 
     - name: Create the avinash user
       user:
@@ -33,3 +54,14 @@
         create_home: yes
         shell: /bin/bash
         state: present
+        
+    - name: Updating avinash's ssh keys
+      copy:
+        dest: "/home/avinash/.ssh/authorized_keys"
+        content: |
+          ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQC1mEdtCETpMm+PE2i3daGyKMD6i5Cx2xZYvnMLCM5Ih9eM39t76wE/rb3PSjk+ZUJMML0r8//7aIb+ooR9960olhI9PuYD9sa4LGn8ZrKXa/oSbRRqlO/+4ifSHM7OVUUlpJjNp5gWCSExKEEaTSp0/SvD07VoO/Hskb4MLrOvu4Uo0PlDk5CSRrFqXMnTKP8TY39uCS5Un17b2qQ18viugg6eJ/5vpBqvJmrF5rj+4DIb6afpd9lxaj9cOBtdsYinDH6ZMAv+FUTgCup3gacts3/ezKl/DYtvxaSaftp9nCufkCMJMb4zlfKXsFeZsrtaZsuEDoohYtPzopUQ3QcF avinash@bastion
+    
+    - name: Updating avinash's keys permissions  
+      file:
+        path: "/home/avinash/.ssh/authorized_keys"
+        mode: '0600'
