@@ -1,7 +1,8 @@
 ---
 - name: install git, curl, and vim
   hosts: localhost
-  become: true  # Run the tasks with elevated privileges (root)
+  gather_facts: no
+  become: true  
   tasks:
     - name: Install Git
       package:
