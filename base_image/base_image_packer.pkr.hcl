@@ -15,7 +15,7 @@ source "amazon-ebs" "rocky-linux" {
   source_ami      = "ami-05150ea4d8a533099"  # Replace with the correct Rocky Linux AMI ID
   ssh_username    = "rocky"  # Default SSH username for Rocky Linux
   ami_regions     = [
-    "us-east-2", "us-east-1"
+    "us-east-2" #, "us-east-1"
   ]
  # ssh_keypair_name  = "keypair"
  # ssh_private_key_file = "/etc/ansible/keypair.pem"
