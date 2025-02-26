@@ -54,6 +54,9 @@ build {
     playbook_file = "code_deploy_playbook.yml"
   }
   provisioner "ansible-local" {
+    playbook_file = "composer_playbook.yml"
+  }
+  provisioner "ansible-local" {
     playbook_file = "filebeat_playbook.yml"
   }
   provisioner "ansible-local" {
