@@ -16,7 +16,6 @@
       copy:
         dest: "/etc/fstab"
         content: |
-          #
           UUID=74c6e75b-add1-4b5c-ac07-dc6d3d9065be / xfs defaults,noatime 1  1
           UUID=9a8e4002-5e2d-4ca4-ae93-65411762c09b /twid xfs defaults,nofail 0 2
 #         fs-0d128686506baa805:/   /data   efs     defaults,_netdev      0       0
