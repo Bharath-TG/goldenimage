@@ -19,3 +19,5 @@ else
   echo "Device /dev/nvme1n1 does not exist."
 fi
 
+echo "Rebooting the system to apply changes..."
+sudo reboot
