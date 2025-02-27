@@ -87,7 +87,14 @@
               default_type        application/octet-stream;
 
               include /etc/nginx/conf.d/*.conf;
-
+              server {
+                  listen 8081;
+                  location /status {
+                      fastcgi_pass   unix:/run/php-fpm/www.sock;  # Ensure this is the correct socket path for PHP-FPM
+                      fastcgi_param SCRIPT_FILENAME /status;
+                      include fastcgi_params;
+                  }
+              }
               server {
                   listen       80;
                   listen       [::]:80;
@@ -96,7 +103,7 @@
 
                   include /etc/nginx/default.d/*.conf;
 
-            location / {
+                  location / {
                   }
 
                   error_page 404 /404.html;
@@ -305,6 +312,7 @@
           pm.min_spare_servers = 50
           pm.max_spare_servers = 150
           pm.max_requests = 500
+          pm.status_path = /status
           slowlog = /var/log/php-fpm/www-slow.log
           request_terminate_timeout = 1800
           clear_env = yes
