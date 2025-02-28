@@ -89,3 +89,8 @@
       file:
         path: "/home/avinash/.ssh/authorized_keys"
         mode: '0600'
+
+    - name: updating .bash_profile
+      lineinfile:
+        path: "/home/rocky/.bash_profile"
+        line: 'export PATH=$PATH:$HOME/.local/bin:$HOME/bin'
