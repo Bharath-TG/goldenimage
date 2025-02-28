@@ -19,6 +19,11 @@
         create_home: yes
         shell: /bin/bash
         state: present
+    - name: updating .bash_profile
+      lineinfile:
+        path: "/home/kushal/.bash_profile"
+        line: 'export PATH=$PATH:$HOME/.local/bin:$HOME/bin'
+        
     - name: Creating .ssh directory
       command: sudo mkdir /home/kushal/.ssh
 
@@ -27,7 +32,7 @@
         dest: "/home/kushal/.ssh/authorized_keys"
         content: |
           ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDZYJSrjCvnxLTuHDY164cKJ5i9qOAQEGkQ5lDjEvS5y1WRiu76ptmo2XJj3ktkJXMXjdulMc0nUKvf0cVtFZcwA7RBkGgN+/1TEFoSejctYKznX2I5KUgFN32+S/6wWm1bQ7Xak0lpWsS8BS0MCmaQG4Ex90aDkAUb2Q4yF7vxsl6Dlu0kQCOMas9tw4UGTb6WuG0yFwJas9aFR+6sp32fFXL8Re6rYwV9FWqHPt1nKjYmyRg3+7KxHSDwm9N1wJmxGUNo22LlQB/jXnrDIhYWwMPW6Y5EFFN89oecwOyQGOmOdDvSGHEF4QxZ5WBlBsV0MrmJ1StWbqxpVKiRtP/P kushal@bastion
-    
+
     - name: Updating kushal's keys permissions  
       file:
         path: "/home/kushal/.ssh/authorized_keys"
@@ -39,7 +44,12 @@
         create_home: yes
         shell: /bin/bash
         state: present
-
+        
+    - name: updating .bash_profile
+      lineinfile:
+        path: "/home/john.zacharia/.bash_profile"
+        line: 'export PATH=$PATH:$HOME/.local/bin:$HOME/bin'
+        
     - name: Creating .ssh directory
       command: sudo mkdir /home/john.zacharia/.ssh
 
@@ -60,6 +70,11 @@
         create_home: yes
         shell: /bin/bash
         state: present
+
+    - name: updating .bash_profile
+      lineinfile:
+        path: "/home/avinash/.bash_profile"
+        line: 'export PATH=$PATH:$HOME/.local/bin:$HOME/bin'
     
     - name: Creating .ssh directory
       command: sudo mkdir /home/avinash/.ssh
