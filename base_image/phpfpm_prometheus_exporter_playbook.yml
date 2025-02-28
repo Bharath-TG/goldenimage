@@ -37,7 +37,7 @@
           [Service]
           User=nodeexporter
           Group=nodeexporter
-          ExecStart=/usr/local/bin/phpfpm_exporter --phpfpm.status-path=http://localhost:8081/status
+          ExecStart=/usr/local/bin/phpfpm_exporter --phpfpm.socket-paths="unix:///run/php-fpm/www.sock" --phpfpm.status-path="/status"
           Restart=always
           RestartSec=10
           TimeoutStartSec=200
