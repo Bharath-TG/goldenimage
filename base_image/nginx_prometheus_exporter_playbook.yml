@@ -35,7 +35,7 @@
           [Service]
           User=nodeexporter
           Group=nodeexporter
-          ExecStart=/usr/local/bin/nginx-prometheus-exporter -nginx.scrape-uri=http://localhost:8081/status
+          ExecStart=/usr/local/bin/nginx-prometheus-exporter -nginx.scrape-uri=http://localhost:81/nginx_status
           Restart=always
           RestartSec=10
           TimeoutStartSec=200
