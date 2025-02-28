@@ -87,14 +87,7 @@
               default_type        application/octet-stream;
 
               include /etc/nginx/conf.d/*.conf;
-              server {
-                  listen 8081;
-                  location /status {
-                      fastcgi_pass   unix:/run/php-fpm/www.sock;  # Ensure this is the correct socket path for PHP-FPM
-                      fastcgi_param SCRIPT_FILENAME /status;
-                      include fastcgi_params;
-                  }
-              }
+              
               server {
                   listen       80;
                   listen       [::]:80;
@@ -115,6 +108,25 @@
                   }
               }
 
+              server {
+                  listen       81;
+                  server_name  localhost;
+                  root         /usr/share/nginx/html;
+
+	                location /nginx_status {
+                  stub_status;
+ 	                }
+                  location / {
+                  }
+
+                  error_page 404 /404.html;
+                  location = /404.html {
+                  }
+
+                  error_page 500 502 503 504 /50x.html;
+                  location = /50x.html {
+                  }
+              }
 
           }
     - name: updating configuration php.ini
