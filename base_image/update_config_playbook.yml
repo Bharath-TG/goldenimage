@@ -418,3 +418,7 @@
       systemd:
         name: filebeat
         state: restarted
+
+    - name: clean /temp
+      shell: |
+        sudo rm -r /temp/*
