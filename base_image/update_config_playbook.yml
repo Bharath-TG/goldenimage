@@ -207,7 +207,7 @@
           allow_url_fopen = On
           allow_url_include = Off
           default_socket_timeout = 3600
-          extension=apcu.so
+          ; extension=apcu.so
           apc.enabled=1
           apc.enable_cli=1
           extension=redis.so
