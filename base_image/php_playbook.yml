@@ -57,8 +57,8 @@
           - php-xml
           - php-zip
           - php-pear           
-          - php-igbinary       
-          - php-redis         
-          - php-apcu
+#          - php-igbinary       
+#          - php-redis         
+#          - php-apcu
         state: present
 
