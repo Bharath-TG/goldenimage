@@ -36,6 +36,8 @@
     - name: Updating kushal's keys permissions  
       file:
         path: "/home/kushal/.ssh/authorized_keys"
+        owner: "kushal"
+        group: "kushal"
         mode: '0600'
         
     - name: Create the john.zacharia user
@@ -62,6 +64,8 @@
     - name: Updating john.zacharia's keys permissions  
       file:
         path: "/home/john.zacharia/.ssh/authorized_keys"
+        owner: "john.zacharia"
+        group: "john.zacharia"
         mode: '0600'
 
     - name: Create the avinash user
@@ -88,6 +92,8 @@
     - name: Updating avinash's keys permissions  
       file:
         path: "/home/avinash/.ssh/authorized_keys"
+        owner: "avinash"
+        group: "avinash"
         mode: '0600'
 
     - name: updating .bash_profile
