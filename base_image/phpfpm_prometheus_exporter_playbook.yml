@@ -23,7 +23,7 @@
         remote_src: yes
 
     - name: Move phpfpm-exporter binary to /usr/local/bin
-      command: mv /tmp/phpfpm_exporter /usr/local/bin/
+      command: mv /tmp/php-fpm_exporter /usr/local/bin/
       # creates: /usr/local/bin/phpfpm_exporter
 
     - name: Create systemd service file for phpfpm-exporter
