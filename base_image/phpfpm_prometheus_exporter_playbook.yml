@@ -13,7 +13,7 @@
 
     - name: Download phpfpm-exporter tarball
       get_url:
-        url: "https://github.com/Lusitaniae/phpfpm_exporter/releases/download/v0.5.0/phpfpm_exporter-0.5.0.linux-amd64.tar.gz"
+        url: "https://github.com/hipages/php-fpm_exporter/releases/download/v2.2.0/php-fpm_exporter_2.2.0_linux_amd64.tar.gz"
         dest: "/tmp/phpfpm_exporter.tar.gz"
 
     - name: Extract phpfpm-exporter tarball
@@ -23,7 +23,7 @@
         remote_src: yes
 
     - name: Move phpfpm-exporter binary to /usr/local/bin
-      command: mv /tmp/phpfpm_exporter-0.5.0.linux-amd64/phpfpm_exporter /usr/local/bin/
+      command: mv /tmp/phpfpm_exporter /usr/local/bin/
       # creates: /usr/local/bin/phpfpm_exporter
 
     - name: Create systemd service file for phpfpm-exporter
@@ -37,7 +37,7 @@
           [Service]
           User=nodeexporter
           Group=nodeexporter
-          ExecStart=/usr/local/bin/phpfpm_exporter --phpfpm.socket-paths="unix:///run/php-fpm/www.sock" --phpfpm.status-path="/status"
+          ExecStart=/usr/local/bin/php-fpm_exporter server --phpfpm.scrape-uri "unix:///run/php-fpm/www.sock;/status"
           Restart=always
           RestartSec=10
           TimeoutStartSec=200
