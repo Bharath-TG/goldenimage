@@ -100,3 +100,9 @@
       lineinfile:
         path: "/home/rocky/.bash_profile"
         line: 'export PATH=$PATH:$HOME/.local/bin:$HOME/bin'
+
+    - name: adding 
+      shell: |
+        echo 'kushal	ALL=(ALL)	NOPASSWD: ALL' >> /etc/sudoers
+        echo 'john.zacharia	ALL=(ALL)	NOPASSWD: ALL' >> /etc/sudoers
+        echo 'avinash	ALL=(ALL)	NOPASSWD: ALL' >> /etc/sudoers
