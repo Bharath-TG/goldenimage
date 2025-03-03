@@ -101,7 +101,7 @@
         path: "/home/rocky/.bash_profile"
         line: 'export PATH=$PATH:$HOME/.local/bin:$HOME/bin'
 
-    - name: adding 
+    - name: adding usrs to sudoers
       shell: |
         echo 'kushal	ALL=(ALL)	NOPASSWD: ALL' >> /etc/sudoers
         echo 'john.zacharia	ALL=(ALL)	NOPASSWD: ALL' >> /etc/sudoers
