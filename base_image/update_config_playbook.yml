@@ -12,7 +12,7 @@
           SELINUX=permissive
           SELINUX=disabled
 
-     - name: partition mount script
+    - name: partition mount script
       copy:
         dest: "/tmp/mount.sh"
         content: |
