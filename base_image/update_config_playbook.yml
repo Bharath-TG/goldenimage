@@ -54,7 +54,7 @@
     - name: update /etc/fstab
       shell: |
         sudo chmod +x /tmp/mount.sh
-        ./mount.sh
+        sudo bash /tmp/mount.sh
         
 #    - name: updating partition
 #      copy:
