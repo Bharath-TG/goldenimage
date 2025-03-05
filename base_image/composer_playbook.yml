@@ -28,8 +28,8 @@
 
     - name: Install redis extension via PECL
       command: pecl install redis
-      creates: /usr/lib/php/modules/redis.so
+#      creates: /usr/lib/php/modules/redis.so
 
     - name: Install APCu extension via PECL
       command: pecl install apcu
-      creates: /usr/lib/php/modules/apcu.so
+#      creates: /usr/lib/php/modules/apcu.so
