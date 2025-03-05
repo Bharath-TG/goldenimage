@@ -11,7 +11,7 @@ packer {
 source "amazon-ebs" "rocky-linux" {
   region          = "us-east-2"  # ohio region
   ami_name        = "rocky-ami-version-1-{{timestamp}}"
-  instance_type   = "t3a.large"    # Instance type (can adjust as needed)
+  instance_type   = "t2.small"    # Instance type (can adjust as needed)
   source_ami      = "ami-05150ea4d8a533099"  # "ami-0321f0c22d67f6571"  Replace with the correct Rocky Linux AMI ID
   ssh_username    = "rocky"  # Default SSH username for Rocky Linux
   ami_regions     = [
