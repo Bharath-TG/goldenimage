@@ -19,6 +19,20 @@ source "amazon-ebs" "rocky-linux" {
   ]
   # ssh_keypair_name  = "keypair"
   # ssh_private_key_file = "/etc/ansible/keypair.pem"
+  launch_block_device_mappings {
+    volume_type = "gp3"
+    device_name = "/dev/xvda"
+    delete_on_termination = true
+    volume_size = 30
+    }
+
+  launch_block_device_mappings  {
+    volume_type = "gp3"
+    device_name = "/dev/sdf"
+    delete_on_termination = true
+    volume_size = 100
+    kms_key_id = "9934778b-963e-498d-8a4e-0fa3e3f83678"
+  }
 }
 
 # Build configuration to install, configure, and provision
