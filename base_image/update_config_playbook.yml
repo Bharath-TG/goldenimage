@@ -21,7 +21,7 @@
           if [ -e /dev/sdf ]; then
           
             if ! blkid /dev/sdf | grep -q "TYPE=\"xfs\""; then
-              echo "The device /dev/nvme1n1 is not formatted with XFS. Formatting it now."
+              echo "The device /dev/sdf is not formatted with XFS. Formatting it now."
               sudo mkfs.xfs /dev/sdf
             else
               echo "The device /dev/sdf is already formatted with XFS."
@@ -35,20 +35,20 @@
             echo "Device /dev/sdf does not exist."
           fi
           
-          if [ -e /dev/xvda ]; then
+          if [ -e /dev/sda1 ]; then
           
-            if ! blkid /dev/xvda | grep -q "TYPE=\"xfs\""; then
-              echo "The device /dev/nvme1n1 is not formatted with XFS. Formatting it now."
-              sudo mkfs.xfs /dev/xvda
+            if ! blkid /dev/sda1 | grep -q "TYPE=\"xfs\""; then
+              echo "The device /dev/sda1 is not formatted with XFS. Formatting it now."
+              sudo mkfs.xfs /dev/sda1
             else
-              echo "The device /dev/xvda is already formatted with XFS."
+              echo "The device /dev/sda1 is already formatted with XFS."
             fi
           
-            UUID=$(blkid -s UUID -o value /dev/xvda)
+            UUID=$(blkid -s UUID -o value /dev/sda1)
             echo "UUID=$UUID / xfs defaults,noatime 1  1" | sudo tee -a /etc/fstab
           
           else
-            echo "Device /dev/xvda does not exist."
+            echo "Device /dev/sda1 does not exist."
           fi
 
     - name: update /etc/fstab
