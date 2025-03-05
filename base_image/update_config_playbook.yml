@@ -45,7 +45,7 @@
             fi
           
             UUID=$(blkid -s UUID -o value /dev/xvda)
-            echo "UUID=$UUID /twid xfs defaults,nofail 0 2" | sudo tee -a /etc/fstab
+            echo "UUID=$UUID / xfs defaults,noatime 1  1" | sudo tee -a /etc/fstab
           
           else
             echo "Device /dev/xvda does not exist."
