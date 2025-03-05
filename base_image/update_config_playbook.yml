@@ -18,25 +18,38 @@
         content: |
           #!/bin/bash
 
-          if [ -e /dev/nvme1n1 ]; then
+          if [ -e /dev/sdf ]; then
           
-            if ! blkid /dev/nvme1n1 | grep -q "TYPE=\"xfs\""; then
+            if ! blkid /dev/sdf | grep -q "TYPE=\"xfs\""; then
               echo "The device /dev/nvme1n1 is not formatted with XFS. Formatting it now."
-              sudo mkfs.xfs /dev/nvme1n1
+              sudo mkfs.xfs /dev/sdf
             else
-              echo "The device /dev/nvme1n1 is already formatted with XFS."
+              echo "The device /dev/sdf is already formatted with XFS."
             fi
           
-            sudo mkdir -p /twid
-            sudo mount /dev/nvme1n1 /twid
-            echo "/dev/nvme1n1 /twid xfs defaults,nofail 0 2" | sudo tee -a /etc/fstab
+            sudo mount /dev/sdf /twid
+            UUID=$(blkid -s UUID -o value /dev/sdf)
+            echo "UUID=$UUID /twid xfs defaults,nofail 0 2" | sudo tee -a /etc/fstab
           
           else
-            echo "Device /dev/nvme1n1 does not exist."
+            echo "Device /dev/sdf does not exist."
           fi
           
-#          echo "Rebooting the system to apply changes..."
-#          sudo reboot
+          if [ -e /dev/xvda ]; then
+          
+            if ! blkid /dev/xvda | grep -q "TYPE=\"xfs\""; then
+              echo "The device /dev/nvme1n1 is not formatted with XFS. Formatting it now."
+              sudo mkfs.xfs /dev/xvda
+            else
+              echo "The device /dev/xvda is already formatted with XFS."
+            fi
+          
+            UUID=$(blkid -s UUID -o value /dev/xvda)
+            echo "UUID=$UUID /twid xfs defaults,nofail 0 2" | sudo tee -a /etc/fstab
+          
+          else
+            echo "Device /dev/xvda does not exist."
+          fi
           
 #    - name: updating partition
 #      copy:
