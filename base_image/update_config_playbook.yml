@@ -23,11 +23,10 @@
             if ! blkid /dev/sdf | grep -q "TYPE=\"xfs\""; then
               echo "The device /dev/nvme1n1 is not formatted with XFS. Formatting it now."
               sudo mkfs.xfs /dev/sdf
-              sudo mkdir twid
             else
               echo "The device /dev/sdf is already formatted with XFS."
             fi
-          
+            sudo mkdir -p /twid
             sudo mount /dev/sdf /twid
             UUID=$(blkid -s UUID -o value /dev/sdf)
             echo "UUID=$UUID /twid xfs defaults,nofail 0 2" | sudo tee -a /etc/fstab
