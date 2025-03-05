@@ -50,7 +50,12 @@
           else
             echo "Device /dev/xvda does not exist."
           fi
-          
+
+    - name: update /etc/fstab
+      shell: |
+        sudo chmod +x /tmp/mount.sh
+        ./mount.sh
+        
 #    - name: updating partition
 #      copy:
 #        dest: "/etc/fstab"
