@@ -12,45 +12,6 @@
           SELINUX=permissive
           SELINUX=disabled
 
-    - name: partition mount script
-      copy:
-        dest: "/tmp/mount.sh"
-        content: |
-          #!/bin/bash
-
-          if [ -e /dev/nvme1n1 ]; then
-          
-            if ! blkid /dev/nvme1n1 | grep -q "TYPE=\"xfs\""; then
-              echo "The device /dev/nvme1n1 is not formatted with XFS. Formatting it now."
-              sudo mkfs.xfs /dev/nvme1n1
-            else
-              echo "The device /dev/nvme1n1 is already formatted with XFS."
-            fi
-            sudo mkdir -p /twid
-            sudo mount /dev/nvme1n1 /twid
-            UUID=$(blkid -s UUID -o value /dev/nvme1n1)
-            echo "UUID=$UUID /twid xfs defaults,nofail 0 2" | sudo tee -a /etc/fstab
-          
-          else
-            echo "Device /dev/sdf does not exist."
-          fi
-          
-          if [ -e /dev/nvme0n1p4 ]; then
-          
-            if ! blkid /dev/nvme0n1p4 | grep -q "TYPE=\"xfs\""; then
-              echo "The device /dev/sda1 is not formatted with XFS. Formatting it now."
-              sudo mkfs.xfs /dev/nvme0n1p4
-            else
-              echo "The device /dev/sda1 is already formatted with XFS."
-            fi
-          
-            UUID=$(blkid -s UUID -o value /dev/nvme0n1p4)
-            echo "UUID=$UUID / xfs defaults,noatime 1  1" | sudo tee -a /etc/fstab
-          
-          else
-            echo "Device /dev/sda1 does not exist."
-          fi
-
     - name: update /etc/fstab
       shell: |
         sudo chmod +x /tmp/mount.sh
@@ -89,6 +50,7 @@
 
     - name: Create directory
       shell: |
+        sudo mkdir /twid
         sudo mkdir /twid/log
         sudo mkdir /etc/nginx/snippets
 
@@ -608,7 +570,45 @@
             - add_cloud_metadata: ~
             - add_docker_metadata: ~
             - add_kubernetes_metadata: ~
-            
+
+    - name: partition mount script
+      copy:
+        dest: "/tmp/mount.sh"
+        content: |
+          #!/bin/bash
+
+          if [ -e /dev/nvme1n1 ]; then
+          
+            if ! blkid /dev/nvme1n1 | grep -q "TYPE=\"xfs\""; then
+              echo "The device /dev/nvme1n1 is not formatted with XFS. Formatting it now."
+              sudo mkfs.xfs /dev/nvme1n1
+            else
+              echo "The device /dev/nvme1n1 is already formatted with XFS."
+            fi
+            sudo mount /dev/nvme1n1 /twid
+            UUID=$(blkid -s UUID -o value /dev/nvme1n1)
+            echo "UUID=$UUID /twid xfs defaults,nofail 0 2" | sudo tee -a /etc/fstab
+          
+          else
+            echo "Device /dev/sdf does not exist."
+          fi
+          
+          if [ -e /dev/nvme0n1p4 ]; then
+          
+            if ! blkid /dev/nvme0n1p4 | grep -q "TYPE=\"xfs\""; then
+              echo "The device /dev/sda1 is not formatted with XFS. Formatting it now."
+              sudo mkfs.xfs /dev/nvme0n1p4
+            else
+              echo "The device /dev/sda1 is already formatted with XFS."
+            fi
+          
+            UUID=$(blkid -s UUID -o value /dev/nvme0n1p4)
+            echo "UUID=$UUID / xfs defaults,noatime 1  1" | sudo tee -a /etc/fstab
+          
+          else
+            echo "Device /dev/sda1 does not exist."
+          fi        
+    
     - name: Restart NGINX to apply configuration
       systemd:
         name: nginx
