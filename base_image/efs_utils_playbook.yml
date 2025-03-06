@@ -28,9 +28,9 @@
         creates: /tmp/efs-utils/build/amazon-efs-utils*rpm
 
     - name: Install the built RPM package for EFS utils
-      dnf:
-        name: /tmp/efs-utils/build/amazon-efs-utils*rpm
-        state: present
+      command:
+        chdir: /tmp/efs-utils/build
+        cmd: sudo dnf install ./amazon-efs-utils* -y
 
     - name: Install botocore
       shell: |
