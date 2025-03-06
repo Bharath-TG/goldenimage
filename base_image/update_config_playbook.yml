@@ -70,7 +70,7 @@
         chmod 600 /swapfile1 && \
         mkswap /swapfile1 && \
         swapon /swapfile1 && \
-        echo '/swapfile1 swap swap defaults 0 0' | sudo tee -a /etc/fstab > /dev/null
+        echo '/swapfile1 swap swap defaults 0 0' | sudo tee -a /etc/fstab
 
     - name: updating codedeploy config
       copy:
