@@ -11,11 +11,6 @@
         content: |
           SELINUX=permissive
           SELINUX=disabled
-
-    - name: update /etc/fstab
-      shell: |
-        sudo chmod +x /tmp/mount.sh
-        sudo bash /tmp/mount.sh
         
 #    - name: updating partition
 #      copy:
@@ -31,7 +26,8 @@
         chmod 600 /swapfile1 && \
         mkswap /swapfile1 && \
         swapon /swapfile1 && \
-        echo '/swapfile1 swap swap defaults 0 0' >> /etc/fstab
+        sudo rm -f /etc/fstab
+        echo '/swapfile1 swap swap defaults 0 0' | sudo tee -a /etc/fstab > /dev/null
 
     - name: updating codedeploy config
       copy:
@@ -570,7 +566,7 @@
             - add_cloud_metadata: ~
             - add_docker_metadata: ~
             - add_kubernetes_metadata: ~
-
+    
     - name: partition mount script
       copy:
         dest: "/tmp/mount.sh"
@@ -607,8 +603,13 @@
           
           else
             echo "Device /dev/sda1 does not exist."
-          fi        
+          fi
     
+    - name: update /etc/fstab
+      shell: |
+        sudo chmod +x /tmp/mount.sh
+        sudo bash /tmp/mount.sh
+        
     - name: Restart NGINX to apply configuration
       systemd:
         name: nginx
