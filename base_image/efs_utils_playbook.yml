@@ -19,7 +19,6 @@
         repo: "https://github.com/aws/efs-utils.git"
         dest: "/tmp/efs-utils"
         clone: yes
-        update: yes
 
     - name: Build the RPM package for EFS utils
       command:
