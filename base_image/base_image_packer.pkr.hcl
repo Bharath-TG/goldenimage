@@ -9,13 +9,13 @@ packer {
 
 # Using a Rocky Linux AMI as the base
 source "amazon-ebs" "rocky-linux" {
-  region          = "us-east-2"  # ohio region
+  region          = "ap-south-1"  # ohio region
   ami_name        = "rocky-ami-version-1-{{timestamp}}"
-  instance_type   = "t2.small"    # Instance type (can adjust as needed)
-  source_ami      = "ami-05150ea4d8a533099"  # "ami-0321f0c22d67f6571"  Replace with the correct Rocky Linux AMI ID
+  instance_type   = "t3a.large"    # Instance type (can adjust as needed)
+  source_ami      = "ami-0321f0c22d67f6571"   # "ami-05150ea4d8a533099"  Replace with the correct Rocky Linux AMI ID
   ssh_username    = "rocky"  # Default SSH username for Rocky Linux
   ami_regions     = [
-    "us-east-2" #, "us-east-1"
+    "ap-south-1" #, "us-east-1"
   ]
   # ssh_keypair_name  = "keypair"
   # ssh_private_key_file = "/etc/ansible/keypair.pem"
@@ -24,7 +24,7 @@ source "amazon-ebs" "rocky-linux" {
     volume_type = "gp3"
     device_name = "/dev/sdf"
     delete_on_termination = true
-    volume_size = 100
+    volume_size = 20
   }
 }
 
