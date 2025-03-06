@@ -1,4 +1,3 @@
----
 - name: install efs_utils
   hosts: localhost
   gather_facts: no
@@ -14,10 +13,13 @@
           - cargo
           - openssl-devel
         state: present
-    - name: Download nginx-prometheus-exporter tarball
-      get_url:
-        url: "https://github.com/aws/efs-utils"
+
+    - name: Clone the EFS utils repository
+      git:
+        repo: "https://github.com/aws/efs-utils.git"
         dest: "/tmp/efs-utils"
+        clone: yes
+        update: yes
 
     - name: Build the RPM package for EFS utils
       command:
@@ -31,7 +33,7 @@
         name: /tmp/efs-utils/build/amazon-efs-utils*rpm
         state: present
 
-    - name: install botocore
+    - name: Install botocore
       shell: |
         sudo yum -y install wget
         sudo wget https://bootstrap.pypa.io/get-pip.py -O /tmp/get-pip.py
