@@ -67,6 +67,9 @@ build {
     playbook_file = "filebeat_playbook.yml"
   }
   provisioner "ansible-local" {
+    playbook_file = "efs_utils_playbook.yml"
+  }
+  provisioner "ansible-local" {
     playbook_file = "initial_packages_playbook.yml"
   }
   provisioner "ansible-local" {
