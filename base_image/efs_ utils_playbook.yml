@@ -1,3 +1,38 @@
-- name: Create directory
+---
+- name: install efs_utils
+  hosts: localhost
+  gather_facts: no
+  become: true
+  tasks:
+    - name: Install required packages for building EFS utils
+      dnf:
+        name:
+          - git
+          - rpm-build
+          - make
+          - rust
+          - cargo
+          - openssl-devel
+        state: present
+    - name: Download nginx-prometheus-exporter tarball
+      get_url:
+        url: "https://github.com/aws/efs-utils"
+        dest: "/tmp/efs-utils"
+
+    - name: Build the RPM package for EFS utils
+      command:
+        chdir: /tmp/efs-utils
+        cmd: make rpm
+      args:
+        creates: /tmp/efs-utils/build/amazon-efs-utils*rpm
+
+    - name: Install the built RPM package for EFS utils
+      dnf:
+        name: /tmp/efs-utils/build/amazon-efs-utils*rpm
+        state: present
+
+    - name: install botocore
       shell: |
-        sudo mkdir /twid/log
+        sudo yum -y install wget
+        sudo wget https://bootstrap.pypa.io/get-pip.py -O /tmp/get-pip.py
+        sudo pip3 install botocore || sudo /usr/local/bin/pip3 install botocore
