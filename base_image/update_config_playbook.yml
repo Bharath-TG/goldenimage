@@ -28,7 +28,7 @@
             fi
             sudo mount /dev/nvme1n1 /twid
             UUID=$(blkid -s UUID -o value /dev/nvme1n1)
-            echo "UUID=$UUID /twid xfs defaults,nofail 0 2" | sudo tee -a /etc/fstab
+            echo "UUID=$UUID /twid xfs defaults,nofail 0 2" >> /etc/fstab
           
           else
             echo "Device /dev/nvme1n1 does not exist."
