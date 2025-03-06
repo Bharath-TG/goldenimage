@@ -34,21 +34,21 @@
             echo "Device /dev/nvme1n1 does not exist."
           fi
           
-          if [ -e /dev/nvme0n1p4 ]; then
+          # if [ -e /dev/nvme0n1p4 ]; then
           
-            if ! blkid /dev/nvme0n1p4 | grep -q "TYPE=\"xfs\""; then
-              echo "The device /dev/sda1 is not formatted with XFS. Formatting it now."
-              sudo mkfs.xfs /dev/nvme0n1p4
-            else
-              echo "The device /dev/sda1 is already formatted with XFS."
-            fi
+          #   if ! blkid /dev/nvme0n1p4 | grep -q "TYPE=\"xfs\""; then
+          #     echo "The device /dev/sda1 is not formatted with XFS. Formatting it now."
+          #     sudo mkfs.xfs /dev/nvme0n1p4
+          #   else
+          #     echo "The device /dev/sda1 is already formatted with XFS."
+          #   fi
           
-            UUID=$(blkid -s UUID -o value /dev/nvme0n1p4)
-            echo "UUID=$UUID / xfs defaults,noatime 1  1" | sudo tee -a /etc/fstab
+          #   UUID=$(blkid -s UUID -o value /dev/nvme0n1p4)
+          #   echo "UUID=$UUID / xfs defaults,noatime 1  1" | sudo tee -a /etc/fstab
           
-          else
-            echo "Device nvme0n1p4 does not exist."
-          fi
+          # else
+          #   echo "Device nvme0n1p4 does not exist."
+          # fi
     
     - name: update /etc/fstab
       shell: |
@@ -70,7 +70,6 @@
         chmod 600 /swapfile1 && \
         mkswap /swapfile1 && \
         swapon /swapfile1 && \
-        sudo rm -f /etc/fstab
         echo '/swapfile1 swap swap defaults 0 0' | sudo tee -a /etc/fstab > /dev/null
 
     - name: updating codedeploy config
