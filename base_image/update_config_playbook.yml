@@ -27,6 +27,7 @@
               echo "The device /dev/nvme1n1 is already formatted with XFS."
             fi
             sudo mkdir -p /twid
+            sudo mkdir /data
             sudo mount /dev/nvme1n1 /twid
             UUID=$(blkid -s UUID -o value /dev/nvme1n1)
             echo "UUID=$UUID /twid xfs defaults,nofail 0 2" | sudo tee -a /etc/fstab
