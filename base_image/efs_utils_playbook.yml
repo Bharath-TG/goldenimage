@@ -1,3 +1,4 @@
+[rocky@ip-172-31-11-83 ansible]$ cat /home/rocky/goldenimage/base_image/efs_utils_playbook.yml 
 - name: install efs_utils
   hosts: localhost
   gather_facts: no
@@ -30,7 +31,7 @@
     - name: Install the built RPM package for EFS utils
       command:
         chdir: /tmp/efs-utils/build
-        cmd: sudo dnf install ./amazon-efs-utils* -y
+        cmd: sudo dnf install amazon-efs-utils-2.2.0-1.el9.x86_64.rpm -y  # make sure you have updated right rpm file
 
     - name: Install botocore
       shell: |
