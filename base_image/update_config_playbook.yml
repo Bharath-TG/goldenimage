@@ -17,7 +17,6 @@
         dest: "/tmp/mount.sh"
         content: |
           #!/bin/bash
-          #!/bin/bash
 
           # Get the root disk (e.g., /dev/nvme0n1 or /dev/nvme1n1)
           root_disk=$(df / | tail -1 | awk '{print $1}')
