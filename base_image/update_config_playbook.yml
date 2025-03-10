@@ -17,39 +17,36 @@
         dest: "/tmp/mount.sh"
         content: |
           #!/bin/bash
+          #!/bin/bash
 
-          if [ -e /dev/nvme1n1 ]; then
+          # Get the root disk (e.g., /dev/nvme0n1 or /dev/nvme1n1)
+          root_disk=$(df / | tail -1 | awk '{print $1}')
           
-            if ! blkid /dev/nvme1n1 | grep -q "TYPE=\"xfs\""; then
-              echo "The device /dev/nvme1n1 is not formatted with XFS. Formatting it now."
-              sudo mkfs.xfs /dev/nvme1n1
-            else
-              echo "The device /dev/nvme1n1 is already formatted with XFS."
-            fi
-            sudo mkdir -p /twid
-            sudo mount /dev/nvme1n1 /twid
-            UUID=$(blkid -s UUID -o value /dev/nvme1n1)
-            echo "UUID=$UUID /twid xfs defaults,nofail 0 2" | sudo tee -a /etc/fstab
+          echo "Root disk: $root_disk"
           
+          # Define the disks we want to check (we will match the base disk name)
+          disk_to_format=""
+          
+          # Check if the root disk is on /dev/nvme0n1* or /dev/nvme1n1*
+          if [[ $root_disk == /dev/nvme0n1* ]]; then
+              # If root is on /dev/nvme0n1*, we will format /dev/nvme1n1
+              disk_to_format="/dev/nvme1n1"
+          elif [[ $root_disk == /dev/nvme1n1* ]]; then
+              # If root is on /dev/nvme1n1*, we will format /dev/nvme0n1
+              disk_to_format="/dev/nvme0n1"
           else
-            echo "Device /dev/nvme1n1 does not exist."
+              echo "Root disk is neither on /dev/nvme0n1* nor /dev/nvme1n1* - exiting."
+              exit 1
           fi
           
-          # if [ -e /dev/nvme0n1p4 ]; then
-          
-          #   if ! blkid /dev/nvme0n1p4 | grep -q "TYPE=\"xfs\""; then
-          #     echo "The device /dev/sda1 is not formatted with XFS. Formatting it now."
-          #     sudo mkfs.xfs /dev/nvme0n1p4
-          #   else
-          #     echo "The device /dev/sda1 is already formatted with XFS."
-          #   fi
-          
-          #   UUID=$(blkid -s UUID -o value /dev/nvme0n1p4)
-          #   echo "UUID=$UUID / xfs defaults,noatime 1  1" | sudo tee -a /etc/fstab
-          
-          # else
-          #   echo "Device nvme0n1p4 does not exist."
-          # fi
+          echo "Disk to format: $disk_to_format"
+
+          echo "Formatting disk: $disk_to_format"
+          sudo mkfs.xfs $disk_to_format
+          sudo mkdir -p /twid
+          sudo mount $disk_to_format /twid
+          uuid=$(sudo blkid -o value -s UUID $disk_to_format)
+          echo "UUID=$uuid  /twid  xfs  defaults,nofail 0 2" | sudo tee -a /etc/fstab 
     
     - name: update /etc/fstab
       shell: |
@@ -57,13 +54,9 @@
         sudo bash /tmp/mount.sh
         sudo rm -f /tmp/mount.sh
         
-#    - name: updating partition
-#      copy:
-#        dest: "/etc/fstab"
-#        content: |
 #          UUID=74c6e75b-add1-4b5c-ac07-dc6d3d9065be / xfs defaults,noatime 1  1
 #          UUID=9a8e4002-5e2d-4ca4-ae93-65411762c09b /twid xfs defaults,nofail 0 2
-#         fs-0d128686506baa805:/   /data   efs     defaults,_netdev      0       0
+#          fs-0d128686506baa805:/   /data   efs     defaults,_netdev      0       0
 
     - name: Create swap
       shell: |
