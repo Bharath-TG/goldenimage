@@ -1,3 +1,4 @@
+#!/bin/bash 
 # Install Ansible
 
 sudo dnf update -y
