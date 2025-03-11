@@ -92,6 +92,10 @@ build {
   }
 
   provisioner "ansible-local" {
+    playbook_file = "../additional_packages/logwatch_playbook.yml"
+  }
+
+  provisioner "ansible-local" {
     playbook_file = "../code_deploy_agent/code_deploy_agent_conf_playbook.yml"
   }
 
