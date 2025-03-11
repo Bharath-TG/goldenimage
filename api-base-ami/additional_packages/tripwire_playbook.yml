@@ -2,6 +2,7 @@
 - name: Install Tripwire
   hosts: localhost
   become: yes
+  gather_facts: no
   tasks:
 
     - name: Ensure the EPEL repository is installed
