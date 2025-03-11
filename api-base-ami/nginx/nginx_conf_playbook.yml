@@ -1,1 +1,46 @@
+---
+- name: update configuration files
+  hosts: localhost
+  gather_facts: no
+  become: true
 
+  tasks:
+    - name: Create directory
+      shell: |
+        sudo mkdir /twid/log
+        sudo mkdir /etc/nginx/snippets
+
+    - name: updating configuration nginx.conf
+      copy:
+        dest: "/etc/nginx/nginx.conf"
+        content: |
+          
+
+    - name: updating configuration conf.d/security.conf
+      copy:
+        dest: "/etc/nginx/conf.d/security.conf"
+        content: |
+          
+
+    - name: updating configuration conf.d/system.conf
+      copy:
+        dest: "/etc/nginx/conf.d/system.conf"
+        content: |
+          
+
+    - name: updating configuration conf.d/tasks.conf
+      copy:
+        dest: "/etc/nginx/conf.d/tasks.conf"
+        content: |
+
+          
+    - name: updating configuration snippets/headers.conf
+      copy:
+        dest: "/etc/nginx/snippets/headers.conf"
+        content: |
+          
+
+    - name: Restart NGINX to apply configuration
+      systemd:
+        name: nginx
+        state: reloaded
