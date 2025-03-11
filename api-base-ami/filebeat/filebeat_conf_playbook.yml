@@ -1,1 +1,18 @@
+---
+- name: update filebeat config file
+  hosts: localhost
+  gather_facts: no
+  become: true
 
+  tasks:
+    - name: updating configuration filebeat.yml
+      copy:
+        dest: "/etc/filebeat/filebeat.yml"
+        content: |
+          #
+          
+            
+    - name: Restart Filebeat to apply configuration
+      systemd:
+        name: filebeat
+        state: restarted
