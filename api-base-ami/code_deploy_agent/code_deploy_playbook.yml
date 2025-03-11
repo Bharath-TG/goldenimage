@@ -5,7 +5,6 @@
   become: true
 
   tasks:
-
     - name: updating codedeploy config
       copy:
         dest: "/etc/codedeploy-agent/conf/codedeployagent.yml"
