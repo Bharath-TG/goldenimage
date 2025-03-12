@@ -11,6 +11,10 @@
         content: |
           SELINUX=permissive
           SELINUX=disabled
+
+    - name: adding bastion proxy 
+      shell: |
+        echo 'proxy=http://172.31.21.180:3128/' >> /etc/yum.conf
           
     - name: partition mount script
       copy:
