@@ -1,1 +1,20 @@
+---
+- name: install git, curl, and vim
+  hosts: localhost
+  gather_facts: no
+  become: true  
+  tasks:
+    - name: Install Git
+      package:
+        name: git
+        state: present  # Ensures that Git is installed
 
+    - name: Install Curl
+      package:
+        name: curl
+        state: present  # Ensures that Curl is installed
+
+    - name: Install Vim
+      package:
+        name: vim
+        state: present  # Ensures that Vim is installed
