@@ -19,7 +19,7 @@
         name: vim
         state: present  # Ensures that Vim is installed
 
-    - name: Install Ruby
+    - name: Install awscli
       dnf:
         name: awscli
         state: present
