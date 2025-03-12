@@ -1,1 +1,46 @@
+---
+- name: Install AWS CodeDeploy Agent
+  hosts: localhost
+  gather_facts: no
+  become: true
+  tasks:
+    - name: Update all packages
+      dnf:
+        name: '*'
+        state: latest
 
+    - name: Install Ruby
+      dnf:
+        name: ruby
+        state: present
+
+    - name: Install wget
+      dnf:
+        name: wget
+        state: present
+        
+    - name: Install chkconfig (for compatibility or managing services)
+      dnf:
+        name: chkconfig
+        state: present
+
+    - name: Download CodeDeploy install script
+      get_url:
+        url: https://aws-codedeploy-us-east-2.s3.us-east-2.amazonaws.com/latest/install
+        dest: /tmp/install
+        mode: 'u+x'
+
+    - name: Run CodeDeploy install script
+      command: /tmp/install auto
+
+    - name: Start and enable CodeDeploy Agent service
+      systemd:
+        name: codedeploy-agent
+        state: started
+        enabled: true
+        daemon_reload: yes
+
+    - name: Check CodeDeploy Agent status
+      systemd:
+        name: codedeploy-agent
+        state: started
