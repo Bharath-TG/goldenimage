@@ -1,1 +1,42 @@
+---
+- name: Install Filebeat 7
+  hosts: localhost
+  gather_facts: no
+  become: true
+  tasks:
+    - name: Set crypto policy back to LEGACY
+      command: update-crypto-policies --set LEGACY
 
+    - name: Add the Elastic GPG key
+      rpm_key:
+        state: present
+        key: https://artifacts.elastic.co/GPG-KEY-elasticsearch
+
+    - name: Add the Elastic repository for Filebeat 7.x
+      yum_repository:
+        name: elastic-7.x
+        description: Elastic repository for 7.x packages
+        baseurl: https://artifacts.elastic.co/packages/7.x/yum
+        enabled: yes
+        gpgcheck: yes
+        gpgkey: https://artifacts.elastic.co/GPG-KEY-elasticsearch
+
+    - name: Install Filebeat 7
+      dnf:
+        name: filebeat
+        state: present
+
+    - name: Enable and start Filebeat service
+      systemd:
+        name: filebeat
+        enabled: yes
+        state: started
+        daemon_reload: yes
+
+    - name: Verify Filebeat status
+      systemd:
+        name: filebeat
+        state: started
+        
+    - name: Set crypto policy back to default (SHA-256 or higher) 
+      command: update-crypto-policies --set DEFAULT
