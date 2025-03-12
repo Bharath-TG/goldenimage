@@ -18,3 +18,8 @@
       package:
         name: vim
         state: present  # Ensures that Vim is installed
+
+    - name: Install Ruby
+      dnf:
+        name: awscli
+        state: present
