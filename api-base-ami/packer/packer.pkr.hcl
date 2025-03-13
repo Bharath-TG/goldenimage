@@ -28,7 +28,7 @@ source "amazon-ebs" "rocky-linux" {
     volume_type = "gp3"
     device_name = "/dev/sdf"
     delete_on_termination = true
-    volume_size = 20
+    volume_size = 100
   }
 }
 
