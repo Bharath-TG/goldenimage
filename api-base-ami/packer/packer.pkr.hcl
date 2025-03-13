@@ -68,15 +68,15 @@ build {
   }
 
   provisioner "ansible-local" {
-    playbook_file = "../filebeat/filebeat_playbook.yml"
-  }
-
-  provisioner "ansible-local" {
     playbook_file = "../code_deploy_agent/code_deploy_playbook.yml"
   }
 
   provisioner "ansible-local" {
     playbook_file = "../additional_packages/composer_playbook.yml"
+  }
+
+  provisioner "ansible-local" {
+    playbook_file = "../filebeat/filebeat_playbook.yml"
   }
 
   provisioner "ansible-local" {
