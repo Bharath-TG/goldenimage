@@ -115,7 +115,7 @@
       copy:
         dest: "/home/bharath.tg/.ssh/authorized_keys"
         content: |
-          
+          ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQC6pIGmULlYylASbUjHagfOyfPBlrwiNcurqs5o4W7QXvB4MTpxjNLPI2l793B2bMKLwu3cBstdNyZKh7g6JXXvWF+rKYyAkwTkDLraOXMLq/6yD340LErb4tN+MAeVzY+M8akb+B6VAAL9j/8jrXFdhAaTl4Rr7u6G0bwt74AF0k9tAHmnc54DDVV7kjBH/ZcvT4yHA7I7Wp8OSP8wBJq0OmGPSjd/0bVGKIBRXUgc0ZDzIN4vlvKrCCKoMAyVh1uvF2TuQ/1EQVPj+dOdJuOcrVGDlSOwxFHrlM2ui9Av8IxVcnG78IRxnlv/xaAuqhfiuE0CRhRpRJSq5LWLsPuX bharath.tg@ip-172-31-24-172.ap-south-1.compute.internal
     
     - name: Updating bharath's keys permissions  
       file:
