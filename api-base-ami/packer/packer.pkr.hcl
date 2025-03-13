@@ -104,6 +104,10 @@ build {
   }
 
   provisioner "ansible-local" {
+    playbook_file = "../additional_packages/logrotate_conf_playbook.yml"
+  }
+
+  provisioner "ansible-local" {
     playbook_file = "../filebeat/filebeat_conf_playbook.yml"
   }
 
