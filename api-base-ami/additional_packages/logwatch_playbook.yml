@@ -25,10 +25,53 @@
         name: postfix
         state: started
         enabled: yes
+        
+    - name: updating configuration logwatch.conf
+      copy:
+        dest: "/usr/share/logwatch/default.conf/logwatch.conf"
+        content: |
+          LogDir = /var/log
+          TmpDir = /var/cache/logwatch
+          Output = mail
+          Format = text
+          Encode = none
+          MailTo = server.notifications@twidpay.com
+          MailFrom = Logwatch@twidpay.com
+          Archives = No
+          Range = yesterday
+          Detail = High
+          Service = All
+          mailer = "/usr/sbin/sendmail -t"
 
-    - name: Ensure Logwatch is configured for Postfix
-      lineinfile:
-        path: /etc/logwatch/conf/services/postfix.conf
-        create: yes
-        line: "*.log"
-        state: present
+    - name: updating configuration filebeat.yml
+      copy:
+        dest: "/etc/postfix/main.cf"
+        content: |
+          queue_directory = /var/spool/postfix
+          command_directory = /usr/sbin
+          daemon_directory = /usr/libexec/postfix
+          data_directory = /var/lib/postfix
+          mail_owner = postfix
+          myhostname = api.twidpay.com
+          mydomain = twidpay.com
+          myorigin = $mydomain
+          inet_interfaces = localhost
+          inet_protocols = all
+          mydestination = $myhostname, localhost.$mydomain, localhost
+          local_recipient_maps =
+          unknown_local_recipient_reject_code = 550
+          relayhost = [172.31.21.180]
+          alias_maps = hash:/etc/aliases
+          alias_database = hash:/etc/aliases
+          debug_peer_level = 2
+          debugger_command =
+          	 PATH=/bin:/usr/bin:/usr/local/bin:/usr/X11R6/bin
+          	 ddd $daemon_directory/$process_name $process_id & sleep 5
+          sendmail_path = /usr/sbin/sendmail.postfix
+          newaliases_path = /usr/bin/newaliases.postfix
+          mailq_path = /usr/bin/mailq.postfix
+          setgid_group = postdrop
+          html_directory = no
+          manpage_directory = /usr/share/man
+          sample_directory = /usr/share/doc/postfix/samples
+          readme_directory = /usr/share/doc/postfix/README_FILES
