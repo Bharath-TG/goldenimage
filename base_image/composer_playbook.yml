@@ -14,7 +14,7 @@
         cd /tmp
         php composer-setup.php
       args:
-        creates: /usr/local/bin/composer  # Skip if Composer is already installed
+        creates: /bin/composer  # Skip if Composer is already installed
 
     - name: Move Composer to /usr/local/bin
       command:
