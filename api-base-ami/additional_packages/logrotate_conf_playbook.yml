@@ -1,0 +1,59 @@
+---
+- name: update logrotate config file
+  hosts: localhost
+  gather_facts: no
+  become: true
+
+  tasks:
+    - name: updating configuration system
+      copy:
+        dest: "/etc/logrotate.d/system"
+        content: |
+          /twid/system/storage/logs/*log {
+            su root kushal
+            daily
+            missingok
+            rotate 1
+            compress
+            delaycompress
+            notifempty
+            postrotate
+              mv /twid/system/storage/logs/*.gz /data/logs/system_canary/172313535/1733653450/system-canary/
+            endscript
+          }
+
+    - name: updating configuration nginx
+      copy:
+        dest: "/etc/logrotate.d/nginx"
+        content: |
+          /twid/log/*log
+          /var/log/nginx/*.log {
+            create 0640 nginx root
+            daily
+            rotate 10
+            missingok
+            notifempty
+            compress
+            sharedscripts
+            postrotate
+              /bin/kill -USR1 `cat /run/nginx.pid 2>/dev/null` 2>/dev/null || true
+            endscript
+          }
+
+    - name: updating configuration system
+      copy:
+        dest: "/etc/logrotate.d/chrony"
+        content: |
+          /var/log/chrony/*.log {
+            daily
+            rotate 7
+            missingok
+            notifempty
+            nocreate
+            sharedscripts
+            postrotate
+              /usr/bin/chronyc cyclelogs > /dev/null 2>&1 || true
+            endscript
+            compress
+            dateext
+          }
