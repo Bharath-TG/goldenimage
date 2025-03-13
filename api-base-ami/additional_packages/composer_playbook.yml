@@ -30,3 +30,7 @@
     - name: Install APCu extension via PECL
       command: pecl install apcu
 #      creates: /usr/lib/php/modules/apcu.so  # Only install if the extension isn't already present
+
+    - name: Install igbinary extension via PECL
+      command: pecl install igbinary
+#      creates: /usr/lib/php/modules/igbinary.so  # Only install if the extension isn't already present
