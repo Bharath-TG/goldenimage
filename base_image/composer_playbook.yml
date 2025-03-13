@@ -19,7 +19,7 @@
     - name: Move Composer to /usr/local/bin
       command:
         cmd: mv /tmp/composer.phar /bin/composer
-        creates: /usr/local/bin/composer  # Skip if Composer is already installed
+        creates: /bin/composer  # Skip if Composer is already installed
 
     - name: Clean up Composer installer
       file:
