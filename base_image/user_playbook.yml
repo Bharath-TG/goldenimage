@@ -96,6 +96,34 @@
         group: "avinash"
         mode: '0600'
 
+    - name: Create the bharath user
+      user:
+        name: bharath.tg
+        create_home: yes
+        shell: /bin/bash
+        state: present
+
+    - name: updating .bash_profile
+      lineinfile:
+        path: "/home/bharath.tg/.bash_profile"
+        line: 'export PATH=$PATH:$HOME/.local/bin:$HOME/bin'
+    
+    - name: Creating .ssh directory
+      command: sudo mkdir /home/bharath.tg/.ssh
+
+    - name: Updating bharath's ssh keys
+      copy:
+        dest: "/home/bharath.tg/.ssh/authorized_keys"
+        content: |
+          ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQC6pIGmULlYylASbUjHagfOyfPBlrwiNcurqs5o4W7QXvB4MTpxjNLPI2l793B2bMKLwu3cBstdNyZKh7g6JXXvWF+rKYyAkwTkDLraOXMLq/6yD340LErb4tN+MAeVzY+M8akb+B6VAAL9j/8jrXFdhAaTl4Rr7u6G0bwt74AF0k9tAHmnc54DDVV7kjBH/ZcvT4yHA7I7Wp8OSP8wBJq0OmGPSjd/0bVGKIBRXUgc0ZDzIN4vlvKrCCKoMAyVh1uvF2TuQ/1EQVPj+dOdJuOcrVGDlSOwxFHrlM2ui9Av8IxVcnG78IRxnlv/xaAuqhfiuE0CRhRpRJSq5LWLsPuX bharath.tg@ip-172-31-24-172.ap-south-1.compute.internal
+    
+    - name: Updating bharath's keys permissions  
+      file:
+        path: "/home/bharath.tg/.ssh/authorized_keys"
+        owner: "bharath.tg"
+        group: "bharath.tg"
+        mode: '0600'
+
     - name: updating .bash_profile
       lineinfile:
         path: "/home/rocky/.bash_profile"
