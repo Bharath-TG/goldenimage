@@ -1,24 +1,21 @@
 ---
-- name: Install Composer
+- name: Install Composer and PHP extensions
   hosts: localhost
   gather_facts: no
   become: true
   tasks:
+
     - name: Download Composer installer to /tmp
       get_url:
         url: https://getcomposer.org/installer
         dest: /tmp/composer-setup.php
+        mode: '0644'
 
     - name: Install Composer
       shell: |
         cd /tmp
-        php composer-setup.php
+        php composer-setup.php --install-dir=/bin --filename=composer
       args:
-        creates: /bin/composer  # Skip if Composer is already installed
-
-    - name: Move Composer to /usr/local/bin
-      command:
-        cmd: mv /tmp/composer.phar /bin/composer
         creates: /bin/composer  # Skip if Composer is already installed
 
     - name: Clean up Composer installer
@@ -28,8 +25,8 @@
 
     - name: Install redis extension via PECL
       command: pecl install redis
-#      creates: /usr/lib/php/modules/redis.so
+#      creates: /usr/lib/php/modules/redis.so  # Only install if the extension isn't already present
 
     - name: Install APCu extension via PECL
       command: pecl install apcu
-#      creates: /usr/lib/php/modules/apcu.so
+#      creates: /usr/lib/php/modules/apcu.so  # Only install if the extension isn't already present
