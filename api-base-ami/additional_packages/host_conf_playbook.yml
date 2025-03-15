@@ -79,3 +79,91 @@
         sudo mkdir /twid/system/storage/framework/cache
         sudo mkdir /twid/system/storage/framework/sessions
         sudo mkdir /twid/system/storage/framework/views
+
+    - name: Adding preTerminate script
+      copy:
+        dest: "/root/preTerminate.sh"
+        content: |
+          #!/bin/bash
+          set -e
+          export asg_name="PLACEHOLDERASG"
+          export instanceId="PLACEHOLDERINSTANCE"
+          export HTTPS_PROXY="http://172.31.21.180:3128/"
+          while true
+          do
+          	currentState=`curl http://169.254.169.254/latest/meta-data/autoscaling/target-lifecycle-state`
+          	echo $currentState
+          	if [ "$currentState" = "Terminated" ]
+          	then
+          		/bin/systemctl stop serf
+          		echo "Entering sleep for 600sec for target deregistration"
+          		sleep 600
+          		/bin/bash /root/final_backup.sh
+          		if [[ $? -eq 0 ]]
+          		then
+          			/usr/sbin/logwatch --output mail --hostname api --range today || true
+          			/usr/bin/aws autoscaling complete-lifecycle-action --lifecycle-hook-name preterminate --auto-scaling-group-name "$asg_name" --lifecycle-action-result CONTINUE  --region ap-south-1 --instance-id "$instanceId"
+          			sleep 100
+          			systemctl stop nginx
+          			systemctl stop php-fpm
+          
+          		fi
+          	fi
+          	sleep 10
+          done
+          
+    - name: Adding preTerminate script
+      copy:
+        dest: "/etc/systemd/system/preterminate.service"
+        content: |
+          [Unit]
+          Description=Lifecycle hook respond script
+          After=network.target
+          After=network-online.target
+          Wants=network-online.target
+          
+          [Service]
+          ExecStart=/bin/bash /root/preTerminate.sh
+          Restart=always
+          RestartSec=10
+          [Install]
+          WantedBy=multi-user.target
+          
+    - name: Adding final_backup script
+      copy:
+        dest: "/root/final_backup.sh"
+        content: |
+          #!/bin/bash
+          set -e
+          zip -r /data/logs/PLACEHOLDER/api/final_api.zip /twid/api/storage/logs
+          if [[ $? -eq 0 ]]
+          then
+                  echo "Zipped tasks logs succesfully"
+          else
+                  exit 1
+          fi
+          
+          [root@ip-172-31-25-134 /]# cat /root/final_backup.sh 
+          #!/bin/bash
+          set -e
+          zip -r /data/logs/PLACEHOLDER/api/final_api.zip /twid/api/storage/logs
+          if [[ $? -eq 0 ]]
+          then
+                  echo "Zipped tasks logs succesfully"
+          else
+                  exit 1
+          fi
+
+    - name: Adding final_backup script
+      copy:
+        dest: "/root/final_backup.sh"
+        content: |
+          #!/bin/bash
+          set -e
+          zip -r /data/logs/PLACEHOLDER/api/final_api.zip /twid/api/storage/logs
+          if [[ $? -eq 0 ]]
+          then
+                  echo "Zipped tasks logs succesfully"
+          else
+                  exit 1
+          fi
