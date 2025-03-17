@@ -154,14 +154,14 @@
               fastcgi_hide_header             X-Powered-By;
               fastcgi_hide_header             X-CF-Powered-By;
             }
-
-	          location /status {
+            
+            location /status {
               stub_status;
               allow 127.0.0.1;        #only allow requests from localhost
               deny all;               #deny all other hosts
             }
-
-	          location ~ /\. {
+            
+            location ~ /\. {
               deny  all;
             }
           }
