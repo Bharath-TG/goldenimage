@@ -5,55 +5,101 @@
   become: true
 
   tasks:
-    - name: updating configuration system
+    - name: updating configuration api
       copy:
-        dest: "/etc/logrotate.d/system"
+        dest: "/etc/logrotate.d/api"
         content: |
-          /twid/system/storage/logs/*log {
-            su root kushal
-            daily
-            missingok
-            rotate 1
-            compress
-            delaycompress
-            notifempty
-            postrotate
-              mv /twid/system/storage/logs/*.gz /data/logs/system_canary/172313535/1733653450/system-canary/
-            endscript
+          /twid/api/storage/logs/*log {
+              su root kushal
+              daily
+              missingok
+              rotate 1
+              compress
+              delaycompress
+              notifempty
+              postrotate
+                          mv /twid/api/storage/logs/*.gz /data/logs/PLACEHOLDER/api/
+              endscript
           }
 
     - name: updating configuration nginx
       copy:
         dest: "/etc/logrotate.d/nginx"
         content: |
-          /twid/log/*log
+          /twid/log/*.log
           /var/log/nginx/*.log {
-            create 0640 nginx root
-            daily
-            rotate 10
-            missingok
-            notifempty
-            compress
-            sharedscripts
-            postrotate
-              /bin/kill -USR1 `cat /run/nginx.pid 2>/dev/null` 2>/dev/null || true
-            endscript
+              create 0640 nginx root
+              daily
+              rotate 10
+              missingok
+              notifempty
+              compress
+              sharedscripts
+              postrotate
+                  /bin/kill -USR1 `cat /run/nginx.pid 2>/dev/null` 2>/dev/null || true
+              endscript
           }
 
-    - name: updating configuration system
+    - name: updating configuration chrony
       copy:
         dest: "/etc/logrotate.d/chrony"
         content: |
           /var/log/chrony/*.log {
-            daily
-            rotate 7
-            missingok
-            notifempty
-            nocreate
-            sharedscripts
-            postrotate
-              /usr/bin/chronyc cyclelogs > /dev/null 2>&1 || true
-            endscript
-            compress
-            dateext
+              daily
+              rotate 7
+              missingok
+              notifempty
+              nocreate
+              sharedscripts
+              postrotate
+                  /usr/bin/chronyc cyclelogs > /dev/null 2>&1 || true
+              endscript
+              compress
+              dateext
+          }
+
+    - name: updating configuration clamav-update
+      copy:
+        dest: "/etc/logrotate.d/clamav-update"
+        content: |
+          /var/log/freshclam.log {
+                  monthly
+                  notifempty
+                  missingok
+                  postrotate
+                          systemctl try-restart clamav-freshclam.service
+                  endscript
+          }
+
+    - name: updating configuration psacct
+      copy:
+        dest: "/etc/logrotate.d/psacct"
+        content: |
+          # Logrotate file for psacct RPM
+          /var/account/pacct {
+              compress
+              delaycompress
+              notifempty
+              daily
+              rotate 31
+              create 0600 root root
+              postrotate
+                 if /usr/bin/systemctl --quiet is-active psacct.service ; then
+                     /usr/sbin/accton /var/account/pacct | /usr/bin/grep -v "Turning on process accounting, file set to '/var/account/pacct'." | /usr/bin/cat
+                 fi
+              endscript
+          }
+
+    - name: updating configuration redis
+      copy:
+        dest: "/etc/logrotate.d/redis"
+        content: |
+          /var/log/redis/*.log {
+              weekly
+              rotate 10
+              copytruncate
+              delaycompress
+              compress
+              notifempty
+              missingok
           }
