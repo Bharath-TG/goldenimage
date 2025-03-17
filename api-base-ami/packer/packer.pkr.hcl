@@ -26,6 +26,13 @@ source "amazon-ebs" "rocky-linux" {
 
   launch_block_device_mappings  {
     volume_type = "gp3"
+    device_name = "/dev/sda1"
+    delete_on_termination = true
+    volume_size = 20
+  }
+
+  launch_block_device_mappings  {
+    volume_type = "gp3"
     device_name = "/dev/sdf"
     delete_on_termination = true
     volume_size = 100
