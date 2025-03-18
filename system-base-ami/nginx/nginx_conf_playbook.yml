@@ -232,7 +232,7 @@
           add_header X-Content-Type-Options nosniff;
           add_header Strict-Transport-Security "max-age=15768000; includeSubdomains; preload";
 
-    - name: Restart NGINX to apply configuration
-      systemd:
-        name: nginx
-        state: reloaded
+#    - name: Restart NGINX to apply configuration
+#      systemd:
+#        name: nginx
+#        state: reloaded
