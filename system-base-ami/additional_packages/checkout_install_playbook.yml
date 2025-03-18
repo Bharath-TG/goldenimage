@@ -37,7 +37,7 @@
         dest: "/tmp/install_composer.sh"
         content: |
           #!/bin/bash
-          cd /twid/api
+          cd /twid/system
           sudo su kushal
           git config --global --add safe.directory /twid/system
           composer install --no-dev -n
