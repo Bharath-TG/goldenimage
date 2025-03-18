@@ -37,6 +37,12 @@
           sudo su kushal
           composer install --no-dev -n
           sudo rm -f /home/rocky/.ssh/id_rsa
+        
+    - name: run install_composer script
+      shell: |
+        sudo chmod +x /tmp/install_composer.sh
+        sudo bash /tmp/install_composer.sh
+        sudo rm -f /tmp/install_composer.sh
 
     - name: update /twid/system directory permision
       shell: |
@@ -47,11 +53,4 @@
     - name: Wait for 10 minutes
       ansible.builtin.pause:
         minutes: 10
-        
-    - name: run install_composer script
-      shell: |
-        sudo chmod +x /tmp/install_composer.sh
-        sudo bash /tmp/install_composer.sh
-        sudo rm -f /tmp/install_composer.sh
-
     
