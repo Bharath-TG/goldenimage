@@ -1,5 +1,5 @@
 ---
-- name: git checkout system code and install
+- name: git checkout api code and install
   hosts: localhost
   gather_facts: no
   become: true
@@ -39,7 +39,7 @@
           #!/bin/bash
           cd /twid/api
           sudo su kushal
-          git config --global --add safe.directory /twid/system
+          git config --global --add safe.directory /twid/api
           composer install --no-dev -n
     
     - name: run install_composer script
