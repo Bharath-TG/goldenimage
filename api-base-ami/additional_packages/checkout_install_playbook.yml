@@ -23,7 +23,6 @@
       shell: |
         sudo mkdir /twid/api/storage/framework
         sudo mkdir /twid/api/storage/framework/cache
-#        sudo mkdir /twid/api/storage/framework/sessions
         sudo mkdir /twid/api/storage/framework/views
 
     - name: update dir permission
