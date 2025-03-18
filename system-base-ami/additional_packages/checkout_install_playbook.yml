@@ -26,28 +26,28 @@
         sudo mkdir /twid/system/storage/framework/sessions
         sudo mkdir /twid/system/storage/framework/views
 
-    - name: update dir permission
-      shell: |
-        sudo chown -R apache:kushal /twid/system/
-        sudo chmod -R 775 /twid/system/
-        sudo rm -f /home/rocky/.ssh/id_rsa
-    
     - name: install_composer script
       copy:
         dest: "/tmp/install_composer.sh"
         content: |
           #!/bin/bash
-          cd /twid/system
+          sudo cd /twid/system
+          sudo chmod -R 775 /twid/system/
+          sudo chown -R apache:kushal /twid/system/
+          sleep 20
           sudo su kushal
           git config --global --add safe.directory /twid/system
           composer install --no-dev -n
-    
+          sudo rm -f /home/rocky/.ssh/id_rsa
+          
+    - name: Wait for 10 minutes
+      ansible.builtin.pause:
+        minutes: 10
+        
     - name: run install_composer script
       shell: |
         sudo chmod +x /tmp/install_composer.sh
         sudo bash /tmp/install_composer.sh
         sudo rm -f /tmp/install_composer.sh
 
-    - name: Wait for 5 minutes
-      ansible.builtin.pause:
-        minutes: 5
+    
