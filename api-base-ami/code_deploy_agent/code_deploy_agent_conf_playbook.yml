@@ -17,6 +17,6 @@
           :root_dir: '/opt/codedeploy-agent/deployment-root'
           :verbose: false
           :wait_between_runs: 1
-          :proxy_uri: 'http://172.31.21.180:3128/'
           :max_revisions: 5
+          :proxy_uri: 'http://172.31.21.180:3128/'
 
