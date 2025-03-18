@@ -35,7 +35,7 @@
           sudo chmod -R 775 /twid/api/
           sudo chown -R apache:kushal /twid/api/
           sudo su kushal
-          git config --global --add safe.directory /twid/system
+          git config --global --add safe.directory /twid/api
           composer install --no-dev -n
           sudo rm -f /home/rocky/.ssh/id_rsa
     
@@ -45,7 +45,7 @@
         sudo bash /tmp/install_composer.sh
         sudo rm -f /tmp/install_composer.sh
 
-    - name: update /twid/system directory permision
+    - name: update /twid/api directory permision
       shell: |
         sudo chmod -R 775 /twid/api/
         sudo chown -R apache:kushal /twid/api/
