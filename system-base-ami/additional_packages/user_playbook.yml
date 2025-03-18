@@ -133,33 +133,7 @@
       copy:
         dest: "/home/rocky/.ssh/id_rsa"
         content: |
-          -----BEGIN RSA PRIVATE KEY-----
-          MIIEpAIBAAKCAQEAubLLNopGbCmxjusOEISHeBOzXhgLlGfJjgU999bvb5BthtRz
-          TTQrDMGcOayolzgiSDrL389iMVR+Y9KhXA+MV9TKh/+GVALBbvZ0Qr9o1JQLbhwx
-          316kk1xMw/Rxl7GKc2v0x8e7Kh6K5iFr0X0Mas4Rlb0I4r/Ttd9m95c+CCdBN1GI
-          akzWcyNP68wokVVqvQ9iNblh2n4mJQ7txAUQuZeU0h9yowN3T2edsbaqT/V99M3+
-          GhW/47KrgpLe1BCd8dEVztsLVAn2y5xvuws0q+CQqNYD0yjzOMyVH67IbA75HUrD
-          eHHqIrf1UOLKh6BTL0MvnzQQoGAjCC2uqwizkQIDAQABAoIBAQCyoynUBL7sLEuv
-          5bT49NTxEVqaaN0y3YjKQ4ayVaSuGS0T6Gom2cmUEug7nznrhseL3mvjmLeoJtUT
-          KDuruRVUJNLUc16AkMoN+a4ry8CHxwcb3KmpbH07eS4rz4o62EMM98xZJ22Ifis2
-          aO40b2wzjpriBiB3KPv72LZP9cFpyt3EXw3b5V+LL9Dd4sXtD5bjwmNd61aI9iga
-          h/ejKjd9E80LurStkn6A1GvKDglh9QrBK5aEyTOYH/0jFx94SHHDdofJ1BTM6BRS
-          Pr589I7zaX6pJYtUwvzPpWNhDZ8JzzEap0jzcoWIr9P5fulrJH/3guCKCofo8Y/p
-          X+fg5neFAoGBAODO5B+/o34++XQ+PPNv/WAwcHknnJI8W+lex+v3qPVztmeSp4wy
-          TQPCZJDrGmjQv+jCIBGjmcBIS4cj8aT1D2382M+aQlvh+f1jAOCqsRaKK7WdLl/P
-          LvPj6SXzFnWjio9dOFm/N2g7C4S+z7DkQxI3ROORwgbfpOlFZLVmvlJbAoGBANN2
-          vNVFfKK5vDa739waOkgFbBZmBHY8GJfd9mdSFn01jQAMHXT6ZPzLH37zGVMI3Z6P
-          knimMHhMdm7lvaj80FSBtW+V4nnVZ79AYyFAHde4m8G/3wZ0iOyAA+DYOFB6qqj/
-          qcwpV/eUf8APNuHm+TRVBaq2nyGUF2Kp2YYNZN2DAoGAdY+7/F5bQUntabyiYyvN
-          dN/f8XulhVPLPN8z7VI2KSW53a/zrn0fiTe/H4nS5b1EnpPl8VN8s/EajjFdzMXa
-          q8nuF6Kz0Rj7gmajrtmUghT/hpoMBk5yX1hwNEhLFnnPm+lD7qrwbrFx9JlUQ00b
-          RgthGyC+Npn9w39mivaP0MECgYAxlWrruzJhWZnXX7A7BO9bieHxUpSDQM4ndgVb
-          7rSVQWRBeZXCox/g4qQM+WWbwb1te47FuXouCwfOMxKIuFcFKbDobEXBeZetEaTs
-          3ALjXUcwZBQgiFy+z7mZFDoILOstW11uINeelvRpjWe6CpWufq0ofU/M6NOe7+Kw
-          ex2GjwKBgQCUMCz5781uV+0q7I0uVJpbSAf61DJqSYi2uN0O+zld26PiRqF/12yS
-          46U3KqqzwZ2347rdbEej14DYEkfUjzWCgX1/lzU1zPgN9MPLlPh8HNk9yfmXSAmG
-          6e8osBWnVNiELb8seGgo8Mm5iKC4XULtBkCH2Iu/VI6ylUOt/VYmkw==
-          -----END RSA PRIVATE KEY-----
+          
     
     - name: Updating rocky's ssh keys permissions  
       file:
