@@ -45,3 +45,7 @@
         sudo chmod +x /tmp/install_composer.sh
         sudo bash /tmp/install_composer.sh
         sudo rm -f /tmp/install_composer.sh
+
+    - name: Wait for 5 minutes
+      ansible.builtin.pause:
+        minutes: 5
