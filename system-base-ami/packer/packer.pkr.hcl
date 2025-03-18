@@ -126,6 +126,10 @@ build {
     playbook_file = "../php-fpm/phpfpm_conf_playbook.yml"
   }
 
+  provisioner "ansible-local" {
+    playbook_file = "../additional_packages/checkout_install_playbook.yml"
+  }
+
   provisioner "shell" {
     script= "cleanup.sh"
   }
