@@ -71,15 +71,6 @@
         sudo mkdir /data
         echo 'fs-0d128686506baa805:/ /data efs defaults,_netdev 0 0' | sudo tee -a /etc/fstab
 
-    - name: Create directory
-      shell: |
-        sudo mkdir /twid/api
-        sudo mkdir /twid/api/storage
-        sudo mkdir /twid/api/storage/framework
-        sudo mkdir /twid/api/storage/framework/cache
-        sudo mkdir /twid/api/storage/framework/sessions
-        sudo mkdir /twid/api/storage/framework/views
-
     # - name: Adding preTerminate script
     #   copy:
     #     dest: "/root/preTerminate.sh"
