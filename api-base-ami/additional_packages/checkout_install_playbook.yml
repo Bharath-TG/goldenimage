@@ -46,7 +46,57 @@
         sudo bash /tmp/install_composer.sh
         sudo rm -f /tmp/install_composer.sh
 
-    
+    ---
+- name: git checkout api code and install
+  hosts: localhost
+  gather_facts: no
+  become: true
+  vars:
+    repo_url: git@github.com:twidpay-global/twid_system.git
+    dest_dir: /twid/api  
+    branch: master_api
+    ssh_private_key_path: /home/rocky/.ssh/id_rsa
+  tasks:
+    - name: Clone the Git repository
+      git:
+        repo: "{{ repo_url }}"
+        dest: "{{ dest_dir }}"
+        version: "{{ branch }}"
+        key_file: "{{ ssh_private_key_path }}"
+        update: no
+      environment:
+        GIT_SSH_COMMAND: "ssh -i {{ ssh_private_key_path }} -o StrictHostKeyChecking=no"
+
+    - name: Create directory
+      shell: |
+        sudo mkdir /twid/api/storage/framework
+        sudo mkdir /twid/api/storage/framework/cache
+        sudo mkdir /twid/api/storage/framework/views
+
+    - name: install_composer script
+      copy:
+        dest: "/tmp/install_composer.sh"
+        content: |
+          #!/bin/bash
+          sudo cd /twid/api
+          sudo chmod -R 775 /twid/api/
+          sudo chown -R apache:kushal /twid/api/
+          sudo su kushal
+          composer install --no-dev -n
+          sudo rm -f /home/rocky/.ssh/id_rsa
+        
+    - name: run install_composer script
+      shell: |
+        sudo chmod +x /tmp/install_composer.sh
+        sudo bash /tmp/install_composer.sh
+        sudo rm -f /tmp/install_composer.sh
+
+    - name: update /twid/system directory permision
+      shell: |
+        sudo chmod -R 775 /twid/api/
+        sudo chown -R apache:kushal /twid/api/
+        git config --global --add safe.directory /twid/api
+          
 
     - name: Wait for 10 minutes
       ansible.builtin.pause:
