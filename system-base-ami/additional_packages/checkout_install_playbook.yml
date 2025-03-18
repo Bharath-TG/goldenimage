@@ -38,6 +38,8 @@
         content: |
           #!/bin/bash
           cd /twid/system
+          sudo su kushal
+          git config --global --add safe.directory /twid/system
           composer install --no-dev -n
     
     - name: update /etc/fstab
