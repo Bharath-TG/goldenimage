@@ -34,11 +34,15 @@
           sudo cd /twid/system
           sudo chmod -R 775 /twid/system/
           sudo chown -R apache:kushal /twid/system/
-          sleep 20
           sudo su kushal
-          git config --global --add safe.directory /twid/system
           composer install --no-dev -n
           sudo rm -f /home/rocky/.ssh/id_rsa
+
+    - name: update /twid/system directory permision
+      shell: |
+        sudo chmod -R 775 /twid/system/
+        sudo chown -R apache:kushal /twid/system/
+        git config --global --add safe.directory /twid/system
           
     - name: Wait for 10 minutes
       ansible.builtin.pause:
