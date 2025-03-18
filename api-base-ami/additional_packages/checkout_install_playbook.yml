@@ -32,7 +32,7 @@
         sudo chmod -R 775 /twid/api/
         sudo rm -f /home/rocky/.ssh/id_rsa
     
-    - name: partition mount script
+    - name: update install_composer script
       copy:
         dest: "/tmp/install_composer.sh"
         content: |
@@ -42,7 +42,7 @@
           git config --global --add safe.directory /twid/system
           composer install --no-dev -n
     
-    - name: update /etc/fstab
+    - name: run install_composer script
       shell: |
         sudo chmod +x /tmp/install_composer.sh
         sudo bash /tmp/install_composer.sh
