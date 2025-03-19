@@ -76,10 +76,10 @@
       environment:
         GIT_SSH_COMMAND: ssh -i {{ ssh_private_key_path }} -o StrictHostKeyChecking=no
         
-    - name: Clean up SSH private key file
-      file:
-        path: "{{ ssh_private_key_path }}"
-        state: absent
+#    - name: Clean up SSH private key file
+#      file:
+#        path: "{{ ssh_private_key_path }}"
+#        state: absent
         
     - name: install_composer script
       copy:
