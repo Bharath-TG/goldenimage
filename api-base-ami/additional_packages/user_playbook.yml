@@ -129,19 +129,6 @@
         path: "/home/rocky/.bash_profile"
         line: 'export PATH=$PATH:$HOME/.local/bin:$HOME/bin'
 
-    - name: Updating rocky's ssh keys
-      copy:
-        dest: "/home/rocky/.ssh/id_rsa"
-        content: |
-          a
-    
-    - name: Updating rocky's ssh keys permissions  
-      file:
-        path: "/home/rocky/.ssh/id_rsa"
-        owner: "rocky"
-        group: "rocky"
-        mode: '0600'
-
     - name: adding usrs to sudoers
       shell: |
         echo 'kushal	ALL=(ALL)	NOPASSWD: ALL' >> /etc/sudoers
