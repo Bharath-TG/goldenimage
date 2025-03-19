@@ -1,14 +1,71 @@
 ---
-- name: git checkout api code and install
+- name: Git checkout API code and install
   hosts: localhost
   gather_facts: no
   become: true
   vars:
     repo_url: git@github.com:twidpay-global/twid_api.git
-    dest_dir: /twid/api  
+    dest_dir: /tmp/api
     branch: master_api
-    ssh_private_key_path: /home/rocky/.ssh/id_rsa
+    secret_id: twid/git_ssh_key
+    ssh_private_key_path: /etc/ansible/git_ssh_key
+    region: us-east-2
   tasks:
+    - name: adding python script to fetch secrets
+      copy:
+        dest: /etc/ansible/fetch_ssh_key.py
+        content: >
+          #!/usr/bin/env python3
+          import boto3
+          import base64
+          import json
+          import sys
+          
+          # Fetch arguments from Ansible playbook
+          secret_id = sys.argv[1]
+          ssh_private_key_path = sys.argv[2]  # File path to store the encoded private key
+          region = sys.argv[3]
+          
+          # Create a Secrets Manager client
+          client = boto3.client('secretsmanager', region_name=region)
+
+          # Fetch the secret value from AWS Secrets Manager
+          response = client.get_secret_value(SecretId=secret_id)
+
+          # Decode the base64 secret
+          secret = json.loads(response['SecretString'])
+
+          # Log the secret content for debugging
+          print("Secret content:", secret)
+
+          # Fetch the correct key from the secret
+          if 'ssh_key' in secret:
+              private_key = secret['ssh_key']
+          else:
+              print("The key 'ssh_key' was not found in the secret.")
+              sys.exit(1)
+
+          # Decode the base64 private key
+          decoded_key = base64.b64decode(private_key)
+
+          # Store the decoded private key into a file
+          with open(ssh_private_key_path, "wb") as decoded_file:
+              decoded_file.write(decoded_key)
+              
+    - name: update permisssions for python file
+      shell: |
+        sudo chmod 777 /etc/ansible/fetch_ssh_key.py
+        
+    - name: Fetch SSH private key from AWS Secrets Manager using boto3
+      command: /etc/ansible/fetch_ssh_key.py "{{ secret_id }}" "{{
+        ssh_private_key_path }}" "{{ region }}"
+      register: secret
+      
+    - name: update permissions for private keys
+      shell: |
+        sudo chown rocky:rocky /etc/ansible/git_ssh_key
+        sudo chmod 600 /etc/ansible/git_ssh_key
+        
     - name: Clone the Git repository
       git:
         repo: "{{ repo_url }}"
@@ -17,20 +74,19 @@
         key_file: "{{ ssh_private_key_path }}"
         update: no
       environment:
-        GIT_SSH_COMMAND: "ssh -i {{ ssh_private_key_path }} -o StrictHostKeyChecking=no"
-
-#    - name: Create directory
-#      shell: |
-#        sudo mkdir /twid/api/storage/framework
-#        sudo mkdir /twid/api/storage/framework/cache
-#        sudo mkdir /twid/api/storage/framework/views
-
+        GIT_SSH_COMMAND: ssh -i {{ ssh_private_key_path }} -o StrictHostKeyChecking=no
+        
+    - name: Clean up SSH private key file
+      file:
+        path: "{{ ssh_private_key_path }}"
+        state: absent
+        
     - name: install_composer script
       copy:
-        dest: "/tmp/install_composer.sh"
+        dest: /tmp/install_composer.sh
         content: |
           #!/bin/bash
-          
+
           sudo cd /twid/api
           sudo chmod -R 775 /twid/api/
           sudo chown -R apache:kushal /twid/api/
@@ -38,19 +94,15 @@
           git config --global --add safe.directory /twid/api
           composer install --no-dev -n
           sudo rm -f /home/rocky/.ssh/id_rsa
-    
+          
     - name: run install_composer script
       shell: |
         sudo chmod +x /tmp/install_composer.sh
         sudo bash /tmp/install_composer.sh
         sudo rm -f /tmp/install_composer.sh
-
+        
     - name: update /twid/api directory permision
-      shell: |
+      shell: |+
         sudo chmod -R 775 /twid/api/
         sudo chown -R apache:kushal /twid/api/
         git config --global --add safe.directory /twid/api
-          
-    - name: Wait for 10 minutes
-      ansible.builtin.pause:
-        minutes: 10
