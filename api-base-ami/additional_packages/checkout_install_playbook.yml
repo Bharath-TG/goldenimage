@@ -65,6 +65,7 @@
       shell: |
         sudo chown rocky:rocky /home/rocky/.ssh/id_rsa
         sudo chmod 600 /home/rocky/.ssh/id_rsa
+        sudo chmod 777 /twid
         
     - name: Clone the Git repository
       git:
