@@ -11,11 +11,7 @@
     ssh_private_key_path: /etc/ansible/git_ssh_key
     region: us-east-2
     
-  tasks:
-    - name: install boto3
-      shell: |
-        pip3 install boto3
-        
+  tasks:        
     - name: adding python script to fetch secrets
       copy:
         dest: /etc/ansible/fetch_ssh_key.py
@@ -105,7 +101,7 @@
         sudo rm -f /tmp/install_composer.sh
         
     - name: update /twid/api directory permision
-      shell: |+
+      shell: |
         sudo chmod -R 775 /twid/api/
         sudo chown -R apache:kushal /twid/api/
         git config --global --add safe.directory /twid/api
