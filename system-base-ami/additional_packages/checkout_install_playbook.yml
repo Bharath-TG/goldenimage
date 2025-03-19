@@ -61,8 +61,8 @@
       
     - name: update permissions for private keys
       shell: |
-        sudo chown rocky:rocky /etc/ansible/git_ssh_key
-        sudo chmod 600 /etc/ansible/git_ssh_key
+        sudo chown rocky:rocky /home/rocky/.ssh/id_rsa
+        sudo chmod 600 /home/rocky/.ssh/id_rsa
         
     - name: Clone the Git repository
       git:
