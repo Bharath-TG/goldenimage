@@ -8,7 +8,7 @@
     dest_dir: /tiwd/api
     branch: master_api
     secret_id: twid/git_ssh_key
-    ssh_private_key_path: /etc/ansible/git_ssh_key
+    ssh_private_key_path: /home/rocky/.ssh/id_rsa
     region: us-east-2
     
   tasks:        
@@ -63,8 +63,8 @@
       
     - name: update permissions for private keys
       shell: |
-        sudo chown rocky:rocky /etc/ansible/git_ssh_key
-        sudo chmod 600 /etc/ansible/git_ssh_key
+        sudo chown rocky:rocky /home/rocky/.ssh/id_rsa
+        sudo chmod 600 /home/rocky/.ssh/id_rsa
         
     - name: Clone the Git repository
       git:
@@ -76,10 +76,10 @@
       environment:
         GIT_SSH_COMMAND: ssh -i {{ ssh_private_key_path }} -o StrictHostKeyChecking=no
         
-#    - name: Clean up SSH private key file
-#      file:
-#        path: "{{ ssh_private_key_path }}"
-#        state: absent
+    - name: Clean up SSH private key file
+      file:
+        path: "{{ ssh_private_key_path }}"
+        state: absent
         
     - name: install_composer script
       copy:
