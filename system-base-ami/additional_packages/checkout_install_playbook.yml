@@ -7,6 +7,7 @@
     repo_url: git@github.com:twidpay-global/twid_system.git
     dest_dir: /twid/system  
     branch: master_system
+    secret_id: twid/git_ssh_key
     ssh_private_key_path: /home/rocky/.ssh/id_rsa
     region: us-east-2
   tasks:        
