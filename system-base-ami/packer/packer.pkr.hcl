@@ -14,7 +14,7 @@ packer {
 # Using a Rocky Linux AMI as the base
 source "amazon-ebs" "rocky-linux" {
   region          = "ap-south-1"  # ohio region
-  ami_name        = "rocky-ami-version-1-{{timestamp}}"
+  ami_name        = "system-rocky-ami-version-{{timestamp}}"
   instance_type   = "t3.xlarge"    # Instance type (can adjust as needed)
   source_ami      =  "ami-0321f0c22d67f6571" # "ami-05150ea4d8a533099" Replace with the correct Rocky Linux AMI ID
   ssh_username    = "rocky"  # Default SSH username for Rocky Linux
