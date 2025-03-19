@@ -92,7 +92,6 @@
           sudo su kushal
           git config --global --add safe.directory /twid/api
           composer install --no-dev -n
-          sudo rm -f /home/rocky/.ssh/id_rsa
           
     - name: run install_composer script
       shell: |
