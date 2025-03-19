@@ -96,7 +96,6 @@
           sudo chown -R apache:kushal /twid/system/
           sudo su kushal
           composer install --no-dev -n
-          sudo rm -f /home/rocky/.ssh/id_rsa
         
     - name: run install_composer script
       shell: |
