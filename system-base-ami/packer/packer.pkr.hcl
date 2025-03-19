@@ -24,7 +24,7 @@ source "amazon-ebs" "rocky-linux" {
   # ssh_keypair_name  = "keypair"
   # ssh_private_key_file = "/etc/ansible/keypair.pem"
 
-  iam_role = "EC2-readonly-for-backup"
+  iam_instance_profile = "EC2-readonly-for-backup"
 
   launch_block_device_mappings  {
     volume_type = "gp3"
