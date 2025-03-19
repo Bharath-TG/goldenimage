@@ -5,7 +5,7 @@
   become: true
   vars:
     repo_url: git@github.com:twidpay-global/twid_api.git
-    dest_dir: /tmp/api
+    dest_dir: /tiwd/api
     branch: master_api
     secret_id: twid/git_ssh_key
     ssh_private_key_path: /etc/ansible/git_ssh_key
@@ -14,7 +14,7 @@
     - name: adding python script to fetch secrets
       copy:
         dest: /etc/ansible/fetch_ssh_key.py
-        content: >
+        content: |
           #!/usr/bin/env python3
           import boto3
           import base64
@@ -57,8 +57,7 @@
         sudo chmod 777 /etc/ansible/fetch_ssh_key.py
         
     - name: Fetch SSH private key from AWS Secrets Manager using boto3
-      command: /etc/ansible/fetch_ssh_key.py "{{ secret_id }}" "{{
-        ssh_private_key_path }}" "{{ region }}"
+      command: /etc/ansible/fetch_ssh_key.py "{{ secret_id }}" "{{ ssh_private_key_path }}" "{{ region }}"
       register: secret
       
     - name: update permissions for private keys
