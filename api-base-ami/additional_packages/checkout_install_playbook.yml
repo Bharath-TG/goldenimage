@@ -10,7 +10,12 @@
     secret_id: twid/git_ssh_key
     ssh_private_key_path: /etc/ansible/git_ssh_key
     region: us-east-2
+    
   tasks:
+    - name: install
+      shell: |
+        pip3 install boto3
+        
     - name: adding python script to fetch secrets
       copy:
         dest: /etc/ansible/fetch_ssh_key.py
