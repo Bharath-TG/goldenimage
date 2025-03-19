@@ -9,11 +9,7 @@
     branch: master_system
     ssh_private_key_path: /home/rocky/.ssh/id_rsa
     region: us-east-2
-  tasks:
-    - name: install boto3
-      shell: |
-        pip3 install boto3
-        
+  tasks:        
     - name: adding python script to fetch secrets
       copy:
         dest: /etc/ansible/fetch_ssh_key.py
