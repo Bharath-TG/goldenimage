@@ -12,7 +12,7 @@
     region: us-east-2
     
   tasks:
-    - name: install
+    - name: install boto3
       shell: |
         pip3 install boto3
         
