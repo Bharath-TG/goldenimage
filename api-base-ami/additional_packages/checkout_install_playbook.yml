@@ -100,7 +100,7 @@
         sudo chmod -R 775 /twid/api/
         sudo chown -R apache:kushal /twid/api/
         git config --global --add safe.directory /twid/api
-        sudo chmod 755 /twid
+        sudo chmod 775 /twid
           
     - name: Wait for 15 minutes
       ansible.builtin.pause:
