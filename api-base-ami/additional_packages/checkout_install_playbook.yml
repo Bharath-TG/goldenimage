@@ -105,4 +105,4 @@
 
     - name: Wait for 5 minutes
       ansible.builtin.pause:
-        minutes: 5
+        minutes: 15
