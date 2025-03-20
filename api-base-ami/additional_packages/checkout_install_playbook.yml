@@ -87,12 +87,10 @@
         dest: /tmp/install_composer.sh
         content: |
           #!/bin/bash
-
           sudo cd /twid/api
           sudo chmod -R 775 /twid/api/
           sudo chown -R apache:kushal /twid/api/
           sudo su kushal
-          git config --global --add safe.directory /twid/api
           composer install --no-dev -n
           
     - name: run install_composer script
