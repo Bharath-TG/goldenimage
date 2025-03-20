@@ -4,7 +4,7 @@
   gather_facts: no
   become: true
   vars:
-    repo_url: git@github.com:twidpay-global/twid_system.git
+    repo_url: git@github.com:twidpay-global/twid_api.git
     dest_dir: /twid/api  
     branch: master_api
     secret_id: twid/git_ssh_key
