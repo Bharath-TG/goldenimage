@@ -1,16 +1,15 @@
 ---
-- name: Git checkout API code and install
+- name: git checkout API code and install
   hosts: localhost
   gather_facts: no
   become: true
   vars:
-    repo_url: git@github.com:twidpay-global/twid_api.git
-    dest_dir: /tiwd/api
+    repo_url: git@github.com:twidpay-global/twid_system.git
+    dest_dir: /twid/api  
     branch: master_api
     secret_id: twid/git_ssh_key
     ssh_private_key_path: /home/rocky/.ssh/id_rsa
     region: ap-south-1
-    
   tasks:        
     - name: adding python script to fetch secrets
       copy:
@@ -81,28 +80,28 @@
       file:
         path: "{{ ssh_private_key_path }}"
         state: absent
-        
+
     - name: install_composer script
       copy:
-        dest: /tmp/install_composer.sh
+        dest: "/tmp/install_composer.sh"
         content: |
           #!/bin/bash
           cd /twid/api
           composer install --no-dev -n
-          
+        
     - name: run install_composer script
       shell: |
         sudo chmod +x /tmp/install_composer.sh
         sudo bash /tmp/install_composer.sh
         sudo rm -f /tmp/install_composer.sh
-        
+
     - name: update /twid/api directory permision
       shell: |
         sudo chmod -R 775 /twid/api/
         sudo chown -R apache:kushal /twid/api/
         git config --global --add safe.directory /twid/api
         sudo chmod 755 /twid
-
-    - name: Wait for 5 minutes
+          
+    - name: Wait for 15 minutes
       ansible.builtin.pause:
         minutes: 15
