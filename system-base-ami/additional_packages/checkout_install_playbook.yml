@@ -93,10 +93,7 @@
         dest: "/tmp/install_composer.sh"
         content: |
           #!/bin/bash
-          sudo cd /twid/system
-          sudo chmod -R 775 /twid/system/
-          sudo chown -R apache:kushal /twid/system/
-          sudo su kushal
+          cd /twid/system
           composer install --no-dev -n
         
     - name: run install_composer script
@@ -112,6 +109,6 @@
         git config --global --add safe.directory /twid/system
         sudo chmod 755 /twid
           
-    - name: Wait for 5 minutes
+    - name: Wait for 15 minutes
       ansible.builtin.pause:
-        minutes: 5
+        minutes: 15
