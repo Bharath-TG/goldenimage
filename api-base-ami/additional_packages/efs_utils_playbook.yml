@@ -34,7 +34,7 @@
         chdir: /tmp/efs-utils/build
         cmd: sudo dnf install amazon-efs-utils-2.2.0-1.el9.x86_64.rpm -y  # make sure you have updated right rpm file
 
-    - name: Install botocore
+    - name: Install botocore and boto3
       shell: |
         sudo yum -y install wget
         sudo wget https://bootstrap.pypa.io/get-pip.py -O /tmp/get-pip.py
