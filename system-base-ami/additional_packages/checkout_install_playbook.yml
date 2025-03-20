@@ -110,6 +110,7 @@
         sudo chmod -R 775 /twid/system/
         sudo chown -R apache:kushal /twid/system/
         git config --global --add safe.directory /twid/system
+        sudo chmod 755 /twid
           
     - name: Wait for 5 minutes
       ansible.builtin.pause:
