@@ -102,6 +102,6 @@
         git config --global --add safe.directory /twid/api
         sudo chmod 775 /twid
           
-    - name: Wait for 15 minutes
+    - name: Wait for 5 minutes
       ansible.builtin.pause:
-        minutes: 15
+        minutes: 5
