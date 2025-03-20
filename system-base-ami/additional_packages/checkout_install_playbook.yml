@@ -9,7 +9,7 @@
     branch: master_system
     secret_id: twid/git_ssh_key
     ssh_private_key_path: /home/rocky/.ssh/id_rsa
-    region: ap-south-1
+    region: us-east-2
   tasks:        
     - name: adding python script to fetch secrets
       copy:
