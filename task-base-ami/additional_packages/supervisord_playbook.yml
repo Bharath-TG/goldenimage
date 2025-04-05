@@ -1,0 +1,81 @@
+---
+- name: Install Supervisord
+  hosts: localhost
+  gather_facts: no
+  become: yes
+  tasks:
+
+    - name: Ensure EPEL repository is installed
+      dnf:
+        name: epel-release
+        state: present
+
+    - name: Install Supervisor
+      dnf:
+        name: supervisor
+        state: present
+
+    - name: Start supervisord service
+      systemd:
+        name: supervisord
+        state: started
+        enabled: true
+
+    - name: Verify supervisord service is running
+      systemd:
+        name: supervisord
+        state: started
+
+    - name: updating configuration supervisord config
+      copy:
+        dest: "/etc/supervisord.d/laravel-worker.conf"
+        content: |
+          [program:laravel-worker-1]
+          process_name=%(program_name)s_%(process_num)02d
+          command=php /twid/tasks/artisan queue:work sqs --queue=Fashalot-SQS --sleep=1 --tries=2
+          autostart=true
+          autorestart=true
+          user=kushal
+          numprocs=10
+          redirect_stderr=true
+          stdout_logfile=/twid/tasks/storage/logs/sqs_worker.log
+
+          [program:laravel-worker-2]
+          process_name=%(program_name)s_%(process_num)02d
+          command=php /twid/tasks/artisan queue:work sqs --queue=high_priority --sleep=0 --tries=0
+          autostart=true
+          autorestart=true
+          user=kushal
+          numprocs=160
+          redirect_stderr=true
+          stdout_logfile=/twid/tasks/storage/logs/sqs_high_worker.log
+
+          [program:laravel-worker-3]
+          process_name=%(program_name)s_%(process_num)02d
+          command=php /twid/tasks/artisan queue:work sqs --queue=low_priority --sleep=5 --tries=3
+          autostart=true
+          autorestart=true
+          user=kushal
+          numprocs=10
+          redirect_stderr=true
+          stdout_logfile=/twid/tasks/storage/logs/sqs_low_worker.log
+
+          [program:laravel-worker-4]
+          process_name=%(program_name)s_%(process_num)02d
+          command=php /twid/tasks/artisan queue:work sqs --queue=twid_slow_tasks --sleep=5 --tries=3
+          autostart=true
+          autorestart=true
+          user=kushal
+          numprocs=25
+          redirect_stderr=true
+          stdout_logfile=/twid/tasks/storage/logs/sqs_twid_slow_tasks_worker.log
+
+          [program:laravel-worker-5]
+          process_name=%(program_name)s_%(process_num)02d
+          command=php /twid/tasks/artisan queue:work sqs --queue=twid_logs --sleep=2 --tries=5
+          autostart=true
+          autorestart=true
+          user=kushal
+          numprocs=5
+          redirect_stderr=true
+          stdout_logfile=/twid/tasks/storage/logs/sqs_twid_logs_worker.log

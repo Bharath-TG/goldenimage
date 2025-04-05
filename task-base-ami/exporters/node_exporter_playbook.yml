@@ -1,0 +1,99 @@
+---
+- name: install node_exporter
+  hosts: localhost
+  gather_facts: no
+  become: true
+
+  tasks:
+    - name: Ensure system is up to date
+      dnf:
+        name: "*"
+        state: latest
+
+    - name: Download node_exporter tarball
+      get_url:
+        url: "https://github.com/prometheus/node_exporter/releases/download/v1.6.1/node_exporter-1.6.1.linux-amd64.tar.gz"
+        dest: "/tmp/node_exporter.tar.gz"
+
+    - name: Extract node_exporter tarball
+      unarchive:
+        src: "/tmp/node_exporter.tar.gz"
+        dest: "/tmp/"
+        remote_src: yes
+
+    - name: Create Directory
+      shell: |
+        mkdir /usr/local/bin/nodeexporter
+        mkdir /usr/local/bin/nodeexporter/custom_metrics
+        touch /nodeexporter/custom_metrics/temp_eth
+
+    - name: Move node_exporter binary to /usr/local/bin
+      command: mv /tmp/node_exporter-1.6.1.linux-amd64/node_exporter /usr/local/bin/node_exporter/
+
+    - name: Create systemd service file for node_exporter
+      copy:
+        dest: "/etc/systemd/system/node_exporter.service"
+        content: |
+          [Unit]
+          Description=Node Exporter
+          After=network.target
+         
+          [Service]
+          User=nodeexporter
+          Group=nodeexporter
+          ExecStart="/usr/local/bin/nodeexporter/node_exporter --collector.textfile.directory /usr/local/bin/nodeexporter/custom_metrics"
+          Restart=always
+          RestartSec=10
+          TimeoutStartSec=200
+          TimeoutStopSec=100
+          
+          [Install]
+          WantedBy=multi-user.target
+
+    - name: Reload systemd to apply new service
+      systemd:
+        daemon_reload: yes
+
+    - name: Start and enable node_exporter service
+      systemd:
+        name: node_exporter
+        state: started
+        enabled: yes
+
+    - name: Clean up the node_exporter tarball
+      file:
+        path: "/tmp/node_exporter.tar.gz"
+        state: absent
+
+    - name: Create Node Custom Metrics Script
+      copy:
+        dest: "/bin/export_eth.sh"
+        content: |
+          #!/bin/bash
+          rm /nodeexporter/custom_metrics/temp_eth
+          /usr/sbin/ethtool -S eth0 | tr -d " " | tail -n +2 | while read n
+          do
+            field=`echo $n | awk -F: '{print $1}'`
+            value=`echo $n | awk -F: '{print $2}'`
+            echo "eth_metrics{metric=\"$field\"} $value" >> /nodeexporter/custom_metrics/temp_eth
+            cp /nodeexporter/custom_metrics/temp_eth /nodeexporter/custom_metrics/eth.prom
+            chmod -R 777 /nodeexporter/custom_metrics
+          done
+          
+    - name: update /bin/export_eth.sh
+      shell: |
+        sudo chmod +x /bin/export_eth.sh
+
+    - name: Add a cron job to run a node exporter custom metric script at every minute
+      cron:
+        name: "Run daily backup script"
+        minute: "*"
+        hour: "*"
+        day: "*"
+        month: "*"
+        weekday: "*"
+        job: "/bin/bash /bin/export_eth.sh >> /var/log/export_eth.log 2>&1"
+        state: present
+        user: nodeexporter
+
+    

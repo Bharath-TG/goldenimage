@@ -1,0 +1,276 @@
+---
+- name: update configuration files
+  hosts: localhost
+  gather_facts: no
+  become: true
+
+  tasks:
+    - name: updating configuration selinux config
+      copy:
+        dest: "/etc/selinux/config"
+        content: |
+          SELINUX=permissive
+          SELINUX=disabled
+
+    - name: adding bastion proxy 
+      shell: |
+        echo 'proxy=http://172.31.21.180:3128/' >> /etc/yum.conf
+
+    - name: adding proxy 
+      shell: |
+        echo '172.31.21.180 bastion.twidpay.com' >> /etc/hosts
+          
+    - name: partition mount script
+      copy:
+        dest: "/tmp/mount.sh"
+        content: |
+          #!/bin/bash
+
+          # Get the root disk (e.g., /dev/nvme0n1 or /dev/nvme1n1)
+          root_disk=$(df / | tail -1 | awk '{print $1}')
+          
+          echo "Root disk: $root_disk"
+          
+          # Define the disks we want to check (we will match the base disk name)
+          disk_to_format=""
+          
+          # Check if the root disk is on /dev/nvme0n1* or /dev/nvme1n1*
+          if [[ $root_disk == /dev/nvme0n1* ]]; then
+              # If root is on /dev/nvme0n1*, we will format /dev/nvme1n1
+              disk_to_format="/dev/nvme1n1"
+          elif [[ $root_disk == /dev/nvme1n1* ]]; then
+              # If root is on /dev/nvme1n1*, we will format /dev/nvme0n1
+              disk_to_format="/dev/nvme0n1"
+          else
+              echo "Root disk is neither on /dev/nvme0n1* nor /dev/nvme1n1* - exiting."
+              exit 1
+          fi
+          
+          echo "Disk to format: $disk_to_format"
+
+          echo "Formatting disk: $disk_to_format"
+          sudo mkfs.xfs $disk_to_format
+          sudo mkdir -p /twid
+          sudo mount $disk_to_format /twid
+          uuid=$(sudo blkid -o value -s UUID $disk_to_format)
+          echo "UUID=$uuid  /twid  xfs  defaults,nofail 0 2" | sudo tee -a /etc/fstab 
+    
+    - name: update /etc/fstab
+      shell: |
+        sudo chmod +x /tmp/mount.sh
+        sudo bash /tmp/mount.sh
+        sudo rm -f /tmp/mount.sh
+        
+    - name: Create swap
+      shell: |
+        dd if=/dev/zero of=/swapfile1 bs=1M count=512 && \
+        chmod 600 /swapfile1 && \
+        mkswap /swapfile1 && \
+        swapon /swapfile1 && \
+        echo '/swapfile1 swap swap defaults 0 0' | sudo tee -a /etc/fstab
+        sudo mkdir /data
+        echo 'fs-0d128686506baa805:/ /data efs defaults,_netdev 0 0' | sudo tee -a /etc/fstab
+
+    - name: Adding preTerminate script
+      copy:
+        dest: "/root/preTerminate.sh"
+        content: |
+          #!/bin/bash
+          set -e
+          export asg_name="PLACEHOLDERASG"
+          export instanceId="PLACEHOLDERINSTANCE"
+          export persistentVolume="PLACEHOLDERPERSISTENTVOLUME"
+          export HTTPS_PROXY="http://172.31.21.180:3128/"
+          while true
+          do
+            currentState=`curl http://169.254.169.254/latest/meta-data/autoscaling/target-lifecycle-state`
+            if [ "$currentState" != "InService" ]
+            then
+                    /usr/bin/aws ec2 create-tags  --resources ${persistentVolume} --tags Key=backupAndDeleteTasks,Value=true --region ap-south-1
+
+              /bin/systemctl stop supervisord
+              if [[ $? -eq 0 ]]
+              then
+                # Added for issue when aws lifecycle hook is removed after being sent. We have no reason to keep the instance up at this point regardless of the response from below call.
+                /usr/bin/aws autoscaling complete-lifecycle-action --lifecycle-hook-name preterminate --auto-scaling-group-name "$asg_name" --lifecycle-action-result CONTINUE  --region ap-south-1 --instance-id "$instanceId" || true
+                sleep 400
+                init 0
+              fi
+            fi
+            sleep 10
+          done
+
+    - name: Create systemd service file for preTerminate script
+      copy:
+        dest: "/etc/systemd/system/preterminate.service"
+        content: |
+          [Unit]
+          Description=Lifecycle hook respond script
+          After=network.target
+          After=network-online.target
+          Wants=network-online.target
+
+          [Service]
+          ExecStart=/bin/bash /root/preTerminate.sh
+          Restart=always
+          RestartSec=10
+          [Install]
+          WantedBy=multi-user.target
+
+    - name: Adding preInterrupt script
+      copy:
+        dest: "/root/preInterrupt.sh"
+        content: |
+          #!/bin/bash
+          set -e
+          export asg_name="PLACEHOLDERASG"
+          export instanceId="PLACEHOLDERINSTANCE"
+          export persistentVolume="PLACEHOLDERPERSISTENTVOLUME"
+          export HTTPS_PROXY="http://172.31.21.180:3128/"
+          while true
+          do
+            currentState=`curl -w %{http_code} -s --output /dev/null http://169.254.169.254/latest/meta-data/spot/termination-time`
+            if [ $currentState -eq 200 ]
+            then
+              /usr/bin/aws ec2 create-tags  --resources ${persistentVolume} --tags Key=backupAndDeleteTasks,Value=true --region ap-south-1 
+              /bin/systemctl stop supervisord
+              if [[ $? -eq 0 ]]
+              then
+                sleep 200
+                exit 0
+              fi
+            fi
+            sleep 5
+          done
+
+    - name: Create systemd service file for preInterrupt script
+      copy:
+        dest: "/etc/systemd/system/preinterrupt.service "
+        content: |
+          [Unit]
+          Description=Lifecycle hook respond script
+          After=network.target
+          After=network-online.target
+          Wants=network-online.target
+
+          [Service]
+          ExecStart=/bin/bash /root/preInterrupt.sh
+          Restart=on-failure
+          RestartSec=1s
+
+          [Install]
+          WantedBy=multi-user.target
+    
+    - name: Adding resizeVolume.sh script
+      copy:
+        dest: "/root/resizeVolume.sh"
+        content: |
+          export persistentVolume="PLACEHOLDERPERSISTENTVOLUME"
+          export HTTPS_PROXY="http://172.31.21.180:3128/"
+          while true
+          do
+          export usedPercentageTwid=`df -h | grep '/twid' | awk '{print $5}' | tr -d '%'`
+          echo $usedPercentageTwid
+          if [[ $usedPercentageTwid -gt 90 ]]
+          then
+            echo "Volume threshold exceeded"
+          export currentSize=`aws ec2 describe-volumes --volume-ids $persistentVolume --region ap-south-1 | grep -oP '(?<="Size": ).*'`
+          export newSize=$(( $currentSize * 2 ))
+          echo $newSize
+          echo "Modifying volume to $newSize"
+          aws ec2 modify-volume --size $newSize --volume-id $persistentVolume --region ap-south-1
+          sleep 5
+          while true
+          do
+          modifiedSize=`lsblk | grep '/twid' | awk '{print $4}' | tr -d 'G'`
+          if [[ $modifiedSize -eq $newSize ]]
+          then
+            echo "Resizing filesystem"
+            xfs_growfs /twid 
+            break
+          fi
+          sleep 5
+          done
+          fi
+          sleep 5
+          done
+          
+
+    - name: Create systemd service file for resizevolume script
+      copy:
+        dest: "/etc/systemd/system/resizevolume.service"
+        content: |
+          [Unit]
+          Description=Resize volume systemd
+          After=network.target
+          After=network-online.target
+          Wants=network-online.target
+
+          [Service]
+          ExecStart=/bin/bash /root/resizeVolume.sh
+          Restart=on-failure
+          RestartSec=1s
+
+          [Install]
+          WantedBy=multi-user.target
+          
+    - name: update script exexution permissions
+      shell: |
+        sudo chmod +x /root/preTerminate.sh
+        sudo chmod +x /root/preInterrupt.sh
+        sudo chmod +x /root/resizeVolume.sh
+    # - name: Adding preTerminate script
+    #   copy:
+    #     dest: "/etc/systemd/system/preterminate.service"
+    #     content: |
+    #       [Unit]
+    #       Description=Lifecycle hook respond script
+    #       After=network.target
+    #       After=network-online.target
+    #       Wants=network-online.target
+          
+    #       [Service]
+    #       ExecStart=/bin/bash /root/preTerminate.sh
+    #       Restart=always
+    #       RestartSec=10
+    #       [Install]
+    #       WantedBy=multi-user.target
+          
+    # - name: Adding final_backup script
+    #   copy:
+    #     dest: "/root/final_backup.sh"
+    #     content: |
+    #       #!/bin/bash
+    #       set -e
+    #       zip -r /data/logs/PLACEHOLDER/api/final_api.zip /twid/api/storage/logs
+    #       if [[ $? -eq 0 ]]
+    #       then
+    #               echo "Zipped tasks logs succesfully"
+    #       else
+    #               exit 1
+    #       fi
+          
+    #       [root@ip-172-31-25-134 /]# cat /root/final_backup.sh 
+    #       #!/bin/bash
+    #       set -e
+    #       zip -r /data/logs/PLACEHOLDER/api/final_api.zip /twid/api/storage/logs
+    #       if [[ $? -eq 0 ]]
+    #       then
+    #               echo "Zipped tasks logs succesfully"
+    #       else
+    #               exit 1
+    #       fi
+
+    # - name: Adding final_backup script
+    #   copy:
+    #     dest: "/root/final_backup.sh"
+    #     content: |
+    #       #!/bin/bash
+    #       set -e
+    #       zip -r /data/logs/PLACEHOLDER/api/final_api.zip /twid/api/storage/logs
+    #       if [[ $? -eq 0 ]]
+    #       then
+    #               echo "Zipped tasks logs succesfully"
+    #       else
+    #               exit 1
+    #       fi
