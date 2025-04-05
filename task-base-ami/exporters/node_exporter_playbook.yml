@@ -23,9 +23,9 @@
 
     - name: Create Directory
       shell: |
-        mkdir /usr/local/bin/nodeexporter
-        mkdir /usr/local/bin/nodeexporter/custom_metrics
-        touch /nodeexporter/custom_metrics/temp_eth
+        sudo mkdir /usr/local/bin/nodeexporter
+        sudo mkdir /usr/local/bin/nodeexporter/custom_metrics
+        sudo touch /nodeexporter/custom_metrics/temp_eth
 
     - name: Move node_exporter binary to /usr/local/bin
       command: mv /tmp/node_exporter-1.6.1.linux-amd64/node_exporter /usr/local/bin/node_exporter/
