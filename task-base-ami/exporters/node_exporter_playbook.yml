@@ -28,7 +28,7 @@
         sudo touch /usr/local/bin/nodeexporter/custom_metrics/temp_eth
 
     - name: Move node_exporter binary to /usr/local/bin
-      command: mv /tmp/node_exporter-1.6.1.linux-amd64/node_exporter /usr/local/bin/node_exporter/
+      command: mv /tmp/node_exporter-1.6.1.linux-amd64/node_exporter /usr/local/bin/nodeexporter/
 
     - name: Create systemd service file for node_exporter
       copy:
