@@ -1,5 +1,5 @@
 ---
-- name: update configuration files
+- name: Install dnsmasq
   hosts: localhost
   gather_facts: no
   become: true
