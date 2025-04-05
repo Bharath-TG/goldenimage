@@ -70,14 +70,14 @@
         dest: "/bin/export_eth.sh"
         content: |
           #!/bin/bash
-          rm /nodeexporter/custom_metrics/temp_eth
+          rm /usr/local/bin/nodeexporter/custom_metrics/temp_eth
           /usr/sbin/ethtool -S eth0 | tr -d " " | tail -n +2 | while read n
           do
             field=`echo $n | awk -F: '{print $1}'`
             value=`echo $n | awk -F: '{print $2}'`
-            echo "eth_metrics{metric=\"$field\"} $value" >> /nodeexporter/custom_metrics/temp_eth
-            cp /nodeexporter/custom_metrics/temp_eth /nodeexporter/custom_metrics/eth.prom
-            chmod -R 777 /nodeexporter/custom_metrics
+            echo "eth_metrics{metric=\"$field\"} $value" >> /usr/local/bin/nodeexporter/custom_metrics/temp_eth
+            cp /usr/local/bin/nodeexporter/custom_metrics/temp_eth /usr/local/bin/nodeexporter/custom_metrics/eth.prom
+            chmod -R 777 /usr/local/bin/nodeexporter/custom_metrics
           done
           
     - name: update /bin/export_eth.sh
