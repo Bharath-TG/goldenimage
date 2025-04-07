@@ -145,7 +145,7 @@
 
     - name: Create systemd service file for preInterrupt script
       copy:
-        dest: "/etc/systemd/system/preinterrupt.service "
+        dest: "/etc/systemd/system/preinterrupt.service"
         content: |
           [Unit]
           Description=Lifecycle hook respond script
@@ -219,58 +219,4 @@
         sudo chmod +x /root/preTerminate.sh
         sudo chmod +x /root/preInterrupt.sh
         sudo chmod +x /root/resizeVolume.sh
-    # - name: Adding preTerminate script
-    #   copy:
-    #     dest: "/etc/systemd/system/preterminate.service"
-    #     content: |
-    #       [Unit]
-    #       Description=Lifecycle hook respond script
-    #       After=network.target
-    #       After=network-online.target
-    #       Wants=network-online.target
-          
-    #       [Service]
-    #       ExecStart=/bin/bash /root/preTerminate.sh
-    #       Restart=always
-    #       RestartSec=10
-    #       [Install]
-    #       WantedBy=multi-user.target
-          
-    # - name: Adding final_backup script
-    #   copy:
-    #     dest: "/root/final_backup.sh"
-    #     content: |
-    #       #!/bin/bash
-    #       set -e
-    #       zip -r /data/logs/PLACEHOLDER/api/final_api.zip /twid/api/storage/logs
-    #       if [[ $? -eq 0 ]]
-    #       then
-    #               echo "Zipped tasks logs succesfully"
-    #       else
-    #               exit 1
-    #       fi
-          
-    #       [root@ip-172-31-25-134 /]# cat /root/final_backup.sh 
-    #       #!/bin/bash
-    #       set -e
-    #       zip -r /data/logs/PLACEHOLDER/api/final_api.zip /twid/api/storage/logs
-    #       if [[ $? -eq 0 ]]
-    #       then
-    #               echo "Zipped tasks logs succesfully"
-    #       else
-    #               exit 1
-    #       fi
-
-    # - name: Adding final_backup script
-    #   copy:
-    #     dest: "/root/final_backup.sh"
-    #     content: |
-    #       #!/bin/bash
-    #       set -e
-    #       zip -r /data/logs/PLACEHOLDER/api/final_api.zip /twid/api/storage/logs
-    #       if [[ $? -eq 0 ]]
-    #       then
-    #               echo "Zipped tasks logs succesfully"
-    #       else
-    #               exit 1
-    #       fi
+    
