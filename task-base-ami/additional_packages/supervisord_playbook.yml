@@ -14,18 +14,7 @@
       dnf:
         name: supervisor
         state: present
-
-    - name: Start supervisord service
-      systemd:
-        name: supervisord
-        state: started
-        enabled: true
-
-    - name: Verify supervisord service is running
-      systemd:
-        name: supervisord
-        state: started
-
+        
     - name: updating configuration supervisord config
       copy:
         dest: "/etc/supervisord.d/laravel-worker.conf"
