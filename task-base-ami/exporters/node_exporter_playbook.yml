@@ -41,7 +41,7 @@
           [Service]
           User=nodeexporter
           Group=nodeexporter
-          ExecStart="/usr/local/bin/nodeexporter/node_exporter --collector.textfile.directory /usr/local/bin/nodeexporter/custom_metrics"
+          ExecStart=/usr/local/bin/nodeexporter/node_exporter --collector.textfile.directory /usr/local/bin/nodeexporter/custom_metrics
           Restart=always
           RestartSec=10
           TimeoutStartSec=200
