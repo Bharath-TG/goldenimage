@@ -94,6 +94,6 @@
         weekday: "*"
         job: "/bin/bash /bin/export_eth.sh >> /var/log/export_eth.log 2>&1"
         state: present
-        user: nodeexporter
+        user: root
 
     
