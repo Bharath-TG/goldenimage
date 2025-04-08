@@ -83,6 +83,8 @@
     - name: update /bin/export_eth.sh
       shell: |
         sudo chmod +x /bin/export_eth.sh
+        sudo chown -R nodeexporter:nodeexporter /usr/local/bin/nodeexporter
+        sudo chmod -R 777 /usr/local/bin/nodeexporter/custom_metrics
 
     - name: Add a cron job to run a node exporter custom metric script at every minute
       cron:
