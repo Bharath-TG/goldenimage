@@ -228,44 +228,47 @@
           #Hack to get around efs not being properly mounted at this point.
           while true
           do
-              sleep 5
-              count=`ls  /data/logs | wc -l`
-              echo $count
-              if [[ $count -gt 5 ]]
-              then
-          echo "creating mkdir -p  /data/logs/${uniqueString}/tasks"
-          mkdir -p  /data/logs/${uniqueString}/tasks
+          	sleep 5
+          	count=`ls  /data/logs | wc -l`
+          	echo $count
+          	if [[ $count -gt 5 ]]
+          	then
+          mkdir -p /data/logs/${uniqueString}/tasks
           if [ ! -d /data/logs/${uniqueString}/tasks ]
           then
-              continue
+                  continue
           fi
-  
+          
           break
-              fi
+          	fi
           done
           sed -i "s;PLACEHOLDER;${uniqueString};g" /etc/logrotate.d/tasks
           sed -i "s;PLACEHOLDER;${uniqueString};g" /root/final_backup.sh
+          cp /root/final_backup.sh /twid/final_backup.sh
           export instanceId=`curl http://169.254.169.254/latest/meta-data/instance-id`
-  
           while true
           do
-              sleep 5
-          export instanceId=`curl http://169.254.169.254/latest/meta-data/instance-id`
-          export asg=`/usr/bin/aws ec2 describe-tags --filters "Name=resource-id,Values=${instanceId}" "Name=key,Values=aws:autoscaling:groupName" --region ap-south-1 | grep -oP '(?<="Value": ").*?(?=")'`
+          	sleep 5
           export service=`/usr/bin/aws ec2 describe-tags --filters "Name=resource-id,Values=${instanceId}" "Name=key,Values=service" --region ap-south-1 | grep -oP '(?<="Value": ").*?(?=")'`
-          if [[ -z $asg ]] || [[ -z $service ]] || [[ -z $instanceId ]]
+          export asg=`/usr/bin/aws ec2 describe-tags --filters "Name=resource-id,Values=${instanceId}" "Name=key,Values=aws:autoscaling:groupName" --region ap-south-1 | grep -oP '(?<="Value": ").*?(?=")'`
+          export persistentVolume=`/usr/bin/aws ec2 describe-volumes --filters Name=attachment.instance-id,Values=${instanceId} Name=attachment.delete-on-termination,Values=false --region ap-south-1 | grep -oP '(?<="VolumeId": ").*?(?=")' | uniq`
+          if [[ -z $asg ]] || [[ -z $service ]]
           then
-              continue
+          	continue
           else
-              break
+          	break
           fi
           done
-          touch /data/logs/${uniqueString}/tasks/${instanceId} || true
           sed -i "s;PLACEHOLDERASG;${asg};g" /root/preTerminate.sh
           sed -i "s;PLACEHOLDERINSTANCE;${instanceId};g" /root/preTerminate.sh
-          sed -i "s;SERVICEPLACEHOLDER;${service};g" /etc/serf/serf.config
+          sed -i "s;PLACEHOLDERPERSISTENTVOLUME;${persistentVolume};g" /root/preTerminate.sh
+          sed -i "s;PLACEHOLDERASG;${asg};g" /root/preInterrupt.sh
+          sed -i "s;PLACEHOLDERINSTANCE;${instanceId};g" /root/preInterrupt.sh
+          sed -i "s;PLACEHOLDERPERSISTENTVOLUME;${persistentVolume};g" /root/preInterrupt.sh
+          sed -i "s;PLACEHOLDERPERSISTENTVOLUME;${persistentVolume};g" /root/resizeVolume.sh
+          systemctl start preinterrupt
           systemctl start preterminate
-          systemctl start serf
+          systemctl start resizevolume
           systemctl start redis
           echo $service
 
