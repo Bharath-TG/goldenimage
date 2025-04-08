@@ -213,10 +213,81 @@
 
           [Install]
           WantedBy=multi-user.target
+
+    - name: Create initscript script
+      copy:
+        dest: "/root/initscript.sh"
+        content: |
+          #!/bin/bash
+          set -e
+          export HTTPS_PROXY="http://172.31.21.180:3128/"
+          export currentTimeStamp=`date +%s`
+          export instanceIp=`ip a  | grep inet | grep eth0 | awk '{print $2}' | awk -F/ '{print $1}' | tr -d "."`
+          export uniqueString="tasks_asg/${instanceIp}/${currentTimeStamp}"
+          echo $uniqueString
+          #Hack to get around efs not being properly mounted at this point.
+          while true
+          do
+              sleep 5
+              count=`ls  /data/logs | wc -l`
+              echo $count
+              if [[ $count -gt 5 ]]
+              then
+          echo "creating mkdir -p  /data/logs/${uniqueString}/tasks"
+          mkdir -p  /data/logs/${uniqueString}/tasks
+          if [ ! -d /data/logs/${uniqueString}/tasks ]
+          then
+              continue
+          fi
+  
+          break
+              fi
+          done
+          sed -i "s;PLACEHOLDER;${uniqueString};g" /etc/logrotate.d/tasks
+          sed -i "s;PLACEHOLDER;${uniqueString};g" /root/final_backup.sh
+          export instanceId=`curl http://169.254.169.254/latest/meta-data/instance-id`
+  
+          while true
+          do
+              sleep 5
+          export instanceId=`curl http://169.254.169.254/latest/meta-data/instance-id`
+          export asg=`/usr/bin/aws ec2 describe-tags --filters "Name=resource-id,Values=${instanceId}" "Name=key,Values=aws:autoscaling:groupName" --region ap-south-1 | grep -oP '(?<="Value": ").*?(?=")'`
+          export service=`/usr/bin/aws ec2 describe-tags --filters "Name=resource-id,Values=${instanceId}" "Name=key,Values=service" --region ap-south-1 | grep -oP '(?<="Value": ").*?(?=")'`
+          if [[ -z $asg ]] || [[ -z $service ]] || [[ -z $instanceId ]]
+          then
+              continue
+          else
+              break
+          fi
+          done
+          touch /data/logs/${uniqueString}/tasks/${instanceId} || true
+          sed -i "s;PLACEHOLDERASG;${asg};g" /root/preTerminate.sh
+          sed -i "s;PLACEHOLDERINSTANCE;${instanceId};g" /root/preTerminate.sh
+          sed -i "s;SERVICEPLACEHOLDER;${service};g" /etc/serf/serf.config
+          systemctl start preterminate
+          systemctl start serf
+          systemctl start redis
+          echo $service
+
+    - name: Create final backup script
+      copy:
+        dest: "/root/final_backup.sh"
+        content: |
+          #!/bin/bash
+          set -e
+          zip -r /data/logs/PLACEHOLDER/tasks/final_tasks.zip /twid/tasks/storage/logs
+          if [[ $? -eq 0 ]]
+          then
+                  echo "Zipped tasks logs succesfully"
+          else
+                  exit 1
+          fi
           
     - name: update script exexution permissions
       shell: |
         sudo chmod +x /root/preTerminate.sh
         sudo chmod +x /root/preInterrupt.sh
         sudo chmod +x /root/resizeVolume.sh
+        sudo chmod +x /root/initscript.sh
+        sudo chmod +x /root/final_backup.sh
     
