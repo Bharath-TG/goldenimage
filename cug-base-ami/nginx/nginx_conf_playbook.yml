@@ -1,0 +1,338 @@
+---
+- name: update configuration files
+  hosts: localhost
+  gather_facts: no
+  become: true
+
+  tasks:
+    - name: Create directory
+      shell: |
+        sudo mkdir /twid/log
+        sudo mkdir /etc/nginx/snippets
+
+    - name: updating configuration nginx.conf
+      copy:
+        dest: "/etc/nginx/nginx.conf"
+        content: |
+          user nginx;
+          worker_processes auto;
+          error_log /var/log/nginx/error.log;
+          pid /run/nginx.pid;
+          include /usr/share/nginx/modules/*.conf;
+          events {
+              worker_connections 1024;
+          }
+          http {
+              log_format  main  '$remote_addr - $remote_user [$time_local] "$request" '
+                                '$status $body_bytes_sent "$http_referer" '
+                                '"$http_user_agent" "$http_x_forwarded_for"';
+              access_log  /var/log/nginx/access.log  main;
+              sendfile            		on;
+              tcp_nopush          		on;
+              tcp_nodelay         		on;
+              client_header_timeout               60m;
+              client_body_timeout                 60m;
+              client_header_buffer_size           2k;
+              client_body_buffer_size             256k;
+              client_max_body_size                256m;
+              large_client_header_buffers         4   8k;
+              send_timeout                        600;
+              keepalive_timeout                   600;
+              keepalive_requests                  100000;
+              reset_timedout_connection           on;
+              server_name_in_redirect             off;
+              server_names_hash_max_size          512;
+              server_names_hash_bucket_size       512;
+              types_hash_max_size 4096;
+              include             /etc/nginx/mime.types;
+              default_type        application/octet-stream;
+              include /etc/nginx/conf.d/*.conf;
+              server {
+                  listen       80;
+                  listen       [::]:80;
+                  server_name  _;
+                  root         /usr/share/nginx/html;
+                  include /etc/nginx/default.d/*.conf;
+                location / {
+                  }
+                  error_page 404 /404.html;
+                  location = /404.html {
+                  }
+                  error_page 500 502 503 504 /50x.html;
+                  location = /50x.html {
+                  }
+              }
+          }
+          
+    - name: updating configuration conf.d/a.conf
+      copy:
+        dest: "/etc/nginx/conf.d/a.conf"
+        content: |
+          server {
+            listen 80 default_server;
+            server_name a.tasks.twidpay.com;
+            include /etc/nginx/snippets/headers.conf;
+            root /var/www/html/healthcheck;
+            index index.php index.html index.htm;
+            location / {
+              try_files $uri $uri/ /index.php?$args;
+            }
+            location ~ \.php$ {
+            try_files $uri =404;
+            fastcgi_pass unix:/run/php-fpm/www.sock;
+            fastcgi_index index.php;
+            fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
+            include fastcgi_params;
+            }
+          }
+
+    - name: updating configuration conf.d/tasks-cug.conf
+      copy:
+        dest: "/etc/nginx/conf.d/tasks-cug.conf"
+        content: |
+          server {
+            listen 8001;
+            server_name tasks-cug.twidpay.com tasks-cug.local.twidpay.com;
+            include /etc/nginx/snippets/headers.conf;
+            root /twid/tasks/public;
+            access_log /twid/log/cug_tasks_access_log;
+            error_log /twid/log/cug_tasks_error_log crit;
+            index index.php index.html index.htm;
+            proxy_read_timeout 1800s;
+            proxy_connect_timeout 1800s;
+            proxy_send_timeout 1800s;
+            fastcgi_connect_timeout 1800s;
+            fastcgi_read_timeout 1800s;
+            fastcgi_send_timeout 1800s;
+            fastcgi_keep_conn on;
+            location / {
+              try_files $uri $uri/ /index.php?$args;
+            }
+            location ~ \.php$ {
+            try_files $uri =404;
+            fastcgi_pass unix:/run/php-fpm/www.sock;
+            fastcgi_index index.php;
+            fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
+            include fastcgi_params;
+            
+            # Hide PHP headers
+            fastcgi_hide_header             X-Powered-By;
+            fastcgi_hide_header             X-CF-Powered-By;
+            }
+            location /status {
+              stub_status;
+              allow 127.0.0.1;        #only allow requests from localhost
+              deny all;               #deny all other hosts
+            }
+            location ~ /\. {
+              deny  all;
+            }	
+          }
+
+    - name: updating configuration conf.d/system-cug.conf
+      copy:
+        dest: "/etc/nginx/conf.d/system-cug.conf"
+        content: |
+          server {
+            listen 8001;
+            server_name system-cug.twidpay.com system-cug.local.twidpay.com;
+            include /etc/nginx/snippets/headers.conf;
+            root /twid/system/public;
+            access_log /twid/log/cug_system_access_log;
+            error_log /twid/log/cug_system_error_log crit;
+            index index.php index.html index.htm;
+            proxy_read_timeout 1800s;
+            proxy_connect_timeout 1800s;
+            proxy_send_timeout 1800s;
+            fastcgi_connect_timeout 1800s;
+            fastcgi_read_timeout 1800s;
+            fastcgi_send_timeout 1800s;
+            fastcgi_keep_conn on;
+            location / {
+              try_files $uri $uri/ /index.php?$args;
+            }
+            location ~ \.php$ {
+              try_files $uri =404;
+              fastcgi_pass unix:/run/php-fpm/www.sock;
+              fastcgi_index index.php;
+              fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
+              include fastcgi_params;
+              # Hide PHP headers
+              fastcgi_hide_header             X-Powered-By;
+              fastcgi_hide_header             X-CF-Powered-By;
+            }
+            location /status {
+              stub_status;
+              allow 127.0.0.1;        #only allow requests from localhost
+              deny all;               #deny all other hosts
+            }
+            location ~ /\. {
+              deny  all;
+            }	
+          }
+
+    - name: updating configuration conf.d/api-cug.conf
+      copy:
+        dest: "/etc/nginx/conf.d/api-cug.conf"
+        content: |
+          server {
+            listen 8000;
+            server_name api-cug.twidpay.com api-cug.local.twidpay.com;
+            include /etc/nginx/snippets/headers.conf;
+            root /twid/api/public;
+            access_log /twid/log/cug_api_access_log;
+            error_log /twid/log/cug_api_error_log crit;
+            index index.php index.html index.htm;
+            proxy_read_timeout 1800s;
+            proxy_connect_timeout 1800s;
+            proxy_send_timeout 1800s;
+            fastcgi_connect_timeout 1800s;
+            fastcgi_read_timeout 1800s;
+            fastcgi_send_timeout 1800s;
+            fastcgi_keep_conn on;
+            location / {
+              try_files $uri $uri/ /index.php?$args;
+            }
+            location ~ \.php$ {
+            try_files $uri =404;
+            fastcgi_pass unix:/run/php-fpm/www.sock;
+            fastcgi_index index.php;
+            fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
+            include fastcgi_params;
+            # Hide PHP headers
+            fastcgi_hide_header             X-Powered-By;
+            fastcgi_hide_header             X-CF-Powered-By;
+            }
+            location /status {
+              stub_status;
+              allow 127.0.0.1;        #only allow requests from localhost
+              deny all;               #deny all other hosts
+            }
+            location ~ /\. {
+                deny  all;
+            }	
+          }
+
+    - name: updating configuration conf.d/merchant-cug.conf
+      copy:
+        dest: "/etc/nginx/conf.d/merchant-cug.conf"
+        content: |
+          server {
+            listen 8002;
+            server_name merchant-cug.twidpay.com merchant-cug.local.twidpay.com pwa-cug.twidpay.com pwa-cug.local.twidpay.com;
+            include /etc/nginx/snippets/headers.conf;
+            root /twid/merchant/public;
+            access_log /twid/log/cug_merchant_access_log;
+            error_log /twid/log/cug_merchant_error_log crit;
+            index index.php index.html index.htm;
+            proxy_read_timeout 1800s;
+            proxy_connect_timeout 1800s;
+            proxy_send_timeout 1800s;
+            fastcgi_connect_timeout 1800s;
+            fastcgi_read_timeout 1800s;
+            fastcgi_send_timeout 1800s;
+            fastcgi_keep_conn on;
+            location / {
+              if ($request_method = OPTIONS ) {
+                add_header "Access-Control-Allow-Origin"  "https://dashboard-cug.twidpay.com";
+                add_header "Access-Control-Allow-Headers" "Authorization,Content-Type";
+                add_header "Access-Control-Allow-Credentials" true;
+                return 200;
+              }
+              try_files $uri $uri/ /index.php?$args;
+              if ($request_method = OPTIONS ) {
+                add_header "Access-Control-Allow-Origin"  "https://dashboard-cug.twidpay.com";
+                add_header "Access-Control-Allow-Headers" "Authorization,Content-Type";
+                add_header "Access-Control-Allow-Credentials" true;
+                return 200;
+              }
+            }
+            # add_header Access-Control-Allow-Origin  "*" always;
+            location ~ \.php$ {
+              try_files $uri =404;
+              fastcgi_pass unix:/run/php-fpm/www.sock;
+              fastcgi_index index.php;
+              fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
+              include fastcgi_params;
+              # Hide PHP headers
+              fastcgi_hide_header             X-Powered-By;
+              fastcgi_hide_header             X-CF-Powered-By;
+            }
+            location /status {
+              stub_status;
+              allow 127.0.0.1;        #only allow requests from localhost
+              deny all;               #deny all other hosts
+            }
+            location ~ /\. {
+              deny  all;
+            }	
+          }
+
+    - name: updating configuration conf.d/security.conf
+      copy:
+        dest: "/etc/nginx/conf.d/security.conf"
+        content: |
+          server_tokens off;
+          #add_header X-Frame-Options SAMEORIGIN;
+          add_header X-Frame-Options DENY;
+          add_header X-XSS-Protection "1; mode=block";
+          #add_header X-Content-Type-Options nosniff;
+          add_header Content-Security-Policy "default-src 'self' *.google.com *.amazon.com;";
+          add_header Set-Cookie "Path=/; HttpOnly; Secure";
+          add_header Referrer-Policy 'origin';
+
+    - name: updating configuration snippets/headers.conf
+      copy:
+        dest: "/etc/nginx/snippets/headers.conf"
+        content: | 
+          location ^~ /.well-known/acme-challenge/ {
+            allow all;
+            root /var/lib/letsencrypt/;
+            default_type "text/plain";
+            try_files $uri =404;
+          }
+          add_header X-Content-Type-Options nosniff;
+          add_header Strict-Transport-Security "max-age=15768000; includeSubdomains; preload";
+
+    - name: updating configuration conf.d/dashboard-cug.conf
+      copy:
+        dest: "/etc/nginx/conf.d/dashboard-cug.conf"
+        content: |
+          server {
+            listen 8002;
+            server_name dashboard-cug.twidpay.com dashboard-cug.local.twidpay.com;
+            include /etc/nginx/snippets/headers.conf;
+            root /twid/merchant/public/static/merchant_dashboard_react;
+            access_log /twid/log/cug_merchant_access_log;
+            error_log /twid/log/cug_merchant_error_log crit;
+            index index.php index.html index.htm;
+            proxy_read_timeout 1800s;
+            proxy_connect_timeout 1800s;
+            proxy_send_timeout 1800s;
+            fastcgi_connect_timeout 1800s;
+            fastcgi_read_timeout 1800s;
+            fastcgi_send_timeout 1800s;
+            fastcgi_keep_conn on;
+            location / {
+                try_files $uri $uri/ /index.html?$args;
+            }
+            add_header "Access-Control-Allow-Origin"  *;
+            location ~ \.php$ {
+                try_files $uri =404;
+                fastcgi_pass unix:/run/php-fpm/www.sock;
+                fastcgi_index index.php;
+                fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
+                include fastcgi_params;
+                # Hide PHP headers
+                fastcgi_hide_header             X-Powered-By;
+                fastcgi_hide_header             X-CF-Powered-By;
+            }
+            location /status {
+                stub_status;
+                allow 127.0.0.1;        #only allow requests from localhost
+                deny all;               #deny all other hosts
+            }
+            location ~ /\. {
+                deny  all;
+            }	
+          }
