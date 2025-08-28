@@ -58,3 +58,8 @@
           - php-zip
           - php-pear           
         state: present
+
+    - name: Enable php-fpm to start on boot
+      systemd:
+        name: php-fpm
+        enabled: yes
