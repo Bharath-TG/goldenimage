@@ -62,4 +62,5 @@
     - name: Enable php-fpm to start on boot
       systemd:
         name: php-fpm
+        state: started
         enabled: yes
