@@ -152,7 +152,7 @@
           [dba]
           [curl]
           [openssl]
-          browscap = /twid/browsercap.ini
+          # browscap = /twid/browsercap.ini
           
     - name: updating configuration php-fpm config
       copy:
