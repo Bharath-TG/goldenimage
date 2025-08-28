@@ -117,6 +117,13 @@
         path: "{{ ssh_private_key_path }}"
         state: absent
 
+    - name: Create directory
+      shell: |
+        sudo mkdir /twid/system/storage/framework
+        sudo mkdir /twid/system/storage/framework/cache
+        sudo mkdir /twid/system/storage/framework/sessions
+        sudo mkdir /twid/system/storage/framework/views
+
     - name: system_install_composer script
       copy:
         dest: "/tmp/system_install_composer.sh"
