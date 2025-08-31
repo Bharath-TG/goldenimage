@@ -1,0 +1,71 @@
+---
+- name: update logrotate config file
+  hosts: localhost
+  gather_facts: no
+  become: true
+
+  tasks:
+    - name: updating configuration merchant
+      copy:
+        dest: "/etc/logrotate.d/merchant"
+        content: |
+          /twid/merchant/storage/logs/*log {
+            su root kushal
+            daily
+            missingok
+            rotate 14
+            compress
+            delaycompress
+            notifempty
+            postrotate
+              mv /twid/merchant/storage/logs/*.gz /data/logs/merchant1/
+            endscript
+          }
+
+    - name: updating configuration merchant1
+      copy:
+        dest: "/etc/logrotate.d/merchant1"
+        content: |
+          /twid/log/*log {
+            daily
+            rotate 14
+            create
+            dateext
+            compress
+          }
+
+    - name: updating configuration nginx
+      copy:
+        dest: "/etc/logrotate.d/nginx"
+        content: |
+          /twid/log/*.log
+          /var/log/nginx/*.log {
+            create 0640 nginx root
+            daily
+            rotate 10
+            missingok
+            notifempty
+            compress
+            sharedscripts
+            postrotate
+              /bin/kill -USR1 `cat /run/nginx.pid 2>/dev/null` 2>/dev/null || true
+            endscript
+          }
+
+    - name: updating configuration system
+      copy:
+        dest: "/etc/logrotate.d/chrony"
+        content: |
+          /var/log/chrony/*.log {
+            daily
+            rotate 7
+            missingok
+            notifempty
+            nocreate
+            sharedscripts
+            postrotate
+              /usr/bin/chronyc cyclelogs > /dev/null 2>&1 || true
+            endscript
+            compress
+            dateext
+          }
