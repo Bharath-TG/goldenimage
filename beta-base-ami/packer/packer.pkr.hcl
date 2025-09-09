@@ -71,6 +71,10 @@ build {
   }
 
   provisioner "ansible-local" {
+    playbook_file = "../squid/squid_playbook.yml"
+  }
+
+  provisioner "ansible-local" {
     playbook_file = "../php-fpm/php_playbook.yml"
   }
 
@@ -128,6 +132,10 @@ build {
 
   provisioner "ansible-local" {
     playbook_file = "../php-fpm/phpfpm_conf_playbook.yml"
+  }
+
+  provisioner "ansible-local" {
+    playbook_file = "../squid/squid_conf_playbook.yml"
   }
 
   provisioner "ansible-local" {
