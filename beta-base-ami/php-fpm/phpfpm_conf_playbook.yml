@@ -154,7 +154,13 @@
           [curl]
           #curl.cainfo = "/etc/pki/CA/certs/cacert.pem"
           [openssl]   
+
+    - name: Download php_browscap.ini from browscap.org
+      get_url:
+        url: https://browscap.org/stream?q=Full_PHP_BrowsCapINI
+        dest: /etc/php_browscap.ini
+        mode: '0644'    
                  
-#    - name: Wait for 15 minutes
-#      ansible.builtin.pause:
-#        minutes: 15
+    - name: Wait for 15 minutes
+      ansible.builtin.pause:
+        minutes: 15
