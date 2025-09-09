@@ -25,35 +25,27 @@
         dest: "/tmp/mount.sh"
         content: |
           #!/bin/bash
-
-          # Get the root disk (e.g., /dev/nvme0n1 or /dev/nvme1n1)
-          root_disk=$(df / | tail -1 | awk '{print $1}')
+          root_device=$(lsblk -no pkname $(df / | tail -1 | awk '{print $1}') | head -1)
+          all_devices=($(lsblk -d -n -o NAME | grep nvme))
           
-          echo "Root disk: $root_disk"
+          for dev in "${all_devices[@]}"; do
+              if [[ "$dev" != "$root_device" ]]; then
+                  disk_to_format="/dev/$dev"
+                  break
+              fi
+          done
           
-          # Define the disks we want to check (we will match the base disk name)
-          disk_to_format=""
-          
-          # Check if the root disk is on /dev/nvme0n1* or /dev/nvme1n1*
-          if [[ $root_disk == /dev/nvme0n1* ]]; then
-              # If root is on /dev/nvme0n1*, we will format /dev/nvme1n1
-              disk_to_format="/dev/nvme1n1"
-          elif [[ $root_disk == /dev/nvme1n1* ]]; then
-              # If root is on /dev/nvme1n1*, we will format /dev/nvme0n1
-              disk_to_format="/dev/nvme0n1"
-          else
-              echo "Root disk is neither on /dev/nvme0n1* nor /dev/nvme1n1* - exiting."
+          if [[ -z "$disk_to_format" ]]; then
+              echo "No secondary disk found to format."
               exit 1
           fi
           
-          echo "Disk to format: $disk_to_format"
-
           echo "Formatting disk: $disk_to_format"
-          sudo mkfs.xfs $disk_to_format
-          sudo mkdir -p /twid
-          sudo mount $disk_to_format /twid
-          uuid=$(sudo blkid -o value -s UUID $disk_to_format)
-          echo "UUID=$uuid  /twid  xfs  defaults,nofail 0 2" | sudo tee -a /etc/fstab 
+          mkfs.xfs -f "$disk_to_format"
+          mkdir -p /twid
+          mount "$disk_to_format" /twid
+          uuid=$(blkid -o value -s UUID "$disk_to_format")
+          echo "UUID=$uuid  /twid  xfs  defaults,nofail 0 2" >> /etc/fstab
     
     - name: update /etc/fstab
       shell: |
