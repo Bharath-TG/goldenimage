@@ -261,6 +261,6 @@
         git config --global --add safe.directory /twid/tpap
         sudo chmod 755 /twid
           
-    - name: Wait for 5 minutes
+    - name: Wait for 10 minutes
       ansible.builtin.pause:
         minutes: 10
