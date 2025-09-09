@@ -13,7 +13,7 @@ packer {
 
 # Using a Rocky Linux AMI as the base
 source "amazon-ebs" "rocky-linux" {
-  region          = "ap-south-1" # ohio region "ap-south-1"
+  region          = "ap-south-2" # ohio region "ap-south-1"
   ami_name        = "beta-rocky-ami-version-{{timestamp}}"
   instance_type   = "t3.xlarge"    # Instance type (can adjust as needed)
   source_ami      = "ami-09f32eccb3e71734c" #  "ami-0321f0c22d67f6571" # "ami-05150ea4d8a533099" Replace with the correct Rocky Linux AMI ID
