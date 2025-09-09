@@ -53,7 +53,7 @@ build {
   }
 
   provisioner "file" {
-    source      = "/scripts"
+    source      = "scripts"
     destination = "/tmp/scripts"
   }
 
