@@ -62,7 +62,7 @@ build {
       "sudo mkdir -p /root/scripts",
       "sudo mv /tmp/scripts/* /root/scripts/",
       "sudo chown -R root:root /root/scripts",
-      "sudo chmod +x /root/scripts"
+      "sudo chmod +x /root/scripts/*"
     ]
   }
 
