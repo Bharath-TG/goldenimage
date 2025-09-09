@@ -133,10 +133,10 @@
       environment:
         GIT_SSH_COMMAND: ssh -i {{ ssh_private_key_path }} -o StrictHostKeyChecking=no
 
-    - name: Clone the Git Mapi repository
+    - name: Clone the Git Tpap repository
       git:
-        repo: "{{ mapi_repo_url }}"
-        dest: "{{ mapi_dest_dir }}"
+        repo: "{{ tpap_repo_url }}"
+        dest: "{{ tpap_dest_dir }}"
         version: "{{ branch }}"
         key_file: "{{ ssh_private_key_path }}"
         update: no
