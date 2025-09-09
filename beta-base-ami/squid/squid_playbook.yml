@@ -1,0 +1,27 @@
+---
+- name: Install Squid on beta host
+  hosts: localhost
+  gather_facts: no
+  become: true
+
+  tasks:
+    - name: Update all packages
+      dnf:
+        name: '*'
+        state: latest
+
+    - name: Install EPEL repository
+      dnf:
+        name: epel-release
+        state: present
+
+    - name: Install Squid
+      dnf:
+        name: squid
+        state: present
+
+    - name: Enable and start Squid service
+      systemd:
+        name: squid
+        state: started
+        enabled: yes
