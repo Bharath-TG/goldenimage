@@ -1,0 +1,60 @@
+---
+- name: install PHP 8.4
+  hosts: localhost
+  gather_facts: no
+  become: true
+  tasks:
+
+    - name: Ensure EPEL repository is installed
+      dnf:
+        name: epel-release
+        state: present
+
+    - name: Import Remi GPG key
+      rpm_key:
+        state: present
+        key: https://rpms.remirepo.net/RPM-GPG-KEY-remi          
+
+#    - name: Install Remi repository for PHP 8.4
+#      dnf:
+#        name: http://rpms.remirepo.net/enterprise/remi-release-9.rpm
+#        state: present
+
+    - name: Install Remi repository for PHP 8.4 manually
+      shell: |
+        dnf install -y http://rpms.remirepo.net/enterprise/remi-release-9.rpm
+
+    - name: Install DNF utilities (for enabling the Remi repository)
+      dnf:
+        name: dnf-utils
+        state: present
+
+    - name: Disable all PHP modules
+      command: dnf module disable php -y
+      become: true
+
+    - name: Enable Remi PHP 8.4 repository
+      command: dnf module enable php:remi-8.4 -y
+      become: true
+
+    - name: Install PHP 8.4 and common extensions
+      dnf:
+        name:
+          - php
+          - php-bcmath
+          - php-cli
+          - php-common
+          - php-devel
+          - php-fpm
+          - php-gd
+          - php-intl
+          - php-mbstring
+          - php-mysqlnd
+          - php-opcache
+          - php-pdo
+          - php-process
+          - php-soap
+          - php-xml
+          - php-zip
+          - php-pear           
+        state: present
