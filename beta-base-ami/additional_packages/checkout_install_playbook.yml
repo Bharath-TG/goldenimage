@@ -160,8 +160,12 @@
         dest: "/tmp/system_install_composer.sh"
         content: |
           #!/bin/bash
+          sudo chmod -R 775 /twid/system/
+          sudo chown -R apache:kushal /twid/system/
+          git config --global --add safe.directory /twid/system
           cd /twid/system
-          composer install --no-dev -n
+          sudo -u kushal -- composer update --no-dev
+          sudo -u kushal -- composer install --no-dev -n
         
     - name: run system_install_composer script
       shell: |
@@ -174,8 +178,12 @@
         dest: "/tmp/api_install_composer.sh"
         content: |
           #!/bin/bash
+          sudo chmod -R 775 /twid/api/
+          sudo chown -R apache:kushal /twid/api/
+          git config --global --add safe.directory /twid/api
           cd /twid/api
-          composer install --no-dev -n
+          sudo -u kushal -- composer update --no-dev
+          sudo -u kushal -- composer install --no-dev -n
         
     - name: run api_install_composer script
       shell: |
@@ -188,8 +196,12 @@
         dest: "/tmp/tasks_install_composer.sh"
         content: |
           #!/bin/bash
+          sudo chmod -R 775 /twid/tasks/
+          sudo chown -R apache:kushal /twid/tasks/
+          git config --global --add safe.directory /twid/tasks
           cd /twid/tasks
-          composer install --no-dev -n
+          sudo -u kushal -- composer update --no-dev
+          sudo -u kushal -- composer install --no-dev -n
         
     - name: run tasks_install_composer script
       shell: |
@@ -202,8 +214,12 @@
         dest: "/tmp/merchant_install_composer.sh"
         content: |
           #!/bin/bash
+          sudo chmod -R 775 /twid/merchant/
+          sudo chown -R apache:kushal /twid/merchant/
+          git config --global --add safe.directory /twid/merchant
           cd /twid/merchant
-          composer install --no-dev -n
+          sudo -u kushal -- composer update --no-dev
+          sudo -u kushal -- composer install --no-dev -n
         
     - name: run merchant_install_composer script
       shell: |
@@ -216,8 +232,12 @@
         dest: "/tmp/mapi_install_composer.sh"
         content: |
           #!/bin/bash
+          sudo chmod -R 775 /twid/mapi/
+          sudo chown -R apache:kushal /twid/mapi/
+          git config --global --add safe.directory /twid/mapi
           cd /twid/mapi
-          composer install --no-dev -n
+          sudo -u kushal -- composer update --no-dev
+          sudo -u kushal -- composer install --no-dev -n
         
     - name: run mapi_install_composer script
       shell: |
@@ -230,8 +250,12 @@
         dest: "/tmp/tpap_install_composer.sh"
         content: |
           #!/bin/bash
+          sudo chmod -R 775 /twid/tpap/
+          sudo chown -R apache:kushal /twid/tpap/
+          git config --global --add safe.directory /twid/tpap
           cd /twid/tpap
-          composer install --no-dev -n
+          sudo -u kushal -- composer update --no-dev
+          sudo -u kushal -- composer install --no-dev -n
         
     - name: run tpap_install_composer script
       shell: |
@@ -241,24 +265,12 @@
 
     - name: update directory permision
       shell: |
-        sudo chmod -R 775 /twid/system/
         sudo chown -R apache:kushal /twid/system/
-        git config --global --add safe.directory /twid/system
-        sudo chmod -R 775 /twid/api/
         sudo chown -R apache:kushal /twid/api/
-        git config --global --add safe.directory /twid/api
-        sudo chmod -R 775 /twid/tasks/
         sudo chown -R apache:kushal /twid/tasks/
-        git config --global --add safe.directory /twid/tasks
-        sudo chmod -R 775 /twid/merchant/
         sudo chown -R apache:kushal /twid/merchant/
-        git config --global --add safe.directory /twid/merchant
-        sudo chmod -R 775 /twid/mapi/
         sudo chown -R apache:kushal /twid/mapi/
-        git config --global --add safe.directory /twid/mapi
-        sudo chmod -R 775 /twid/tpap/
         sudo chown -R apache:kushal /twid/tpap/
-        git config --global --add safe.directory /twid/tpap
         sudo chmod 755 /twid
           
     - name: Wait for 10 minutes
