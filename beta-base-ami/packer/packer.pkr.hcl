@@ -53,13 +53,16 @@ build {
   }
 
   provisioner "file" {
-    source      = "scripts"
-    destination = "/root/scripts"
+    source      = "/scripts"
+    destination = "/tmp/scripts"
   }
 
-  provisioner "ansible-local" {
-    playbook_file   = "../additional_packages/copy_scripts.yml"
-    extra_arguments = ["--roles-path=/root/scripts"]
+  provisioner "shell" {
+    inline = [
+      "sudo mkdir -p /root/scripts",
+      "sudo mv /tmp/scripts/* /root/scripts/",
+      "sudo chown -R root:root /root/scripts"
+    ]
   }
 
   provisioner "ansible-local" {
