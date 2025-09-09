@@ -87,19 +87,11 @@ build {
   }
 
   provisioner "ansible-local" {
-    playbook_file = "../code_deploy_agent/code_deploy_playbook.yml"
-  }
-
-  provisioner "ansible-local" {
     playbook_file = "../additional_packages/composer_playbook.yml"
   }
 
   provisioner "ansible-local" {
     playbook_file = "../filebeat/filebeat_playbook.yml"
-  }
-
-  provisioner "ansible-local" {
-    playbook_file = "../additional_packages/efs_utils_playbook.yml"
   }
 
   provisioner "ansible-local" {
@@ -112,14 +104,6 @@ build {
 
   provisioner "ansible-local" {
     playbook_file = "../additional_packages/logwatch_playbook.yml"
-  }
-
-  provisioner "ansible-local" {
-    playbook_file = "../code_deploy_agent/code_deploy_agent_conf_playbook.yml"
-  }
-
-  provisioner "ansible-local" {
-    playbook_file = "../additional_packages/dnsmasq_playbook.yml"
   }
 
   provisioner "ansible-local" {
