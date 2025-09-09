@@ -1,0 +1,141 @@
+---
+- name: update logrotate config file
+  hosts: localhost
+  gather_facts: no
+  become: true
+
+  tasks:
+    - name: updating configuration beta
+      copy:
+        dest: "/etc/logrotate.d/beta"
+        content: |
+          /twid/api/storage/logs/*log 
+          /twid/tasks/storage/logs/*log 
+          /twid/merchant/storage/logs/*log
+          /twid/tasks_tpap/storage/logs/*log
+          /twid/tpap_logs/storage/logs/*log
+          /twid/system/storage/logs/*log {
+              su root apache
+              daily
+              missingok
+              rotate 2
+              compress
+              notifempty
+          }
+
+    - name: updating configuration nginx
+      copy:
+        dest: "/etc/logrotate.d/nginx"
+        content: |
+          /var/log/nginx/*.log {
+            create 0640 nginx root
+            daily
+            rotate 10
+            missingok
+            notifempty
+            compress
+            delaycompress
+            sharedscripts
+            postrotate
+                /bin/kill -USR1 `cat /run/nginx.pid 2>/dev/null` 2>/dev/null || true
+            endscript
+          }
+
+    - name: updating configuration chrony
+      copy:
+        dest: "/etc/logrotate.d/chrony"
+        content: |
+          /var/log/chrony/*.log {
+            daily
+            rotate 7
+            missingok
+            notifempty
+            nocreate
+            sharedscripts
+            postrotate
+                /usr/bin/chronyc cyclelogs > /dev/null 2>&1 || true
+            endscript
+            compress
+            dateext
+          }
+
+    - name: updating configuration squid
+      copy:
+        dest: "/etc/logrotate.d/squid"
+        content: |
+          /var/log/squid/*.log {
+            weekly
+            rotate 5
+            compress
+            notifempty
+            missingok
+            nocreate
+            sharedscripts
+            postrotate
+              # Asks squid to reopen its logs. (logfile_rotate 0 is set in squid.conf)
+              # errors redirected to make it silent if squid is not running
+              /usr/sbin/squid -k rotate 2>/dev/null
+              # Wait a little to allow Squid to catch up before the logs is compressed
+              sleep 1
+            endscript
+          }
+
+    - name: updating configuration psacct
+      copy:
+        dest: "/etc/logrotate.d/psacct"
+        content: |
+          /var/account/pacct {
+            compress
+            delaycompress
+            notifempty
+            daily
+            rotate 31
+            create 0600 root root
+            postrotate
+              if /usr/bin/systemctl --quiet is-active psacct.service ; then
+                  /usr/sbin/accton /var/account/pacct | /usr/bin/grep -v "Turning on process accounting, file set to '/var/account/pacct'." | /usr/bin/cat
+              fi
+            endscript
+          }
+
+    - name: updating configuration redis
+      copy:
+        dest: "/etc/logrotate.d/redis"
+        content: |
+          /var/log/redis/*.log {
+            weekly
+            rotate 10
+            copytruncate
+            delaycompress
+            compress
+            notifempty
+            missingok
+          }
+    
+    - name: updating configuration httpd
+      copy:
+        dest: "/etc/logrotate.d/httpd"
+        content: |
+          /var/log/httpd/*log {
+            missingok
+            notifempty
+            sharedscripts
+            delaycompress
+            postrotate
+                /bin/systemctl reload httpd.service > /dev/null 2>/dev/null || true
+            endscript
+          }
+
+    - name: updating configuration php-fpm
+      copy:
+        dest: "/etc/logrotate.d/php-fpm"
+        content: |
+          /var/log/php-fpm/*log {
+            missingok
+            notifempty
+            sharedscripts
+            delaycompress
+            postrotate
+              /bin/kill -SIGUSR1 `cat /run/php-fpm/php-fpm.pid 2>/dev/null` 2>/dev/null || true
+            endscript
+          }

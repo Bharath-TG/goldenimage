@@ -1,0 +1,27 @@
+---
+- name: Copy scripts
+  hosts: localhost
+  gather_facts: no
+  become: true
+  roles:
+    - api_transfer_from_git.sh
+    - api_get_env_from_secrets.sh
+    - api_unit_test_transfer_from_git.sh
+    - system_transfer_from_git.sh
+    - system_get_env_from_secrets.sh
+    - system_unit_test_transfer_from_git.sh
+    - tasks_transfer_from_git.sh
+    - tasks_get_env_from_secrets.sh
+    - tasks_unit_test_transfer_from_git.sh
+    - merchant_transfer_from_git.sh
+    - merchant_get_env_from_secrets.sh
+    - merchant_unit_test_transfer_from_git.sh
+    - mapi_transfer_from_git.sh
+    - mapi_get_env_from_secrets.sh
+    - mapi_unit_test_transfer_from_git.sh
+    - tpap_transfer_from_git.sh
+    - tpap_get_env_from_secrets.sh
+    - tpap_unit_test_transfer_from_git.sh
+    - get_secrets_versions.sh
+    - rotate_credentials.sh
+    - linter_test_common.sh

@@ -1,0 +1,173 @@
+---
+- name: update configuration files
+  hosts: localhost
+  gather_facts: no
+  become: true
+
+  tasks:
+    - name: updating configuration selinux config
+      copy:
+        dest: "/etc/selinux/config"
+        content: |
+          SELINUX=permissive
+          SELINUX=disabled
+
+    # - name: adding bastion proxy 
+    #   shell: |
+    #     echo 'proxy=http://172.31.21.180:3128/' >> /etc/yum.conf
+
+    # - name: adding proxy 
+    #   shell: |
+    #     echo '172.31.21.180 bastion.twidpay.com' >> /etc/hosts
+          
+    - name: partition mount script
+      copy:
+        dest: "/tmp/mount.sh"
+        content: |
+          #!/bin/bash
+
+          # Get the root disk (e.g., /dev/nvme0n1 or /dev/nvme1n1)
+          root_disk=$(df / | tail -1 | awk '{print $1}')
+          
+          echo "Root disk: $root_disk"
+          
+          # Define the disks we want to check (we will match the base disk name)
+          disk_to_format=""
+          
+          # Check if the root disk is on /dev/nvme0n1* or /dev/nvme1n1*
+          if [[ $root_disk == /dev/nvme0n1* ]]; then
+              # If root is on /dev/nvme0n1*, we will format /dev/nvme1n1
+              disk_to_format="/dev/nvme1n1"
+          elif [[ $root_disk == /dev/nvme1n1* ]]; then
+              # If root is on /dev/nvme1n1*, we will format /dev/nvme0n1
+              disk_to_format="/dev/nvme0n1"
+          else
+              echo "Root disk is neither on /dev/nvme0n1* nor /dev/nvme1n1* - exiting."
+              exit 1
+          fi
+          
+          echo "Disk to format: $disk_to_format"
+
+          echo "Formatting disk: $disk_to_format"
+          sudo mkfs.xfs $disk_to_format
+          sudo mkdir -p /twid
+          sudo mount $disk_to_format /twid
+          uuid=$(sudo blkid -o value -s UUID $disk_to_format)
+          echo "UUID=$uuid  /twid  xfs  defaults,nofail 0 2" | sudo tee -a /etc/fstab 
+    
+    - name: update /etc/fstab
+      shell: |
+        sudo chmod +x /tmp/mount.sh
+        sudo bash /tmp/mount.sh
+        sudo rm -f /tmp/mount.sh
+        
+    - name: Create swap
+      shell: |
+        dd if=/dev/zero of=/swapfile1 bs=1M count=512 && \
+        chmod 600 /swapfile1 && \
+        mkswap /swapfile1 && \
+        swapon /swapfile1 && \
+        echo '/swapfile1 swap swap defaults 0 0' | sudo tee -a /etc/fstab
+
+    # - name: system transfer script
+    #   copy:
+    #     dest: "/root/scripts/system_transfer_from_git.sh"
+    #     content: |
+
+    # - name: system transfer unit test script
+    #   copy:
+    #     dest: "/root/scripts/system_unit_test_transfer_from_git.sh"
+    #     content: |          
+
+
+    # - name: system get env from secrets script
+    #   copy:
+    #     dest: "/root/scripts/system_get_env_from_secrets.sh"
+    #     content: | 
+
+    # - name: api transfer script
+    #   copy:
+    #     dest: "/root/scripts/"
+    #     content: |
+
+
+    # - name: api transfer unit test script
+    #   copy:
+    #     dest: "/root/scripts/"
+    #     content: |   
+
+
+    # - name: api get env from secrets script
+    #   copy:
+    #     dest: "/root/scripts/"
+    #     content: | 
+
+
+    # - name: tasks transfer script
+    #   copy:
+    #     dest: "/root/scripts/"
+    #     content: |
+    
+
+    # - name: tasks transfer unit test script
+    #   copy:
+    #     dest: "/root/scripts/"
+    #     content: |   
+
+
+    # - name: tasks get env from secrets script
+    #   copy:
+    #     dest: "/root/scripts/"
+    #     content: | 
+
+
+    # - name: merchant transfer script
+    #   copy:
+    #     dest: "/root/scripts/"
+    #     content: |
+
+
+    # - name: merchant transfer unit test script
+    #   copy:
+    #     dest: "/root/scripts/"
+    #     content: |   
+
+
+    # - name: merchant get env from secrets script
+    #   copy:
+    #     dest: "/root/scripts/"
+    #     content: | 
+
+
+    # - name: mapi transfer script
+    #   copy:
+    #     dest: "/root/scripts/"
+    #     content: |
+
+    
+    # - name: mapi transfer unit test script
+    #   copy:
+    #     dest: "/root/scripts/"
+    #     content: |   
+
+
+    # # - name: mapi get env from secrets script
+    # #   copy:
+    # #     dest: "/root/scripts/"
+    # #     content: | 
+
+    # - name: tpap transfer script
+    #   copy:
+    #     dest: "/root/scripts/"
+    #     content: |
+
+    
+    # - name: tpap transfer unit test script
+    #   copy:
+    #     dest: "/root/scripts/"
+    #     content: |   
+
+    # # - name: tpap get env from secrets script
+    # #   copy:
+    # #     dest: "/root/scripts/"
+    # #     content: | 
