@@ -1,5 +1,5 @@
 ---
-- name: git checkout TASKS code and install
+- name: git checkout code and install
   hosts: localhost
   gather_facts: no
   become: true
