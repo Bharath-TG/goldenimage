@@ -273,6 +273,6 @@
         sudo chown -R apache:kushal /twid/tpap/
         sudo chmod 755 /twid
           
-    - name: Wait for 10 minutes
-      ansible.builtin.pause:
-        minutes: 10
+    # - name: Wait for 10 minutes
+    #   ansible.builtin.pause:
+    #     minutes: 10
