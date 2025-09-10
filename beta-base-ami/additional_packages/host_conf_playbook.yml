@@ -25,32 +25,48 @@
         dest: "/tmp/mount.sh"
         content: |
           #!/bin/bash
-          # Get root physical disk
-          root_device=$(lsblk -no pkname $(df / | tail -1 | awk '{print $1}') | head -1)
-          all_devices=($(lsblk -d -n -o NAME | grep nvme))
-          for dev in "${all_devices[@]}"; do
-              if [[ "$dev" != "$root_device" ]]; then
+
+          # Get the root mount device
+          root_dev=$(readlink -f /dev/mapper/$(lsblk -no NAME,MOUNTPOINT | grep ' /$' | awk '{print $1}'))
+          
+          # Get the backing disk of the root volume
+          root_disk=$(lsblk -no pkname "$root_dev")
+          
+          # List all nvme disks
+          all_disks=($(lsblk -d -n -o NAME | grep nvme))
+          
+          # Select the other disk
+          disk_to_format=""
+          for dev in "${all_disks[@]}"; do
+              if [[ "$dev" != "$root_disk" ]]; then
                   disk_to_format="/dev/$dev"
                   break
               fi
           done
+          
           if [[ -z "$disk_to_format" ]]; then
-              echo "No secondary disk found to format."
+              echo "No available disk to format"
               exit 1
           fi
+          
           echo "Formatting disk: $disk_to_format"
           mkfs.xfs -f "$disk_to_format"
-          # Wait for UUID to be available
+          
+          # Wait for device to settle
           udevadm settle
           sleep 2
+          
           uuid=$(blkid -o value -s UUID "$disk_to_format")
+          
           if [[ -z "$uuid" ]]; then
               echo "ERROR: UUID not found for $disk_to_format"
               exit 1
           fi
+          
           mkdir -p /twid
           mount "$disk_to_format" /twid
-          echo "UUID=$uuid  /twid  xfs  defaults,nofail 0 2" >> /etc/fstab
+          
+echo "UUID=$uuid  /twid  xfs  defaults,nofail 0 2" >> /etc/fstab
     
     - name: update /etc/fstab
       shell: |
