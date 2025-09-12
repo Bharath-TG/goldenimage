@@ -40,6 +40,22 @@
       args:
         removes: "{{ phpmyadmin_dest_dir }}"
 
+    - name: Create phpmyadmin config
+      copy:
+        dest: "/var/www/html/dbphpmyadmin/config.inc.php"
+        content: |
+          <?php
+          declare(strict_types=1);
+          $cfg['blowfish_secret'] = ''; // YOU MUST FILL THIS IN FOR COOKIE AUTH!
+          $i = 0;
+          $i++;
+          $cfg['Servers'][$i]['auth_type'] = 'cookie';
+          $cfg['Servers'][$i]['host'] = 'beta-cluster.cluster-c1wsqg4mqid6.ap-south-2.rds.amazonaws.com';
+          $cfg['Servers'][$i]['compress'] = false;
+          $cfg['Servers'][$i]['AllowNoPassword'] = false;
+          $cfg['UploadDir'] = '';
+          $cfg['SaveDir'] = '';
+
     - name: Clean up tarball and temp directory
       file:
         path: "{{ item }}"
