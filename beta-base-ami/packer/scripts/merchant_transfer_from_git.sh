@@ -8,7 +8,8 @@ then
 fi
 
 eval "$(ssh-agent -s)"
-ssh-add ~/.ssh/id_github_merchant
+#ssh-add ~/.ssh/id_github_merchant
+ssh-add ~/.ssh/id_github
 rm -fR /twid/deploy/merchant
 git clone -b beta git@github.com:twidpay-global/twid_merchant.git /twid/deploy/merchant
 kill $SSH_AGENT_PID
