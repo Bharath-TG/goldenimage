@@ -24,7 +24,7 @@
         state: directory
 
     - name: Create dbphpmyadmin directory
-      sheel: |
+      shell: |
         sudo mkdir -p /var/www/html/dbphpmyadmin
         
     - name: Download phpMyAdmin tarball
