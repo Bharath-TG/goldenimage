@@ -80,11 +80,12 @@ pipeline {
                     echo "Validating Packer HCL file..."
 
                     // Change to the "base_image" directory
-                    dir('base_image') {
+                    dir('beta-base-ami') {
                         // Validate the Packer HCL file
+                        sh 'cd packer'
                         sh 'ls -l'
                         sh 'packer init .'
-                        sh 'packer validate base_image_packer.pkr.hcl'
+                        sh 'packer validate packer.pkr.hcl'
                     }
                 }
             }
@@ -95,10 +96,11 @@ pipeline {
                     echo "Build Packer HCL file..."
 
                     // Change to the "base_image" directory
-                    dir('base_image') {
+                    dir('beta-base-ami') {
                         // Validate the Packer HCL file
+                        sh 'cd packer'
                         sh 'ls -l'
-                        sh 'packer build base_image_packer.pkr.hcl | tee packer_output.log'
+                        sh 'packer build packer.pkr.hcl | tee packer_output.log'
                     }
                 }
             }
@@ -109,7 +111,7 @@ pipeline {
         success {
             script {
                 
-                def output = sh(script: 'tail -n 1 base_image/packer_output.log | awk -F": " \'{print $2, $3}\'', returnStdout: true).trim()
+                def output = sh(script: 'tail -n 1 beta-base-ami/packer_output.log | awk -F": " \'{print $2, $3}\'', returnStdout: true).trim()
                 def (region, amiId) = output.split()
 
                 echo "Build successful!"
