@@ -1,0 +1,46 @@
+---
+- name: update Fluentd(td-agent) config file
+  hosts: localhost
+  gather_facts: no
+  become: true
+
+  tasks:
+    - name: updating configuration td-agent.conf
+      copy:
+        dest: "/etc/td-agent/td-agent.conf"
+        content: |
+          ####
+          ## Output descriptions:
+          ##
+          
+          <source>
+            @type tail
+            path /twid/merchant/storage/logs/*log,/twid/tasks/storage/logs/*log,/twid/system/storage/logs/*log,/twid/api/storage/logs/*log,/twid/mapi/storage/logs/*log,/twid/tpap_logs/storage/logs/*log,/twid/tpap/storage/logs/*log,/twid/tasks_tpap/storage/logs/*log
+            pos_file /var/log/td-agent/twid.log.pos
+            follow_inodes true
+            read_from_head true
+            path_key tailed_path
+            tag twid.*
+          
+            <parse>
+              @type none
+            </parse>
+          </source>
+          <filter twid.**>
+            @type record_transformer
+            <record>
+              hostname "#{Socket.gethostname}"
+              stage "beta"
+            </record>
+          </filter>
+          <match twid.**>
+            @type elasticsearch
+            host 172.31.22.45
+            port 9200
+            logstash_format true
+          </match>
+            
+    - name: Restart fluentd(td-agent) to apply configuration
+      systemd:
+        name: td-agent
+        state: restarted
