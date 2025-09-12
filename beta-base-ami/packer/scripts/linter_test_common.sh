@@ -1,6 +1,7 @@
 eval "$(ssh-agent -s)"
 export linterStatus=0
-ssh-add ~/.ssh/id_github_${service}
+#ssh-add ~/.ssh/id_github_${service}
+ssh-add ~/.ssh/id_github
 rm -fR /twid/deploy/${service}
 export previousCommitHash=`cat /root/scripts/${service}_commit_log_prev`
 git clone -b beta git@github.com:twidpay-global/twid_${service}.git /twid/deploy/${service}
