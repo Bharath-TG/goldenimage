@@ -1,5 +1,6 @@
 eval "$(ssh-agent -s)"
-ssh-add ~/.ssh/id_github_mapi
+#ssh-add ~/.ssh/id_github_mapi
+ssh-add ~/.ssh/id_github
 rm -fR /twid/deploy/mapi
 
 git clone -b beta git@github.com:twidpay-global/twid_mapi.git /twid/deploy/mapi
