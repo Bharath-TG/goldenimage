@@ -99,7 +99,7 @@ build {
   }
 
   provisioner "ansible-local" {
-    playbook_file = "../filebeat/filebeat_playbook.yml"
+    playbook_file = "../filebeat/fluentd_playbook.yml"
   }
 
   provisioner "ansible-local" {
@@ -131,7 +131,7 @@ build {
   }
 
   provisioner "ansible-local" {
-    playbook_file = "../filebeat/filebeat_conf_playbook.yml"
+    playbook_file = "../filebeat/fluentd_conf_playbook.yml"
   }
 
   provisioner "ansible-local" {
