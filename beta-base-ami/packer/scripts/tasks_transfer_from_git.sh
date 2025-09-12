@@ -8,7 +8,8 @@ then
 fi
 
 eval "$(ssh-agent -s)"
-ssh-add ~/.ssh/id_github_tasks
+#ssh-add ~/.ssh/id_github_tasks
+ssh-add ~/.ssh/id_github
 rm -fR /twid/deploy/tasks
 
 git clone -b beta git@github.com:twidpay-global/twid_tasks.git /twid/deploy/tasks
