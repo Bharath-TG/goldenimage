@@ -160,6 +160,10 @@
         url: https://browscap.org/stream?q=Full_PHP_BrowsCapINI
         dest: /etc/php_browscap.ini
         mode: '0644'    
+
+    - name: Enable php-fpm
+      shell: |
+        systemctl enable php-fpm
                  
     # - name: Wait for 15 minutes
     #   ansible.builtin.pause:
