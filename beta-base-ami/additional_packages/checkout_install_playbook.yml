@@ -82,6 +82,12 @@
         sudo chown rocky:rocky /home/rocky/.ssh/id_rsa
         sudo chmod 600 /home/rocky/.ssh/id_rsa
         sudo chmod 777 /twid
+
+    - name: copy private keys for github
+      shell: |
+        sudo chown root:root ~/.ssh/id_github
+        sudo chmod 600 ~/.ssh/id_github
+        sudo chmod 777 /twid
         
     - name: Clone the Git System repository
       git:
