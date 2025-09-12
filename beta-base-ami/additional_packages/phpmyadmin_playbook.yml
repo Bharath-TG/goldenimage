@@ -23,6 +23,10 @@
         path: "{{ phpmyadmin_extract_dir }}"
         state: directory
 
+    - name: Create dbphpmyadmin directory
+      sheel: |
+        sudo mkdir -p /var/www/html/dbphpmyadmin
+        
     - name: Download phpMyAdmin tarball
       get_url:
         url: "{{ phpmyadmin_url }}"
