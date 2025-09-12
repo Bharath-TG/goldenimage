@@ -1,5 +1,6 @@
 eval "$(ssh-agent -s)"
-ssh-add ~/.ssh/id_github_tasks
+#ssh-add ~/.ssh/id_github_tasks
+ssh-add ~/.ssh/id_github
 rm -fR /twid/deploy/tasks_unit_test || true
 
 git clone -b beta git@github.com:twidpay-global/twid_tasks.git /twid/deploy/tasks_unit_test
