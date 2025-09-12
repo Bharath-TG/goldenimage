@@ -1,5 +1,6 @@
 eval "$(ssh-agent -s)"
-ssh-add ~/.ssh/id_github_tpap
+#ssh-add ~/.ssh/id_github_tpap
+ssh-add ~/.ssh/id_github
 exec {LOCK}> /tmp/tpapdeploymentlock
 flock -x ${LOCK}
 
