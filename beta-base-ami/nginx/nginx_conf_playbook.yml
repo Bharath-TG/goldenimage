@@ -589,21 +589,1024 @@
           add_header X-XSS-Protection "1; mode=block";
           add_header Content-Security-Policy-Report-Only "default-src 'self'";
 
-    - name: updating configuration conf.d/beta-ssl.conf
+    # - name: updating configuration conf.d/beta-ssl.conf
+    #   copy:
+    #     dest: "/etc/nginx/conf.d/beta-ssl.conf"
+    #     content: | 
+    #       server {
+    #         listen 443 ssl http2;
+    #         server_name beta.twidapp.com;
+    #         include /etc/nginx/snippets/headers.conf;
+    #         root /twid/web;
+    #         access_log /var/log/nginx/beta_access_log;
+    #         error_log /var/log/nginx/beta_error_log crit;
+    #         index index.php index.html index.htm;
+    #         ssl_certificate "/etc/letsencrypt/live/beta.twidapp.com-0001/cert.pem";    
+    #         ssl_certificate_key "/etc/letsencrypt/live/beta.twidapp.com-0001/privkey.pem";
+    #         ssl_trusted_certificate "/etc/letsencrypt/live/beta.twidapp.com-0001/fullchain.pem";
+    #         location / {
+    #                 try_files $uri $uri/ /index.php?$args;
+    #         }
+    #         location ~ \.php$ {
+    #                 try_files $uri =404;
+    #                 fastcgi_pass unix:/run/php-fpm/www.sock;
+    #                 fastcgi_index index.php;
+    #                 fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
+    #                 include fastcgi_params;
+    #         }
+    #         location /nginx_status {
+    #                 stub_status;
+    #                 allow 127.0.0.1;        #only allow requests from localhost
+    #                 deny all;               #deny all other hosts
+    #         }
+    #         location = /status {
+    #                 access_log off;
+    #                 allow 127.0.0.1;
+    #                 deny all;
+    #                 include fastcgi_params;
+    #                 fastcgi_pass unix:/run/php-fpm/www.sock;
+    #                 fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
+    #         }
+    #         location ~ /\. {
+    #                 deny  all;
+    #         }
+    #       }
+
+    #       server {
+    #         listen 443 ssl http2;
+    #         server_name api.beta.twidapp.com;
+    #         include /etc/nginx/snippets/headers.conf;
+    #         ssl_certificate "/etc/letsencrypt/live/beta.twidapp.com-0001/fullchain.pem";                   
+    #         ssl_certificate_key "/etc/letsencrypt/live/beta.twidapp.com-0001/privkey.pem";
+    #         ssl_trusted_certificate "/etc/letsencrypt/live/beta.twidapp.com-0001/fullchain.pem";
+    #         root /twid/api/public;
+    #         access_log /var/log/nginx/api_access_log;
+    #         error_log /var/log/nginx/api_error_log crit;
+    #         index index.php index.html index.htm;
+    #         location / {
+    #                 try_files $uri $uri/ /index.php?$args;
+    #         }
+    #         location ~ \.php$ {
+    #                 try_files $uri =404;
+    #                 fastcgi_pass unix:/run/php-fpm/www.sock;
+    #                 fastcgi_index index.php;
+    #                 fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
+    #                 include fastcgi_params;
+    #         }
+    #         location ~ /\. {
+    #                 deny  all;
+    #         }
+    #       }
+
+    #       server {
+    #         listen 443 ssl http2;
+    #         server_name tpap-logs.beta.twidapp.com;
+    #         include /etc/nginx/snippets/headers.conf;
+    #         ssl_certificate "/etc/letsencrypt/live/beta.twidapp.com-0001/fullchain.pem";
+    #         ssl_certificate_key "/etc/letsencrypt/live/beta.twidapp.com-0001/privkey.pem";
+    #         ssl_trusted_certificate "/etc/letsencrypt/live/beta.twidapp.com-0001/fullchain.pem";
+    #         root /twid/tpap_logs/public;
+    #         access_log /var/log/nginx/tpap_logs_access_log;
+    #         error_log /var/log/nginx/tpap_logs_error_log crit;
+    #         index index.php index.html index.htm;
+    #         location / {
+    #                 try_files $uri $uri/ /index.php?$args;
+    #         }
+    #         location ~ \.php$ {
+    #                 try_files $uri =404;
+    #                 fastcgi_pass unix:/run/php-fpm/www.sock;
+    #                 fastcgi_index index.php;
+    #                 fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
+    #                 include fastcgi_params;
+    #         }
+    #         location ~ /\. {
+    #                 deny  all;
+    #         }
+    #       }
+
+    #       server {
+    #         listen 443 ssl http2;
+    #         server_name tpap-tasks.beta.twidapp.com;
+    #         include /etc/nginx/snippets/headers.conf;
+    #         ssl_certificate "/etc/letsencrypt/live/beta.twidapp.com-0001/fullchain.pem";
+    #         ssl_certificate_key "/etc/letsencrypt/live/beta.twidapp.com-0001/privkey.pem";
+    #         ssl_trusted_certificate "/etc/letsencrypt/live/beta.twidapp.com-0001/fullchain.pem";
+    #         root /twid/tasks_tpap/public;
+    #         access_log /var/log/nginx/tasks_tpap_access_log;
+    #         error_log /var/log/nginx/tasks_tpap_error_log crit;
+    #         index index.php index.html index.htm;
+    #         location / {
+    #                 try_files $uri $uri/ /index.php?$args;
+    #         }
+    #         location ~ \.php$ {
+    #                 try_files $uri =404;
+    #                 fastcgi_pass unix:/run/php-fpm/www.sock;
+    #                 fastcgi_index index.php;
+    #                 fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
+    #                 include fastcgi_params;
+    #         }
+    #         location ~ /\. {
+    #                 deny  all;
+    #         }
+    #       }
+
+    #       server {
+    #         listen 443 ssl http2;
+    #         server_name bg.api.beta.twidapp.com;
+    #         include /etc/nginx/snippets/headers.conf;
+    #         ssl_certificate "/etc/letsencrypt/live/beta.twidapp.com-0001/cert.pem";                   
+    #         ssl_certificate_key "/etc/letsencrypt/live/beta.twidapp.com-0001/privkey.pem";
+    #         ssl_trusted_certificate "/etc/letsencrypt/live/beta.twidapp.com-0001/fullchain.pem";
+    #         root /twid/api/public;
+    #         access_log /var/log/nginx/api_access_log;
+    #         error_log /var/log/nginx/api_error_log crit;
+    #         index index.php index.html index.htm;
+    #         location / {
+    #                 try_files $uri $uri/ /index.php?$args;
+    #         }
+    #         location ~ \.php$ {
+    #         try_files $uri =404;
+    #         fastcgi_pass unix:/run/php-fpm/www.sock;
+    #         fastcgi_index index.php;
+    #         fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
+    #         include fastcgi_params;
+    #         }
+    #         location ~ /\. {
+    #                 deny  all;
+    #         }
+    #       }
+
+    #       server {
+    #         listen 443 ssl http2;
+    #         server_name merchant.beta.twidapp.com;
+    #         include /etc/nginx/snippets/headers.conf;
+    #         ssl_certificate "/etc/letsencrypt/live/beta.twidapp.com-0001/cert.pem";                   
+    #         ssl_certificate_key "/etc/letsencrypt/live/beta.twidapp.com-0001/privkey.pem";
+    #         ssl_trusted_certificate "/etc/letsencrypt/live/beta.twidapp.com-0001/fullchain.pem";
+    #         root /twid/merchant/public;
+    #         access_log /var/log/nginx/api_access_log;
+    #         error_log /var/log/nginx/api_error_log crit;
+    #         index index.php index.html index.htm;
+    #         location / {
+    #                 if ($request_method = OPTIONS ) {
+    #                 add_header "Access-Control-Allow-Origin"  *;
+    #                         return 200;
+
+    #                 }
+    #                 try_files $uri $uri/ /index.php?$args;
+    #                 if ($request_method = OPTIONS ) {
+    #                 add_header "Access-Control-Allow-Origin"  *;
+    #                         return 200;
+    #                 }
+    #                 add_header "Access-Control-Allow-Origin"  *;
+    #         }
+    #         location ~ \.php$ {
+    #         if ($http_origin ~ "^$") {
+    #                 set $http_origin "merchant.beta.twidapp.com";
+    #         }
+    #         if ($http_origin !~ '.*\.beta\.twidapp\.com$') {
+    #         return 400;
+    #         }
+    #         set $temp_referer $http_referer;
+    #         if ($temp_referer ~ "^$") {
+    #                 set $temp_referer "https://merchant.beta.twidapp.com";
+    #         }
+    #         if ($temp_referer !~ '^https?://.*twidapp\.com.*') {
+    #                 return 400;
+    #         }
+    #         try_files $uri =404;
+    #         fastcgi_param  HTTP_x-forwarded-host $http_host;
+    #         fastcgi_pass unix:/run/php-fpm/www.sock;
+    #         fastcgi_index index.php;
+    #         fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
+    #         include fastcgi_params;
+    #         add_header "Access-Control-Allow-Origin"  *;
+    #         add_header X-Content-Type-Options nosniff;
+    #         add_header Strict-Transport-Security "max-age=15768000; includeSubdomains; preload";
+    #         add_header X-XSS-Protection "1; mode=block";
+    #         add_header X-Frame-Options DENY;
+    #         add_header Content-Security-Policy "frame-ancestors 'self';";
+    #         add_header Set-Cookie "Path=/; HttpOnly; Secure";
+    #         add_header Referrer-Policy 'origin-when-cross-origin';
+    #         add_header Vary 'twid__session,XSRF-TOKEN';
+    #         # Hide PHP headers
+    #         fastcgi_hide_header             X-Powered-By;
+    #         fastcgi_hide_header             X-CF-Powered-By;
+    #         }
+    #         location ~ /\. {
+    #                 deny  all;
+    #         }
+    #       }
+
+    #       server {
+    #         listen 443 ssl http2;
+    #         server_name docs.beta.twidapp.com;
+    #         include /etc/nginx/snippets/headers.conf;
+    #         ssl_certificate "/etc/letsencrypt/live/beta.twidapp.com-0001/cert.pem";                   
+    #         ssl_certificate_key "/etc/letsencrypt/live/beta.twidapp.com-0001/privkey.pem";
+    #         ssl_trusted_certificate "/etc/letsencrypt/live/beta.twidapp.com-0001/fullchain.pem";
+    #         root /twid/api;
+    #         access_log /var/log/nginx/docs_access_log;
+    #         error_log /var/log/nginx/docs_error_log crit;
+    #         index index.php index.html index.htm;
+    #         location / {
+    #                 try_files $uri $uri/ /index.php?$args;
+    #         }
+
+    #         location ~ \.php$ {
+    #                 try_files $uri =404;
+    #                 fastcgi_pass unix:/run/php-fpm/www.sock;
+    #                 fastcgi_index index.php;
+    #                 fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
+    #                 include fastcgi_params;
+    #         }
+    #         location ~ /\. {
+    #                 deny  all;
+    #         }
+    #       }
+
+    #       server {
+    #         listen 443 ssl http2;
+    #         server_name docs.twidapp.com;
+    #         include /etc/nginx/snippets/headers.conf;
+    #         ssl_certificate "/etc/letsencrypt/live/twidapp.com/cert.pem";                   
+    #         ssl_certificate_key "/etc/letsencrypt/live/twidapp.com/privkey.pem";
+    #         ssl_trusted_certificate "/etc/letsencrypt/live/twidapp.com/fullchain.pem";
+    #         root /twid/api/docs;
+    #         access_log /var/log/nginx/docs_access_log;
+    #         error_log /var/log/nginx/docs_error_log crit;
+    #         index index.php index.html index.htm;
+    #         location / {
+    #                 try_files $uri $uri/ /index.php?$args;
+    #         }
+    #         location ~ \.php$ {
+    #                 try_files $uri =404;
+    #                 fastcgi_pass unix:/run/php-fpm/www.sock;
+    #                 fastcgi_index index.php;
+    #                 fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
+    #                 include fastcgi_params;
+    #         }
+    #         location ~ /\. {
+    #                 deny  all;
+    #         }
+    #       }
+
+
+    #       server {
+    #         listen 443 ssl http2;
+    #         server_name quick-docs.beta.twidapp.com;
+    #         include /etc/nginx/snippets/headers.conf;
+    #         ssl_certificate "/etc/letsencrypt/live/beta.twidapp.com-0001/cert.pem";                   
+    #         ssl_certificate_key "/etc/letsencrypt/live/beta.twidapp.com-0001/privkey.pem";
+    #         ssl_trusted_certificate "/etc/letsencrypt/live/beta.twidapp.com-0001/fullchain.pem";
+    #         root /twid/api/quick-docs;
+    #         access_log /var/log/nginx/quick-docs_access_log;
+    #         error_log /var/log/nginx/quick-docs_error_log crit;
+    #         index index.php index.html index.htm;
+    #         location / {
+    #                 try_files $uri $uri/ /index.php?$args;
+    #         }
+    #         location ~ \.php$ {
+    #                 try_files $uri =404;
+    #                 fastcgi_pass unix:/run/php-fpm/www.sock;
+    #                 fastcgi_index index.php;
+    #                 fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
+    #                 include fastcgi_params;
+    #         }
+    #         location ~ /\. {
+    #                 deny  all;
+    #         }
+    #       }
+
+    #       server {
+    #         listen 443 ssl http2;
+    #         server_name pwa-docs.beta.twidapp.com;
+    #         include /etc/nginx/snippets/headers.conf;
+    #         ssl_certificate "/etc/letsencrypt/live/beta.twidapp.com-0001/cert.pem";                   ssl_certificate_key "/etc/letsencrypt/live/beta.twidapp.com-0001/privkey.pem";
+    #         ssl_trusted_certificate "/etc/letsencrypt/live/beta.twidapp.com-0001/fullchain.pem";
+    #         root /twid/api/pwa-docs;
+    #         access_log /var/log/nginx/pwa-docs_access_log;
+    #         error_log /var/log/nginx/pwa-docs_error_log crit;
+    #         index index.php index.html index.htm;
+    #         location / {
+    #                 try_files $uri $uri/ /index.php?$args;
+    #         }
+    #         location ~ \.php$ {
+    #                 try_files $uri =404;
+    #                 fastcgi_pass unix:/run/php-fpm/www.sock;
+    #                 fastcgi_index index.php;
+    #                 fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
+    #                 include fastcgi_params;
+    #         }
+    #         location ~ /\. {
+    #                 deny  all;
+    #         }
+    #       }
+
+    #       server {
+    #         listen 443 ssl http2;
+    #         server_name twid-pwa-docs.beta.twidapp.com;
+    #         include /etc/nginx/snippets/headers.conf;
+    #         ssl_certificate "/etc/letsencrypt/live/beta.twidapp.com-0001/cert.pem";                   ssl_certificate_key "/etc/letsencrypt/live/beta.twidapp.com-0001/privkey.pem";
+    #         ssl_trusted_certificate "/etc/letsencrypt/live/beta.twidapp.com-0001/fullchain.pem";
+    #         root /twid/api/twid-pwa-docs;
+    #         access_log /var/log/nginx/twid-pwa-docs_access_log;
+    #         error_log /var/log/nginx/twid-pwa-docs_error_log crit;
+    #         index index.php index.html index.htm;
+    #         location / {
+    #                 try_files $uri $uri/ /index.php?$args;
+    #         }
+    #         location ~ \.php$ {
+    #                 try_files $uri =404;
+    #                 fastcgi_pass unix:/run/php-fpm/www.sock;
+    #                 fastcgi_index index.php;
+    #                 fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
+    #                 include fastcgi_params;
+    #         }
+    #         location ~ /\. {
+    #                 deny  all;
+    #         }
+    #       }
+
+    #       server {
+    #         listen 443 ssl http2;
+    #         server_name payment-docs.beta.twidapp.com;
+    #         include /etc/nginx/snippets/headers.conf;
+    #         ssl_certificate "/etc/letsencrypt/live/beta.twidapp.com-0001/cert.pem";                   ssl_certificate_key "/etc/letsencrypt/live/beta.twidapp.com-0001/privkey.pem";
+    #         ssl_trusted_certificate "/etc/letsencrypt/live/beta.twidapp.com-0001/fullchain.pem";
+    #         root /twid/api/payment-docs;
+    #         access_log /var/log/nginx/payment-docs_access_log;
+    #         error_log /var/log/nginx/payment-docs_error_log crit;
+    #         index index.php index.html index.htm;
+    #         location / {
+    #                 try_files $uri $uri/ /index.php?$args;
+    #         }
+    #         location ~ \.php$ {
+    #                 try_files $uri =404;
+    #                 fastcgi_pass unix:/run/php-fpm/www.sock;
+    #                 fastcgi_index index.php;
+    #                 fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
+    #                 include fastcgi_params;
+    #         }
+    #         location ~ /\. {
+    #                 deny  all;
+    #         }
+    #       }
+
+    #       server {
+    #         listen 443 ssl http2;
+    #         server_name pg-docs.beta.twidapp.com;
+    #         include /etc/nginx/snippets/headers.conf;
+    #         ssl_certificate "/etc/letsencrypt/live/beta.twidapp.com-0001/cert.pem";                   ssl_certificate_key "/etc/letsencrypt/live/beta.twidapp.com-0001/privkey.pem";
+    #         ssl_trusted_certificate "/etc/letsencrypt/live/beta.twidapp.com-0001/fullchain.pem";
+    #         root /twid/api/pg-docs;
+    #         access_log /var/log/nginx/pg-docs_access_log;
+    #         error_log /var/log/nginx/pg-docs_error_log crit;
+    #         index index.php index.html index.htm;
+    #         location / {
+    #                 try_files $uri $uri/ /index.php?$args;
+    #         }
+    #         location ~ \.php$ {
+    #                 try_files $uri =404;
+    #                 fastcgi_pass unix:/run/php-fpm/www.sock;
+    #                 fastcgi_index index.php;
+    #                 fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
+    #                 include fastcgi_params;
+    #         }
+    #         location ~ /\. {
+    #                 deny  all;
+    #         }
+    #       }
+
+    #       server {
+    #         listen 443 ssl http2;
+    #         server_name lmp-docs.beta.twidapp.com;
+    #         include /etc/nginx/snippets/headers.conf;
+    #         ssl_certificate "/etc/letsencrypt/live/beta.twidapp.com-0001/cert.pem";                   ssl_certificate_key "/etc/letsencrypt/live/beta.twidapp.com-0001/privkey.pem";
+    #         ssl_trusted_certificate "/etc/letsencrypt/live/beta.twidapp.com-0001/fullchain.pem";
+    #         root /twid/api/lmp-docs;
+    #         access_log /var/log/nginx/lmp-docs_access_log;
+    #         error_log /var/log/nginx/lmp-docs_error_log crit;
+    #         index index.php index.html index.htm;
+    #         location / {
+    #                 try_files $uri $uri/ /index.php?$args;
+    #         }
+    #         location ~ \.php$ {
+    #                 try_files $uri =404;
+    #                 fastcgi_pass unix:/run/php-fpm/www.sock;
+    #                 fastcgi_index index.php;
+    #                 fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
+    #                 include fastcgi_params;
+    #         }
+    #         location ~ /\. {
+    #                 deny  all;
+    #         }
+    #       }
+
+    #       server {
+    #         listen 443 ssl http2;
+    #         server_name gv-docs.beta.twidapp.com;
+    #         include /etc/nginx/snippets/headers.conf;
+    #         ssl_certificate "/etc/letsencrypt/live/beta.twidapp.com-0001/cert.pem";                   ssl_certificate_key "/etc/letsencrypt/live/beta.twidapp.com-0001/privkey.pem";
+    #         ssl_trusted_certificate "/etc/letsencrypt/live/beta.twidapp.com-0001/fullchain.pem";
+    #         root /twid/api/gv-docs;
+    #         access_log /var/log/nginx/gv-docs_access_log;
+    #         error_log /var/log/nginx/gv-docs_error_log crit;
+    #         index index.php index.html index.htm;
+    #         location / {
+    #                 try_files $uri $uri/ /index.php?$args;
+    #         }
+    #         location ~ \.php$ {
+    #                 try_files $uri =404;
+    #                 fastcgi_pass unix:/run/php-fpm/www.sock;
+    #                 fastcgi_index index.php;
+    #                 fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
+    #                 include fastcgi_params;
+    #         }
+    #         location ~ /\. {
+    #                 deny  all;
+    #         }
+    #       }
+
+    #       server {
+    #         listen 443 ssl http2;
+    #         server_name ext-gv-docs.beta.twidapp.com;
+    #         include /etc/nginx/snippets/headers.conf;
+    #         ssl_certificate "/etc/letsencrypt/live/beta.twidapp.com-0001/cert.pem";                   ssl_certificate_key "/etc/letsencrypt/live/beta.twidapp.com-0001/privkey.pem";
+    #         ssl_trusted_certificate "/etc/letsencrypt/live/beta.twidapp.com-0001/fullchain.pem";
+    #         root /twid/api/ext-gv-docs;
+    #         access_log /var/log/nginx/ext-gv_docs_access_log;
+    #         error_log /var/log/nginx/ext-gv_docs_error_log crit;
+    #         index index.php index.html index.htm;
+    #         location / {
+    #                 try_files $uri $uri/ /index.php?$args;
+    #         }
+    #         location ~ \.php$ {
+    #                 try_files $uri =404;
+    #                 fastcgi_pass unix:/run/php-fpm/www.sock;
+    #                 fastcgi_index index.php;
+    #                 fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
+    #                 include fastcgi_params;
+    #         }
+    #         location ~ /\. {
+    #                 deny  all;
+    #         }
+    #       }
+
+    #       server {
+    #         listen 443 ssl http2;
+    #         server_name offer-docs.beta.twidapp.com;
+    #         include /etc/nginx/snippets/headers.conf;
+    #         ssl_certificate "/etc/letsencrypt/live/beta.twidapp.com-0001/cert.pem";                   ssl_certificate_key "/etc/letsencrypt/live/beta.twidapp.com-0001/privkey.pem";
+    #         ssl_trusted_certificate "/etc/letsencrypt/live/beta.twidapp.com-0001/fullchain.pem";
+    #         root /twid/api/offer-docs;
+    #         access_log /var/log/nginx/offer-docs_access_log;
+    #         error_log /var/log/nginx/offer-docs_error_log crit;
+    #         index index.php index.html index.htm;
+    #         location / {
+    #                 try_files $uri $uri/ /index.php?$args;
+    #         }
+    #         location ~ \.php$ {
+    #                 try_files $uri =404;
+    #                 fastcgi_pass unix:/run/php-fpm/www.sock;
+    #                 fastcgi_index index.php;
+    #                 fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
+    #                 include fastcgi_params;
+    #         }
+    #         location ~ /\. {
+    #                 deny  all;
+    #         }
+    #       }
+
+    #       server {
+    #         listen 443 ssl http2;
+    #         server_name tasks.beta.twidapp.com;
+    #         include /etc/nginx/snippets/headers.conf;
+    #         ssl_certificate "/etc/letsencrypt/live/beta.twidapp.com-0001/fullchain.pem";
+    #         ssl_certificate_key "/etc/letsencrypt/live/beta.twidapp.com-0001/privkey.pem";
+    #         ssl_trusted_certificate "/etc/letsencrypt/live/beta.twidapp.com-0001/fullchain.pem";
+    #         root /twid/tasks/public;
+    #         access_log /var/log/nginx/tasks_access_log;
+    #         error_log /var/log/nginx/tasks_error_log crit;
+    #         index index.php index.html index.htm;
+    #         location / {
+    #                 try_files $uri $uri/ /index.php?$args;
+    #         }
+    #         location ~ \.php$ {
+    #                 try_files $uri =404;
+    #                 fastcgi_pass unix:/run/php-fpm/www.sock;
+    #                 fastcgi_index index.php;
+    #                 fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
+    #                 include fastcgi_params;
+    #                 fastcgi_read_timeout 1800;
+    #         }
+    #         add_header Access-Control-Allow-Origin *;
+    #         add_header Access-Control-Allow-Methods "POST, GET, OPTIONS, PUT, DELETE";
+    #         add_header Access-Control-Allow-Headers "Content-Type, Authorization, X-Requested-With";
+    #         location ~ /\. {
+    #                 deny  all;
+    #         }
+    #         location /sms-acl-status-web-hook {
+    #                 deny all;
+    #         }
+    #       }
+
+    #       server {
+    #         listen 443 ssl http2;
+    #         server_name www.beta.twidapp.com;
+    #         include /etc/nginx/snippets/headers.conf;
+    #         ssl_certificate "/etc/letsencrypt/live/beta.twidapp.com-0001/cert.pem";                   ssl_certificate_key "/etc/letsencrypt/live/beta.twidapp.com-0001/privkey.pem";
+    #         ssl_trusted_certificate "/etc/letsencrypt/live/beta.twidapp.com-0001/fullchain.pem";
+    #         root /twid/web/site;
+    #         access_log /var/log/nginx/twid-site_access_log;
+    #         error_log /var/log/nginx/twid-site_error_log crit;
+    #         index index.php index.html index.htm;
+    #         location / {
+    #                 try_files $uri $uri/ /index.php?$args;
+    #         }
+
+    #         location ~ \.php$ {
+    #                 try_files $uri =404;
+    #                 fastcgi_pass unix:/run/php-fpm/www.sock;
+    #                 fastcgi_index index.php;
+    #                 fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
+    #                 include fastcgi_params;
+    #         }
+    #         location ~ /\. {
+    #                 deny  all;
+    #         }
+    #       }
+
+    #       server {
+    #         listen 443 ssl http2;
+    #         server_name merchdev.beta.twidapp.com business.beta.twidapp.com pos.beta.twidapp.com pwa.beta.twidapp.com;
+    #         include /etc/nginx/snippets/headers.conf;
+    #         ssl_certificate "/etc/letsencrypt/live/beta.twidapp.com-0001/fullchain.pem";                   ssl_certificate_key "/etc/letsencrypt/live/beta.twidapp.com-0001/privkey.pem";
+    #         ssl_trusted_certificate "/etc/letsencrypt/live/beta.twidapp.com-0001/fullchain.pem";
+    #         root /twid/merchant/public;
+    #         access_log /var/log/nginx/merchant_access_log;
+    #         error_log /var/log/nginx/merchant_log;
+    #         index index.php index.html index.htm;
+    #         location / {
+    #                 try_files $uri $uri/ /index.php?$args;
+    #         }
+    #         location ~ \.php$ {
+    #                 add_header 'Access-Control-Allow-Origin' '*';
+    #                 add_header 'Access-Control-Allow-Methods' 'GET, POST, OPTIONS';
+    #                 add_header 'Access-Control-Allow-Headers' 'DNT,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type,Content-Range,Range,Authority';
+    #                 add_header 'Access-Control-Allow-Credentials' 'true';
+    #                 try_files $uri =404;
+    #                 fastcgi_pass unix:/run/php-fpm/www.sock;
+    #                 fastcgi_index index.php;
+    #                 fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
+    #                 fastcgi_param  HTTP_x-forwarded-host $http_host;
+    #                 include fastcgi_params;
+    #                 # Hide PHP headers
+    #                 fastcgi_hide_header             X-Powered-By;
+    #                 fastcgi_hide_header             X-CF-Powered-By;
+    #                 #           }
+    #                 proxy_cookie_flags ~ samesite=strict;
+    #                 #add_header "Access-Control-Allow-Origin"  *;
+    #                 #add_header "Access-Control-Allow-Origin"  *;
+    #                 #add_header "Access-Control-Allow-Origin"  "twidpay.com";
+    #                 add_header X-Content-Type-Options nosniff;
+    #                 add_header Strict-Transport-Security "max-age=15768000; includeSubdomains; preload";
+    #                 add_header X-XSS-Protection "1; mode=block";
+    #                 #add_header Content-Security-Policy-Report-Only "default-src 'self' *.google.com *.amazon.com;";
+    #                 #add_header Content-Security-Policy "frame-ancestors 'self';";
+    #                 add_header Content-Security-Policy "frame-ancestors 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' *.beta.twidapp.com *.googletagmanager.com *.errlog.io *.razorpay.com";
+    #                 add_header X-Frame-Options DENY;
+    #                 add_header Set-Cookie "Path=/; HttpOnly; Secure";
+    #                 #add_header Referrer-Policy 'origin';
+    #                 #add_header Access-Control-Allow-Credentials false;
+    #         }
+    #         location ~ /\. {
+    #                 deny  all;
+    #         }
+    #       }
+
+
+
+
+    #       server {
+    #         listen 443 ssl http2;
+    #         server_name affiliate.beta.twidapp.com;
+    #         include /etc/nginx/snippets/headers.conf;
+    #         ssl_certificate "/etc/letsencrypt/live/beta.twidapp.com-0001/fullchain.pem";                   
+    #         ssl_certificate_key "/etc/letsencrypt/live/beta.twidapp.com-0001/privkey.pem";
+    #         ssl_trusted_certificate "/etc/letsencrypt/live/beta.twidapp.com-0001/fullchain.pem";
+    #         root /twid/yono_merchant/public;
+    #         access_log /var/log/nginx/yono_merchant_access_log;
+    #         error_log /var/log/nginx/yono_merchant_log crit;
+    #         index index.php index.html index.htm;
+    #         location / {
+    #                 add_header "Access-Control-Allow-Origin"  *;
+    #                 add_header X-Content-Type-Options nosniff;
+    #                 add_header Strict-Transport-Security "max-age=15768000; includeSubdomains; preload";
+    #                 add_header X-XSS-Protection "1; mode=block";
+    #                 add_header Content-Security-Policy "frame-ancestors 'self';";
+    #                 add_header X-Frame-Options DENY;
+    #                 add_header Set-Cookie "Path=/; HttpOnly; Secure";
+    #                 add_header Referrer-Policy 'origin';
+    #                 fastcgi_param  HTTP_x-forwarded-host $http_host;
+    #                 try_files $uri $uri/ /index.php?$args;
+    #         }
+    #         location ~ \.php$ {
+    #                 try_files $uri =404;
+    #                 fastcgi_pass unix:/run/php-fpm/www.sock;
+    #                 fastcgi_index index.php;
+    #                 fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
+    #                 fastcgi_param  HTTP_x-forwarded-host $http_host;
+    #                 include fastcgi_params;
+    #                 add_header "Access-Control-Allow-Origin"  *;
+    #                 add_header X-Content-Type-Options nosniff;
+    #                 add_header Strict-Transport-Security "max-age=15768000; includeSubdomains; preload";
+    #                 add_header X-XSS-Protection "1; mode=block";
+    #                 #add_header Content-Security-Policy-Report-Only "default-src 'self' *.google.com *.amazon.com;";
+    #                 add_header Content-Security-Policy "frame-ancestors 'self';";
+    #                 add_header X-Frame-Options DENY;
+    #                 add_header Set-Cookie "Path=/; HttpOnly; Secure";
+    #                 add_header Referrer-Policy 'origin';
+    #         }
+    #         location ~ /\. {
+    #                 deny  all;
+    #         }
+    #       }
+
+    #       server {
+    #         listen 443 ssl http2;
+    #         server_name system.beta.twidapp.com;
+    #         #       return 301 https://system.beta.twidapp.com$request_uri;
+    #         include /etc/nginx/snippets/headers.conf;
+    #         ssl_certificate "/etc/letsencrypt/live/beta.twidapp.com-0001/fullchain.pem";                   ssl_certificate_key "/etc/letsencrypt/live/beta.twidapp.com-0001/privkey.pem";
+    #         ssl_trusted_certificate "/etc/letsencrypt/live/beta.twidapp.com-0001/fullchain.pem";
+    #         root /twid/system/public;
+    #         access_log /var/log/nginx/twid-system_access_log;
+    #         error_log /var/log/nginx/twid-system_error_log crit;
+    #         index index.php index.html index.htm;
+    #         location / {
+    #                 try_files $uri $uri/ /index.php?$args;
+    #         }
+    #         location ~ \.php$ {
+    #                 try_files $uri =404;
+    #                 fastcgi_pass unix:/run/php-fpm/www.sock;
+    #                 fastcgi_index index.php;
+    #                 fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
+    #                 include fastcgi_params;
+    #         }
+    #         location ~ /\. {
+    #                 deny  all;
+    #         }
+    #       }
+
+    #       server {
+    #         listen 443 ssl http2;
+    #         server_name system.beta2.twidapp.com;
+    #         #       return 301 https://system.beta.twidapp.com$request_uri;
+    #         include /etc/nginx/snippets/headers.conf;
+    #         ssl_certificate "/etc/letsencrypt/live/beta2.twidapp.com/fullchain.pem";                   ssl_certificate_key "/etc/letsencrypt/live/beta2.twidapp.com/privkey.pem";
+    #         ssl_trusted_certificate "/etc/letsencrypt/live/beta2.twidapp.com/fullchain.pem";
+    #         rewrite ^/(.*)$ https://system.beta.twidapp.com/$1 redirect;
+    #         #       root /twid/system/public;
+    #         #       access_log /var/log/nginx/twid-system_access_log;
+    #         #       error_log /var/log/nginx/twid-system_error_log crit;
+    #         #       index index.php index.html index.htm;
+    #         #       location / {
+    #         #               try_files $uri $uri/ /index.php?$args;
+    #         #       }
+    #         #       location ~ \.php$ {
+    #         #       try_files $uri =404;
+    #         #       fastcgi_pass unix:/run/php-fpm/www.sock;
+    #         #       fastcgi_index index.php;
+    #         #       fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
+    #         #       include fastcgi_params;
+    #         #       }
+    #         #       location ~ /\. {
+    #         #               deny  all;
+    #         #       }
+    #       }
+
+
+    #       server {
+    #         listen 443 ssl http2;
+    #         server_name fk.beta.twidapp.com;
+    #         #       return 301 https://fk.beta.twidapp.com$request_uri;
+    #         include /etc/nginx/snippets/headers.conf;
+    #         ssl_certificate "/etc/letsencrypt/live/beta.twidapp.com-0001/cert.pem";                   ssl_certificate_key "/etc/letsencrypt/live/beta.twidapp.com-0001/privkey.pem";
+    #         ssl_trusted_certificate "/etc/letsencrypt/live/beta.twidapp.com-0001/fullchain.pem";
+    #         root /twid/merchant/public;
+    #         access_log /var/log/nginx/twid-fk_access_log;
+    #         error_log /var/log/nginx/twid-fk_error_log crit;
+    #         index index.php index.html index.htm;
+    #         location / {
+    #                 try_files $uri $uri/ /index.php?$args;
+    #         }
+    #         location ~ \.php$ {
+    #                 try_files $uri =404;
+    #                 fastcgi_pass unix:/run/php-fpm/www.sock;
+    #                 fastcgi_index index.php;
+    #                 fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
+    #                 include fastcgi_params;
+    #         }
+    #         location ~ /\. {
+    #                 deny  all;
+    #         }
+    #       }
+
+    #       server {
+    #         listen 443 ssl http2;
+    #         server_name fk-cx.beta.twidapp.com;
+    #         #       return 301 https://fk-cx.beta.twidapp.com$request_uri;
+    #         include /etc/nginx/snippets/headers.conf;
+    #         ssl_certificate "/etc/letsencrypt/live/beta.twidapp.com-0001/cert.pem";                   ssl_certificate_key "/etc/letsencrypt/live/beta.twidapp.com-0001/privkey.pem";
+    #         ssl_trusted_certificate "/etc/letsencrypt/live/beta.twidapp.com-0001/fullchain.pem";
+    #         root /twid/merchant/public;
+    #         access_log /var/log/nginx/twid-fk-cx_access_log;
+    #         error_log /var/log/nginx/twid-fk-cx_error_log crit;
+    #         index index.php index.html index.htm;
+    #         location / {
+    #                 try_files $uri $uri/ /index.php?$args;
+    #         }
+    #         location ~ \.php$ {
+    #                 try_files $uri =404;
+    #                 fastcgi_pass unix:/run/php-fpm/www.sock;
+    #                 fastcgi_index index.php;
+    #                 fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
+    #                 include fastcgi_params;
+    #         }
+    #         location ~ /\. {
+    #                 deny  all;
+    #         }
+    #       }
+
+    #       server {
+    #         listen 443 ssl http2;
+    #         server_name ag-cx.beta.twidapp.com;
+    #         #       return 301 https://ag-cx.beta.twidapp.com$request_uri;
+    #         include /etc/nginx/snippets/headers.conf;
+    #         ssl_certificate "/etc/letsencrypt/live/beta.twidapp.com-0001/cert.pem";                   ssl_certificate_key "/etc/letsencrypt/live/beta.twidapp.com-0001/privkey.pem";
+    #         ssl_trusted_certificate "/etc/letsencrypt/live/beta.twidapp.com-0001/fullchain.pem";
+    #         root /twid/merchant/public;
+    #         access_log /var/log/nginx/twid-ag-cx_access_log;
+    #         error_log /var/log/nginx/twid-ag-cx_error_log crit;
+    #         index index.php index.html index.htm;
+    #         location / {
+    #                 try_files $uri $uri/ /index.php?$args;
+    #         }
+    #         location ~ \.php$ {
+    #         try_files $uri =404;
+    #         fastcgi_pass unix:/run/php-fpm/www.sock;
+    #         fastcgi_index index.php;
+    #         fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
+    #         include fastcgi_params;
+    #         }
+    #         location ~ /\. {
+    #         deny  all;
+    #         }
+    #       }
+
+    #       server {
+    #         listen 443 ssl http2;
+    #         server_name cx.beta.twidapp.com;
+    #         #       return 301 https://cx.beta.twidapp.com$request_uri;
+    #         include /etc/nginx/snippets/headers.conf;
+    #         ssl_certificate "/etc/letsencrypt/live/beta.twidapp.com-0001/cert.pem";                   ssl_certificate_key "/etc/letsencrypt/live/beta.twidapp.com-0001/privkey.pem";
+    #         ssl_trusted_certificate "/etc/letsencrypt/live/beta.twidapp.com-0001/fullchain.pem";
+    #         root /twid/merchant/public;
+    #         access_log /var/log/nginx/twid-cx_access_log;
+    #         error_log /var/log/nginx/twid-cx_error_log crit;
+    #         index index.php index.html index.htm;
+    #         location / {
+    #                 try_files $uri $uri/ /index.php?$args;
+    #         }
+    #         location ~ \.php$ {
+    #                 try_files $uri =404;
+    #                 fastcgi_pass unix:/run/php-fpm/www.sock;
+    #                 fastcgi_index index.php;
+    #                 fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
+    #                 include fastcgi_params;
+    #         }
+    #         location ~ /\. {
+    #                 deny  all;
+    #         }
+    #       }
+
+    #       server {
+    #         listen 443 ssl http2;
+    #         server_name bpcl.beta.twidapp.com;
+    #         #       return 301 https://bpcl.beta.twidapp.com$request_uri;
+    #         include /etc/nginx/snippets/headers.conf;
+    #         ssl_certificate "/etc/letsencrypt/live/beta.twidapp.com-0001/cert.pem";                   ssl_certificate_key "/etc/letsencrypt/live/beta.twidapp.com-0001/privkey.pem";
+    #         ssl_trusted_certificate "/etc/letsencrypt/live/beta.twidapp.com-0001/fullchain.pem";
+    #         root /twid/merchant/public;
+    #         access_log /var/log/nginx/twid-bpcl_access_log;
+    #         error_log /var/log/nginx/twid-bpcl_error_log crit;
+    #         index index.php index.html index.htm;
+    #         location / {
+    #                 try_files $uri $uri/ /index.php?$args;
+    #         }
+    #         location ~ \.php$ {
+    #                 try_files $uri =404;
+    #                 fastcgi_pass unix:/run/php-fpm/www.sock;
+    #                 fastcgi_index index.php;
+    #                 fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
+    #                 include fastcgi_params;
+    #         }
+    #         location ~ /\. {
+    #                 deny  all;
+    #         }
+    #       }
+
+    #       server {
+    #         listen 443 ssl http2;
+    #         server_name beta.twidpay.com;
+    #         include /etc/nginx/snippets/headers.conf;
+    #         ssl_certificate "/etc/letsencrypt/live/beta.twidapp.com-0001/cert.pem";                   ssl_certificate_key "/etc/letsencrypt/live/beta.twidapp.com-0001/privkey.pem";
+    #         ssl_trusted_certificate "/etc/letsencrypt/live/beta.twidapp.com-0001/fullchain.pem";
+    #         root /twid/merchant/public;
+    #         access_log /var/log/nginx/twid-site_access_log;
+    #         error_log /var/log/nginx/twid-site_error_log crit;
+    #         index index.php index.html index.htm;
+    #         location / {
+    #                 try_files $uri $uri/ /index.php?$args;
+    #         }
+    #         location ~ \.php$ {
+    #                 try_files $uri =404;
+    #                 fastcgi_pass unix:/run/php-fpm/www.sock;
+    #                 fastcgi_index index.php;
+    #                 fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
+    #                 include fastcgi_params;
+    #         }
+    #         location ~ /\. {
+    #                 deny  all;
+    #         }
+    #       }
+
+    #       server {
+    #         listen 443 ssl http2;
+    #         server_name mapi.beta.twidapp.com;
+    #         include /etc/nginx/snippets/headers.conf;
+    #         #ssl_certificate "/etc/letsencrypt/live/beta.twidapp.com/cert.pem";       
+    #         #ssl_certificate_key "/etc/letsencrypt/live/beta.twidapp.com/privkey.pem";
+    #         #ssl_trusted_certificate "/etc/letsencrypt/live/beta.twidapp.com/fullchain.pem";
+    #         ssl_certificate "/etc/letsencrypt/live/beta.twidapp.com-0001/fullchain.pem";                   ssl_certificate_key "/etc/letsencrypt/live/beta.twidapp.com-0001/privkey.pem";
+    #         ssl_trusted_certificate "/etc/letsencrypt/live/beta.twidapp.com-0001/fullchain.pem";
+    #         root /twid/mapi/public;
+    #         access_log /var/log/nginx/twid-mapi_access_log;
+    #         error_log /var/log/nginx/twid-mapi_error_log crit;
+    #         index index.php index.html index.htm;
+    #         location / {
+    #                 add_header "Access-Control-Allow-Origin" *;
+    #                 try_files $uri $uri/ /index.php?$args;
+    #         }
+    #         location ~ \.php$ {
+    #                 try_files $uri =404;
+    #                 fastcgi_pass unix:/run/php-fpm/www.sock;
+    #                 fastcgi_index index.php;
+    #                 fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
+    #                 include fastcgi_params;
+    #                 add_header Access-Control-Allow-Origin *;
+    #                 add_header Access-Control-Allow-Methods "POST, GET, OPTIONS, PUT, DELETE";
+    #                 add_header Access-Control-Allow-Headers "customer-id,offer-customer-hash,app,customer-hash,version,os,app_version,Origin,Content-Type,Accept,Authorization";
+    #                 # Hide PHP headers
+    #                 fastcgi_hide_header             X-Powered-By;
+    #                 fastcgi_hide_header             X-CF-Powered-By;
+    #         }
+    #         location ~ /\. {
+    #                 deny  all;
+    #         }
+    #       }
+
+    #       server {
+    #         listen 443 ssl http2;
+    #         server_name tpap.beta.twidapp.com;
+    #         include /etc/nginx/snippets/headers.conf;
+    #         ssl_certificate "/etc/letsencrypt/live/beta.twidapp.com-0001/fullchain.pem";
+    #         ssl_certificate_key "/etc/letsencrypt/live/beta.twidapp.com-0001/privkey.pem";
+    #         ssl_trusted_certificate "/etc/letsencrypt/live/beta.twidapp.com-0001/fullchain.pem";
+    #         root /twid/tpap/public;
+    #         access_log /var/log/nginx/twid-tpap_access_log;
+    #         error_log /var/log/nginx/twid-tpap_error_log crit;
+    #         index index.php index.html index.htm;
+    #         location / {
+    #                 try_files $uri $uri/ /index.php?$args;
+    #         }
+    #         location ~ \.php$ {
+    #                 try_files $uri =404;
+    #                 fastcgi_pass unix:/run/php-fpm/www.sock;
+    #                 fastcgi_index index.php;
+    #                 fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
+    #                 include fastcgi_params;
+    #                 add_header Strict-Transport-Security "max-age=31536000; includeSubDomains; preload" always;
+    #                 add_header Content-Security-Policy "default-src 'self' *.google.com *.amazon.com;" always;
+    #                 add_header X-XSS-Protection "1; mode=block" always;
+    #                 add_header X-Frame-Options DENY always;
+    #                 add_header X-Content-Type-Options nosniff always;
+    #                 add_header Set-Cookie "Path=/; HttpOnly; Secure" always;
+    #                 add_header Referrer-Policy 'origin' always;
+    #                 add_header Permissions-Policy "geolocation=(),midi=(),sync-xhr=(),microphone=(),camera=(),magnetometer=(),gyroscope=(),fullscreen=(self),payment=()" always;
+    #                 # Hide PHP headers
+    #                 fastcgi_hide_header             X-Powered-By;
+    #                 fastcgi_hide_header             X-CF-Powered-By;
+    #         }
+    #         location ~ /\. {
+    #                 deny  all;
+    #         }
+    #       }
+
+    #       server {
+    #         listen 443 ssl http2;
+    #         server_name yono-system.beta.twidapp.com;
+    #         include /etc/nginx/snippets/headers.conf;
+    #         ssl_certificate "/etc/letsencrypt/live/beta.twidapp.com-0001/fullchain.pem";
+    #         ssl_certificate_key "/etc/letsencrypt/live/beta.twidapp.com-0001/privkey.pem";
+    #         ssl_trusted_certificate "/etc/letsencrypt/live/beta.twidapp.com-0001/fullchain.pem";
+    #         root /twid/yono_system/public;
+    #         access_log /var/log/nginx/yono_system_access_log;
+    #         error_log /var/log/nginx/yono_system_error_log crit;
+    #         index index.php index.html index.htm;
+    #         location / {
+    #                 try_files $uri $uri/ /index.php?$args;
+    #         }
+    #         location ~ \.php$ {
+    #                 try_files $uri =404;
+    #                 fastcgi_pass unix:/run/php-fpm/www.sock;
+    #                 fastcgi_index index.php;
+    #                 fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
+    #                 include fastcgi_params;
+    #         }
+    #         location ~ /\. {
+    #                 deny  all;
+    #         }
+    #       }
+
+    #       server {
+    #         listen 443 ssl http2;
+    #         server_name twidpay.com www.twidapp.com www.twidpay.com twidapp.com;
+    #         include /etc/nginx/snippets/headers.conf;
+    #         ssl_certificate "/etc/letsencrypt/live/twidapp.com/fullchain.pem";
+    #         ssl_certificate_key "/etc/letsencrypt/live/twidapp.com/privkey.pem";
+    #         ssl_trusted_certificate "/etc/letsencrypt/live/twidapp.com/fullchain.pem";
+    #         root /twid/web/site;
+    #         access_log /var/log/nginx/beta_access_log;
+    #         error_log /var/log/nginx/beta_error_log crit;
+    #         index index.php index.html index.htm;
+    #         location / {
+    #                 try_files $uri $uri/ /index.php?$args;
+    #         }
+    #         location ~ \.php$ {
+    #                 try_files $uri =404;
+    #                 fastcgi_pass unix:/run/php-fpm/www.sock;
+    #                 fastcgi_index index.php;
+    #                 fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
+    #                 include fastcgi_params;
+    #         }
+    #         location ~ /\. {
+    #                 deny  all;
+    #         }
+    #       }
+
+    #       server {
+    #         listen 443 ssl http2;
+    #         server_name affiliate-system.beta.twidapp.com;
+    #         include /etc/nginx/snippets/headers.conf;
+    #         ssl_certificate "/etc/letsencrypt/live/beta.twidapp.com-0001/fullchain.pem";
+    #         ssl_certificate_key "/etc/letsencrypt/live/beta.twidapp.com-0001/privkey.pem";
+    #         ssl_trusted_certificate "/etc/letsencrypt/live/beta.twidapp.com-0001/fullchain.pem";
+    #         root /twid/yono_system/public;
+    #         access_log /var/log/nginx/affiliate_system_access_log;
+    #         error_log /var/log/nginx/affiliate_system_error_log crit;
+    #         index index.php index.html index.htm;
+    #         location / {
+    #                 try_files $uri $uri/ /index.php?$args;
+    #         }
+    #         location ~ \.php$ {
+    #                 try_files $uri =404;
+    #                 fastcgi_pass unix:/run/php-fpm/www.sock;
+    #                 fastcgi_index index.php;
+    #                 fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
+    #                 include fastcgi_params;
+    #         }
+    #         location ~ /\. {
+    #                 deny  all;
+    #         }
+    #       }
+    
+    - name: updating configuration conf.d/betanewhttp.conf
       copy:
-        dest: "/etc/nginx/conf.d/beta-ssl.conf"
+        dest: "/etc/nginx/conf.d/betanewhttp.conf"
         content: | 
           server {
-            listen 443 ssl http2;
+            listen 80;
             server_name beta.twidapp.com;
             include /etc/nginx/snippets/headers.conf;
             root /twid/web;
             access_log /var/log/nginx/beta_access_log;
             error_log /var/log/nginx/beta_error_log crit;
             index index.php index.html index.htm;
-            ssl_certificate "/etc/letsencrypt/live/beta.twidapp.com-0001/cert.pem";    
-            ssl_certificate_key "/etc/letsencrypt/live/beta.twidapp.com-0001/privkey.pem";
-            ssl_trusted_certificate "/etc/letsencrypt/live/beta.twidapp.com-0001/fullchain.pem";
+                 
+             
+             
             location / {
                     try_files $uri $uri/ /index.php?$args;
             }
@@ -631,14 +1634,14 @@
                     deny  all;
             }
           }
-
+          
           server {
-            listen 443 ssl http2;
+            listen 80;
             server_name api.beta.twidapp.com;
             include /etc/nginx/snippets/headers.conf;
-            ssl_certificate "/etc/letsencrypt/live/beta.twidapp.com-0001/fullchain.pem";                   
-            ssl_certificate_key "/etc/letsencrypt/live/beta.twidapp.com-0001/privkey.pem";
-            ssl_trusted_certificate "/etc/letsencrypt/live/beta.twidapp.com-0001/fullchain.pem";
+                               
+             
+             
             root /twid/api/public;
             access_log /var/log/nginx/api_access_log;
             error_log /var/log/nginx/api_error_log crit;
@@ -657,14 +1660,14 @@
                     deny  all;
             }
           }
-
+          
           server {
-            listen 443 ssl http2;
+            listen 80;
             server_name tpap-logs.beta.twidapp.com;
             include /etc/nginx/snippets/headers.conf;
-            ssl_certificate "/etc/letsencrypt/live/beta.twidapp.com-0001/fullchain.pem";
-            ssl_certificate_key "/etc/letsencrypt/live/beta.twidapp.com-0001/privkey.pem";
-            ssl_trusted_certificate "/etc/letsencrypt/live/beta.twidapp.com-0001/fullchain.pem";
+            
+             
+             
             root /twid/tpap_logs/public;
             access_log /var/log/nginx/tpap_logs_access_log;
             error_log /var/log/nginx/tpap_logs_error_log crit;
@@ -683,14 +1686,14 @@
                     deny  all;
             }
           }
-
+          
           server {
-            listen 443 ssl http2;
+            listen 80;
             server_name tpap-tasks.beta.twidapp.com;
             include /etc/nginx/snippets/headers.conf;
-            ssl_certificate "/etc/letsencrypt/live/beta.twidapp.com-0001/fullchain.pem";
-            ssl_certificate_key "/etc/letsencrypt/live/beta.twidapp.com-0001/privkey.pem";
-            ssl_trusted_certificate "/etc/letsencrypt/live/beta.twidapp.com-0001/fullchain.pem";
+            
+             
+             
             root /twid/tasks_tpap/public;
             access_log /var/log/nginx/tasks_tpap_access_log;
             error_log /var/log/nginx/tasks_tpap_error_log crit;
@@ -709,14 +1712,14 @@
                     deny  all;
             }
           }
-
+          
           server {
-            listen 443 ssl http2;
+            listen 80;
             server_name bg.api.beta.twidapp.com;
             include /etc/nginx/snippets/headers.conf;
-            ssl_certificate "/etc/letsencrypt/live/beta.twidapp.com-0001/cert.pem";                   
-            ssl_certificate_key "/etc/letsencrypt/live/beta.twidapp.com-0001/privkey.pem";
-            ssl_trusted_certificate "/etc/letsencrypt/live/beta.twidapp.com-0001/fullchain.pem";
+                                
+             
+             
             root /twid/api/public;
             access_log /var/log/nginx/api_access_log;
             error_log /var/log/nginx/api_error_log crit;
@@ -735,14 +1738,14 @@
                     deny  all;
             }
           }
-
+          
           server {
-            listen 443 ssl http2;
+            listen 80;
             server_name merchant.beta.twidapp.com;
             include /etc/nginx/snippets/headers.conf;
-            ssl_certificate "/etc/letsencrypt/live/beta.twidapp.com-0001/cert.pem";                   
-            ssl_certificate_key "/etc/letsencrypt/live/beta.twidapp.com-0001/privkey.pem";
-            ssl_trusted_certificate "/etc/letsencrypt/live/beta.twidapp.com-0001/fullchain.pem";
+                                
+             
+             
             root /twid/merchant/public;
             access_log /var/log/nginx/api_access_log;
             error_log /var/log/nginx/api_error_log crit;
@@ -751,7 +1754,7 @@
                     if ($request_method = OPTIONS ) {
                     add_header "Access-Control-Allow-Origin"  *;
                             return 200;
-
+          
                     }
                     try_files $uri $uri/ /index.php?$args;
                     if ($request_method = OPTIONS ) {
@@ -797,14 +1800,14 @@
                     deny  all;
             }
           }
-
+          
           server {
-            listen 443 ssl http2;
+            listen 80;
             server_name docs.beta.twidapp.com;
             include /etc/nginx/snippets/headers.conf;
-            ssl_certificate "/etc/letsencrypt/live/beta.twidapp.com-0001/cert.pem";                   
-            ssl_certificate_key "/etc/letsencrypt/live/beta.twidapp.com-0001/privkey.pem";
-            ssl_trusted_certificate "/etc/letsencrypt/live/beta.twidapp.com-0001/fullchain.pem";
+                                
+             
+             
             root /twid/api;
             access_log /var/log/nginx/docs_access_log;
             error_log /var/log/nginx/docs_error_log crit;
@@ -812,7 +1815,7 @@
             location / {
                     try_files $uri $uri/ /index.php?$args;
             }
-
+          
             location ~ \.php$ {
                     try_files $uri =404;
                     fastcgi_pass unix:/run/php-fpm/www.sock;
@@ -824,9 +1827,9 @@
                     deny  all;
             }
           }
-
+          
           server {
-            listen 443 ssl http2;
+            listen 80;
             server_name docs.twidapp.com;
             include /etc/nginx/snippets/headers.conf;
             ssl_certificate "/etc/letsencrypt/live/twidapp.com/cert.pem";                   
@@ -850,15 +1853,15 @@
                     deny  all;
             }
           }
-
-
+          
+          
           server {
-            listen 443 ssl http2;
+            listen 80;
             server_name quick-docs.beta.twidapp.com;
             include /etc/nginx/snippets/headers.conf;
-            ssl_certificate "/etc/letsencrypt/live/beta.twidapp.com-0001/cert.pem";                   
-            ssl_certificate_key "/etc/letsencrypt/live/beta.twidapp.com-0001/privkey.pem";
-            ssl_trusted_certificate "/etc/letsencrypt/live/beta.twidapp.com-0001/fullchain.pem";
+                                
+             
+             
             root /twid/api/quick-docs;
             access_log /var/log/nginx/quick-docs_access_log;
             error_log /var/log/nginx/quick-docs_error_log crit;
@@ -877,13 +1880,13 @@
                     deny  all;
             }
           }
-
+          
           server {
-            listen 443 ssl http2;
+            listen 80;
             server_name pwa-docs.beta.twidapp.com;
             include /etc/nginx/snippets/headers.conf;
-            ssl_certificate "/etc/letsencrypt/live/beta.twidapp.com-0001/cert.pem";                   ssl_certificate_key "/etc/letsencrypt/live/beta.twidapp.com-0001/privkey.pem";
-            ssl_trusted_certificate "/etc/letsencrypt/live/beta.twidapp.com-0001/fullchain.pem";
+                                 
+             
             root /twid/api/pwa-docs;
             access_log /var/log/nginx/pwa-docs_access_log;
             error_log /var/log/nginx/pwa-docs_error_log crit;
@@ -902,13 +1905,13 @@
                     deny  all;
             }
           }
-
+          
           server {
-            listen 443 ssl http2;
+            listen 80;
             server_name twid-pwa-docs.beta.twidapp.com;
             include /etc/nginx/snippets/headers.conf;
-            ssl_certificate "/etc/letsencrypt/live/beta.twidapp.com-0001/cert.pem";                   ssl_certificate_key "/etc/letsencrypt/live/beta.twidapp.com-0001/privkey.pem";
-            ssl_trusted_certificate "/etc/letsencrypt/live/beta.twidapp.com-0001/fullchain.pem";
+                                 
+             
             root /twid/api/twid-pwa-docs;
             access_log /var/log/nginx/twid-pwa-docs_access_log;
             error_log /var/log/nginx/twid-pwa-docs_error_log crit;
@@ -927,13 +1930,13 @@
                     deny  all;
             }
           }
-
+          
           server {
-            listen 443 ssl http2;
+            listen 80;
             server_name payment-docs.beta.twidapp.com;
             include /etc/nginx/snippets/headers.conf;
-            ssl_certificate "/etc/letsencrypt/live/beta.twidapp.com-0001/cert.pem";                   ssl_certificate_key "/etc/letsencrypt/live/beta.twidapp.com-0001/privkey.pem";
-            ssl_trusted_certificate "/etc/letsencrypt/live/beta.twidapp.com-0001/fullchain.pem";
+                                 
+             
             root /twid/api/payment-docs;
             access_log /var/log/nginx/payment-docs_access_log;
             error_log /var/log/nginx/payment-docs_error_log crit;
@@ -952,13 +1955,13 @@
                     deny  all;
             }
           }
-
+          
           server {
-            listen 443 ssl http2;
+            listen 80;
             server_name pg-docs.beta.twidapp.com;
             include /etc/nginx/snippets/headers.conf;
-            ssl_certificate "/etc/letsencrypt/live/beta.twidapp.com-0001/cert.pem";                   ssl_certificate_key "/etc/letsencrypt/live/beta.twidapp.com-0001/privkey.pem";
-            ssl_trusted_certificate "/etc/letsencrypt/live/beta.twidapp.com-0001/fullchain.pem";
+                                 
+             
             root /twid/api/pg-docs;
             access_log /var/log/nginx/pg-docs_access_log;
             error_log /var/log/nginx/pg-docs_error_log crit;
@@ -977,13 +1980,13 @@
                     deny  all;
             }
           }
-
+          
           server {
-            listen 443 ssl http2;
+            listen 80;
             server_name lmp-docs.beta.twidapp.com;
             include /etc/nginx/snippets/headers.conf;
-            ssl_certificate "/etc/letsencrypt/live/beta.twidapp.com-0001/cert.pem";                   ssl_certificate_key "/etc/letsencrypt/live/beta.twidapp.com-0001/privkey.pem";
-            ssl_trusted_certificate "/etc/letsencrypt/live/beta.twidapp.com-0001/fullchain.pem";
+                                 
+             
             root /twid/api/lmp-docs;
             access_log /var/log/nginx/lmp-docs_access_log;
             error_log /var/log/nginx/lmp-docs_error_log crit;
@@ -1002,13 +2005,13 @@
                     deny  all;
             }
           }
-
+          
           server {
-            listen 443 ssl http2;
+            listen 80;
             server_name gv-docs.beta.twidapp.com;
             include /etc/nginx/snippets/headers.conf;
-            ssl_certificate "/etc/letsencrypt/live/beta.twidapp.com-0001/cert.pem";                   ssl_certificate_key "/etc/letsencrypt/live/beta.twidapp.com-0001/privkey.pem";
-            ssl_trusted_certificate "/etc/letsencrypt/live/beta.twidapp.com-0001/fullchain.pem";
+                                 
+             
             root /twid/api/gv-docs;
             access_log /var/log/nginx/gv-docs_access_log;
             error_log /var/log/nginx/gv-docs_error_log crit;
@@ -1027,13 +2030,13 @@
                     deny  all;
             }
           }
-
+          
           server {
-            listen 443 ssl http2;
+            listen 80;
             server_name ext-gv-docs.beta.twidapp.com;
             include /etc/nginx/snippets/headers.conf;
-            ssl_certificate "/etc/letsencrypt/live/beta.twidapp.com-0001/cert.pem";                   ssl_certificate_key "/etc/letsencrypt/live/beta.twidapp.com-0001/privkey.pem";
-            ssl_trusted_certificate "/etc/letsencrypt/live/beta.twidapp.com-0001/fullchain.pem";
+                                 
+             
             root /twid/api/ext-gv-docs;
             access_log /var/log/nginx/ext-gv_docs_access_log;
             error_log /var/log/nginx/ext-gv_docs_error_log crit;
@@ -1052,13 +2055,13 @@
                     deny  all;
             }
           }
-
+          
           server {
-            listen 443 ssl http2;
+            listen 80;
             server_name offer-docs.beta.twidapp.com;
             include /etc/nginx/snippets/headers.conf;
-            ssl_certificate "/etc/letsencrypt/live/beta.twidapp.com-0001/cert.pem";                   ssl_certificate_key "/etc/letsencrypt/live/beta.twidapp.com-0001/privkey.pem";
-            ssl_trusted_certificate "/etc/letsencrypt/live/beta.twidapp.com-0001/fullchain.pem";
+                                 
+             
             root /twid/api/offer-docs;
             access_log /var/log/nginx/offer-docs_access_log;
             error_log /var/log/nginx/offer-docs_error_log crit;
@@ -1077,14 +2080,14 @@
                     deny  all;
             }
           }
-
+          
           server {
-            listen 443 ssl http2;
+            listen 80;
             server_name tasks.beta.twidapp.com;
             include /etc/nginx/snippets/headers.conf;
-            ssl_certificate "/etc/letsencrypt/live/beta.twidapp.com-0001/fullchain.pem";
-            ssl_certificate_key "/etc/letsencrypt/live/beta.twidapp.com-0001/privkey.pem";
-            ssl_trusted_certificate "/etc/letsencrypt/live/beta.twidapp.com-0001/fullchain.pem";
+            
+             
+             
             root /twid/tasks/public;
             access_log /var/log/nginx/tasks_access_log;
             error_log /var/log/nginx/tasks_error_log crit;
@@ -1110,13 +2113,13 @@
                     deny all;
             }
           }
-
+          
           server {
-            listen 443 ssl http2;
+            listen 80;
             server_name www.beta.twidapp.com;
             include /etc/nginx/snippets/headers.conf;
-            ssl_certificate "/etc/letsencrypt/live/beta.twidapp.com-0001/cert.pem";                   ssl_certificate_key "/etc/letsencrypt/live/beta.twidapp.com-0001/privkey.pem";
-            ssl_trusted_certificate "/etc/letsencrypt/live/beta.twidapp.com-0001/fullchain.pem";
+                                 
+             
             root /twid/web/site;
             access_log /var/log/nginx/twid-site_access_log;
             error_log /var/log/nginx/twid-site_error_log crit;
@@ -1124,7 +2127,7 @@
             location / {
                     try_files $uri $uri/ /index.php?$args;
             }
-
+          
             location ~ \.php$ {
                     try_files $uri =404;
                     fastcgi_pass unix:/run/php-fpm/www.sock;
@@ -1136,13 +2139,13 @@
                     deny  all;
             }
           }
-
+          
           server {
-            listen 443 ssl http2;
+            listen 80;
             server_name merchdev.beta.twidapp.com business.beta.twidapp.com pos.beta.twidapp.com pwa.beta.twidapp.com;
             include /etc/nginx/snippets/headers.conf;
-            ssl_certificate "/etc/letsencrypt/live/beta.twidapp.com-0001/fullchain.pem";                   ssl_certificate_key "/etc/letsencrypt/live/beta.twidapp.com-0001/privkey.pem";
-            ssl_trusted_certificate "/etc/letsencrypt/live/beta.twidapp.com-0001/fullchain.pem";
+                                
+             
             root /twid/merchant/public;
             access_log /var/log/nginx/merchant_access_log;
             error_log /var/log/nginx/merchant_log;
@@ -1184,17 +2187,17 @@
                     deny  all;
             }
           }
-
-
-
-
+          
+          
+          
+          
           server {
-            listen 443 ssl http2;
+            listen 80;
             server_name affiliate.beta.twidapp.com;
             include /etc/nginx/snippets/headers.conf;
-            ssl_certificate "/etc/letsencrypt/live/beta.twidapp.com-0001/fullchain.pem";                   
-            ssl_certificate_key "/etc/letsencrypt/live/beta.twidapp.com-0001/privkey.pem";
-            ssl_trusted_certificate "/etc/letsencrypt/live/beta.twidapp.com-0001/fullchain.pem";
+                               
+             
+             
             root /twid/yono_merchant/public;
             access_log /var/log/nginx/yono_merchant_access_log;
             error_log /var/log/nginx/yono_merchant_log crit;
@@ -1232,14 +2235,14 @@
                     deny  all;
             }
           }
-
+          
           server {
-            listen 443 ssl http2;
+            listen 80;
             server_name system.beta.twidapp.com;
             #       return 301 https://system.beta.twidapp.com$request_uri;
             include /etc/nginx/snippets/headers.conf;
-            ssl_certificate "/etc/letsencrypt/live/beta.twidapp.com-0001/fullchain.pem";                   ssl_certificate_key "/etc/letsencrypt/live/beta.twidapp.com-0001/privkey.pem";
-            ssl_trusted_certificate "/etc/letsencrypt/live/beta.twidapp.com-0001/fullchain.pem";
+                                
+             
             root /twid/system/public;
             access_log /var/log/nginx/twid-system_access_log;
             error_log /var/log/nginx/twid-system_error_log crit;
@@ -1258,42 +2261,14 @@
                     deny  all;
             }
           }
-
+          
           server {
-            listen 443 ssl http2;
-            server_name system.beta2.twidapp.com;
-            #       return 301 https://system.beta.twidapp.com$request_uri;
-            include /etc/nginx/snippets/headers.conf;
-            ssl_certificate "/etc/letsencrypt/live/beta2.twidapp.com/fullchain.pem";                   ssl_certificate_key "/etc/letsencrypt/live/beta2.twidapp.com/privkey.pem";
-            ssl_trusted_certificate "/etc/letsencrypt/live/beta2.twidapp.com/fullchain.pem";
-            rewrite ^/(.*)$ https://system.beta.twidapp.com/$1 redirect;
-            #       root /twid/system/public;
-            #       access_log /var/log/nginx/twid-system_access_log;
-            #       error_log /var/log/nginx/twid-system_error_log crit;
-            #       index index.php index.html index.htm;
-            #       location / {
-            #               try_files $uri $uri/ /index.php?$args;
-            #       }
-            #       location ~ \.php$ {
-            #       try_files $uri =404;
-            #       fastcgi_pass unix:/run/php-fpm/www.sock;
-            #       fastcgi_index index.php;
-            #       fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
-            #       include fastcgi_params;
-            #       }
-            #       location ~ /\. {
-            #               deny  all;
-            #       }
-          }
-
-
-          server {
-            listen 443 ssl http2;
+            listen 80;
             server_name fk.beta.twidapp.com;
             #       return 301 https://fk.beta.twidapp.com$request_uri;
             include /etc/nginx/snippets/headers.conf;
-            ssl_certificate "/etc/letsencrypt/live/beta.twidapp.com-0001/cert.pem";                   ssl_certificate_key "/etc/letsencrypt/live/beta.twidapp.com-0001/privkey.pem";
-            ssl_trusted_certificate "/etc/letsencrypt/live/beta.twidapp.com-0001/fullchain.pem";
+                                 
+             
             root /twid/merchant/public;
             access_log /var/log/nginx/twid-fk_access_log;
             error_log /var/log/nginx/twid-fk_error_log crit;
@@ -1312,14 +2287,14 @@
                     deny  all;
             }
           }
-
+          
           server {
-            listen 443 ssl http2;
+            listen 80;
             server_name fk-cx.beta.twidapp.com;
             #       return 301 https://fk-cx.beta.twidapp.com$request_uri;
             include /etc/nginx/snippets/headers.conf;
-            ssl_certificate "/etc/letsencrypt/live/beta.twidapp.com-0001/cert.pem";                   ssl_certificate_key "/etc/letsencrypt/live/beta.twidapp.com-0001/privkey.pem";
-            ssl_trusted_certificate "/etc/letsencrypt/live/beta.twidapp.com-0001/fullchain.pem";
+                                 
+             
             root /twid/merchant/public;
             access_log /var/log/nginx/twid-fk-cx_access_log;
             error_log /var/log/nginx/twid-fk-cx_error_log crit;
@@ -1338,14 +2313,14 @@
                     deny  all;
             }
           }
-
+          
           server {
-            listen 443 ssl http2;
+            listen 80;
             server_name ag-cx.beta.twidapp.com;
             #       return 301 https://ag-cx.beta.twidapp.com$request_uri;
             include /etc/nginx/snippets/headers.conf;
-            ssl_certificate "/etc/letsencrypt/live/beta.twidapp.com-0001/cert.pem";                   ssl_certificate_key "/etc/letsencrypt/live/beta.twidapp.com-0001/privkey.pem";
-            ssl_trusted_certificate "/etc/letsencrypt/live/beta.twidapp.com-0001/fullchain.pem";
+                                 
+             
             root /twid/merchant/public;
             access_log /var/log/nginx/twid-ag-cx_access_log;
             error_log /var/log/nginx/twid-ag-cx_error_log crit;
@@ -1364,14 +2339,14 @@
             deny  all;
             }
           }
-
+          
           server {
-            listen 443 ssl http2;
+            listen 80;
             server_name cx.beta.twidapp.com;
             #       return 301 https://cx.beta.twidapp.com$request_uri;
             include /etc/nginx/snippets/headers.conf;
-            ssl_certificate "/etc/letsencrypt/live/beta.twidapp.com-0001/cert.pem";                   ssl_certificate_key "/etc/letsencrypt/live/beta.twidapp.com-0001/privkey.pem";
-            ssl_trusted_certificate "/etc/letsencrypt/live/beta.twidapp.com-0001/fullchain.pem";
+                                 
+             
             root /twid/merchant/public;
             access_log /var/log/nginx/twid-cx_access_log;
             error_log /var/log/nginx/twid-cx_error_log crit;
@@ -1390,14 +2365,14 @@
                     deny  all;
             }
           }
-
+          
           server {
-            listen 443 ssl http2;
+            listen 80;
             server_name bpcl.beta.twidapp.com;
             #       return 301 https://bpcl.beta.twidapp.com$request_uri;
             include /etc/nginx/snippets/headers.conf;
-            ssl_certificate "/etc/letsencrypt/live/beta.twidapp.com-0001/cert.pem";                   ssl_certificate_key "/etc/letsencrypt/live/beta.twidapp.com-0001/privkey.pem";
-            ssl_trusted_certificate "/etc/letsencrypt/live/beta.twidapp.com-0001/fullchain.pem";
+                                 
+             
             root /twid/merchant/public;
             access_log /var/log/nginx/twid-bpcl_access_log;
             error_log /var/log/nginx/twid-bpcl_error_log crit;
@@ -1416,13 +2391,13 @@
                     deny  all;
             }
           }
-
+          
           server {
-            listen 443 ssl http2;
+            listen 80;
             server_name beta.twidpay.com;
             include /etc/nginx/snippets/headers.conf;
-            ssl_certificate "/etc/letsencrypt/live/beta.twidapp.com-0001/cert.pem";                   ssl_certificate_key "/etc/letsencrypt/live/beta.twidapp.com-0001/privkey.pem";
-            ssl_trusted_certificate "/etc/letsencrypt/live/beta.twidapp.com-0001/fullchain.pem";
+                                 
+             
             root /twid/merchant/public;
             access_log /var/log/nginx/twid-site_access_log;
             error_log /var/log/nginx/twid-site_error_log crit;
@@ -1441,16 +2416,16 @@
                     deny  all;
             }
           }
-
+          
           server {
-            listen 443 ssl http2;
+            listen 80;
             server_name mapi.beta.twidapp.com;
             include /etc/nginx/snippets/headers.conf;
             #ssl_certificate "/etc/letsencrypt/live/beta.twidapp.com/cert.pem";       
             #ssl_certificate_key "/etc/letsencrypt/live/beta.twidapp.com/privkey.pem";
             #ssl_trusted_certificate "/etc/letsencrypt/live/beta.twidapp.com/fullchain.pem";
-            ssl_certificate "/etc/letsencrypt/live/beta.twidapp.com-0001/fullchain.pem";                   ssl_certificate_key "/etc/letsencrypt/live/beta.twidapp.com-0001/privkey.pem";
-            ssl_trusted_certificate "/etc/letsencrypt/live/beta.twidapp.com-0001/fullchain.pem";
+                                
+             
             root /twid/mapi/public;
             access_log /var/log/nginx/twid-mapi_access_log;
             error_log /var/log/nginx/twid-mapi_error_log crit;
@@ -1476,14 +2451,14 @@
                     deny  all;
             }
           }
-
+          
           server {
-            listen 443 ssl http2;
+            listen 80;
             server_name tpap.beta.twidapp.com;
             include /etc/nginx/snippets/headers.conf;
-            ssl_certificate "/etc/letsencrypt/live/beta.twidapp.com-0001/fullchain.pem";
-            ssl_certificate_key "/etc/letsencrypt/live/beta.twidapp.com-0001/privkey.pem";
-            ssl_trusted_certificate "/etc/letsencrypt/live/beta.twidapp.com-0001/fullchain.pem";
+            
+             
+             
             root /twid/tpap/public;
             access_log /var/log/nginx/twid-tpap_access_log;
             error_log /var/log/nginx/twid-tpap_error_log crit;
@@ -1513,14 +2488,14 @@
                     deny  all;
             }
           }
-
+          
           server {
-            listen 443 ssl http2;
+            listen 80;
             server_name yono-system.beta.twidapp.com;
             include /etc/nginx/snippets/headers.conf;
-            ssl_certificate "/etc/letsencrypt/live/beta.twidapp.com-0001/fullchain.pem";
-            ssl_certificate_key "/etc/letsencrypt/live/beta.twidapp.com-0001/privkey.pem";
-            ssl_trusted_certificate "/etc/letsencrypt/live/beta.twidapp.com-0001/fullchain.pem";
+            
+             
+             
             root /twid/yono_system/public;
             access_log /var/log/nginx/yono_system_access_log;
             error_log /var/log/nginx/yono_system_error_log crit;
@@ -1539,9 +2514,9 @@
                     deny  all;
             }
           }
-
+          
           server {
-            listen 443 ssl http2;
+            listen 80;
             server_name twidpay.com www.twidapp.com www.twidpay.com twidapp.com;
             include /etc/nginx/snippets/headers.conf;
             ssl_certificate "/etc/letsencrypt/live/twidapp.com/fullchain.pem";
@@ -1565,14 +2540,12 @@
                     deny  all;
             }
           }
-
+          
           server {
-            listen 443 ssl http2;
+            listen 80;
             server_name affiliate-system.beta.twidapp.com;
             include /etc/nginx/snippets/headers.conf;
-            ssl_certificate "/etc/letsencrypt/live/beta.twidapp.com-0001/fullchain.pem";
-            ssl_certificate_key "/etc/letsencrypt/live/beta.twidapp.com-0001/privkey.pem";
-            ssl_trusted_certificate "/etc/letsencrypt/live/beta.twidapp.com-0001/fullchain.pem";
+          
             root /twid/yono_system/public;
             access_log /var/log/nginx/affiliate_system_access_log;
             error_log /var/log/nginx/affiliate_system_error_log crit;
