@@ -287,7 +287,7 @@
           #!/bin/bash
           sudo chmod -R 775 /twid/tasks_tpap/
           sudo chown -R apache:kushal /twid/tasks_tpap/
-          git config --global --add safe.directory /tasks_twid/tpap
+          git config --global --add safe.directory /twid/tasks_tpap
           cd /twid/tasks_tpap
           sudo -u kushal -- composer update --no-dev
           sudo -u kushal -- composer install --no-dev -n
