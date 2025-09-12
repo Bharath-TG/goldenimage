@@ -1,6 +1,7 @@
 #!/bin/bash
 eval "$(ssh-agent -s)"
-ssh-add ~/.ssh/id_github_api
+#ssh-add ~/.ssh/id_github_api
+ssh-add ~/.ssh/id_github
 rm -fR /twid/deploy/api
 
 git clone -b beta git@github.com:twidpay-global/twid_api.git /twid/deploy/api
