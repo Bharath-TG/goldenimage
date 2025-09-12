@@ -87,6 +87,7 @@
 
     - name: copy private keys for github
       shell: |
+        sudo cp /home/rocky/.ssh/id_rsa ~/.ssh/id_github
         sudo chown root:root ~/.ssh/id_github
         sudo chmod 600 ~/.ssh/id_github
         
