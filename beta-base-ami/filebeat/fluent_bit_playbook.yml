@@ -1,0 +1,28 @@
+- name: Install td-agent (Fluentd) on Rocky Linux
+  hosts: localhost
+  become: true
+  tasks:
+    - name: Import GPG key
+      rpm_key:
+        state: present
+        key: https://packages.treasuredata.com/GPG-KEY-td-agent
+
+    - name: Add td-agent YUM repo
+      yum_repository:
+        name: treasuredata
+        description: TreasureData repository
+        baseurl: https://packages.treasuredata.com/4/redhat/$releasever/$basearch
+        gpgcheck: yes
+        gpgkey: https://packages.treasuredata.com/GPG-KEY-td-agent
+        enabled: yes
+
+    - name: Install td-agent
+      dnf:
+        name: td-agent
+        state: present
+
+    - name: Enable and start td-agent
+      systemd:
+        name: td-agent
+        enabled: yes
+        state: started
