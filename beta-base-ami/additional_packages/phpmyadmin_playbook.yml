@@ -1,0 +1,49 @@
+---
+- name: Install phpMyAdmin
+  hosts: localhost
+  gather_facts: no
+  become: true
+  
+  vars:
+    phpmyadmin_url: "https://www.phpmyadmin.net/downloads/phpMyAdmin-latest-all-languages.tar.gz"
+    phpmyadmin_dest_dir: "/var/www/html/dbphpmyadmin"
+    phpmyadmin_extract_dir: "/tmp/phpmyadmin"
+
+  tasks:
+
+    - name: Ensure wget and tar are installed
+      package:
+        name:
+          - wget
+          - tar
+        state: present
+
+    - name: Create temp directory for extraction
+      file:
+        path: "{{ phpmyadmin_extract_dir }}"
+        state: directory
+
+    - name: Download phpMyAdmin tarball
+      get_url:
+        url: "{{ phpmyadmin_url }}"
+        dest: "/tmp/phpMyAdmin.tar.gz"
+
+    - name: Extract phpMyAdmin tarball
+      unarchive:
+        src: "/tmp/phpMyAdmin.tar.gz"
+        dest: "{{ phpmyadmin_extract_dir }}"
+        remote_src: yes
+
+    - name: Move extracted phpMyAdmin to final destination
+      command: >
+        mv {{ phpmyadmin_extract_dir }}/phpMyAdmin-*-all-languages {{ phpmyadmin_dest_dir }}
+      args:
+        removes: "{{ phpmyadmin_dest_dir }}"
+
+    - name: Clean up tarball and temp directory
+      file:
+        path: "{{ item }}"
+        state: absent
+      loop:
+        - "/tmp/phpMyAdmin.tar.gz"
+        - "{{ phpmyadmin_extract_dir }}"
