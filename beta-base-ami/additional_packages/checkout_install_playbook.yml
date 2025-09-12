@@ -10,12 +10,14 @@
     merchant_repo_url: git@github.com:twidpay-global/twid_merchant.git
     mapi_repo_url: git@github.com:twidpay-global/twid_mapi.git
     tpap_repo_url: git@github.com:twidpay-global/twid_tpap.git
+    tasks_tpap_repo_url: git@github.com:twidpay-global/twid_tasks_tpap.git
     system_dest_dir: /twid/system
     api_dest_dir: /twid/api
     tasks_dest_dir: /twid/tasks
     merchant_dest_dir: /twid/merchant
     mapi_dest_dir: /twid/mapi
     tpap_dest_dir: /twid/tpap
+    tasks_tpap_dest_dir: /twid/tasks_tpap
     branch: beta
     secret_id: twid/git_ssh_key
     ssh_private_key_path: /home/rocky/.ssh/id_rsa
@@ -87,7 +89,6 @@
       shell: |
         sudo chown root:root ~/.ssh/id_github
         sudo chmod 600 ~/.ssh/id_github
-        sudo chmod 777 /twid
         
     - name: Clone the Git System repository
       git:
