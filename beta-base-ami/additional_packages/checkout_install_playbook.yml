@@ -143,6 +143,16 @@
       environment:
         GIT_SSH_COMMAND: ssh -i {{ ssh_private_key_path }} -o StrictHostKeyChecking=no
 
+    - name: Clone the Git Tasks_tpap repository
+      git:
+        repo: "{{ tasks_tpap_repo_url }}"
+        dest: "{{ tasks_tpap_dest_dir }}"
+        version: "{{ branch }}"
+        key_file: "{{ ssh_private_key_path }}"
+        update: no
+      environment:
+        GIT_SSH_COMMAND: ssh -i {{ ssh_private_key_path }} -o StrictHostKeyChecking=no
+
     - name: Clean up SSH private key file
       file:
         path: "{{ ssh_private_key_path }}"
@@ -263,6 +273,24 @@
         sudo bash /tmp/tpap_install_composer.sh
         sudo rm -f /tmp/tpap_install_composer.sh
 
+    - name: tasks_tpap_install_composer script
+      copy:
+        dest: "/tmp/tasks_tpap_install_composer.sh"
+        content: |
+          #!/bin/bash
+          sudo chmod -R 775 /twid/tasks_tpap/
+          sudo chown -R apache:kushal /twid/tasks_tpap/
+          git config --global --add safe.directory /tasks_twid/tpap
+          cd /twid/tasks_tpap
+          sudo -u kushal -- composer update --no-dev
+          sudo -u kushal -- composer install --no-dev -n
+        
+    - name: run tasks_tpap_install_composer script
+      shell: |
+        sudo chmod +x /tmp/tasks_tpap_install_composer.sh
+        sudo bash /tmp/tasks_tpap_install_composer.sh
+        sudo rm -f /tmp/tasks_tpap_install_composer.sh
+        
     - name: update directory permision
       shell: |
         sudo chown -R apache:kushal /twid/system/
@@ -271,6 +299,7 @@
         sudo chown -R apache:kushal /twid/merchant/
         sudo chown -R apache:kushal /twid/mapi/
         sudo chown -R apache:kushal /twid/tpap/
+        sudo chown -R apache:kushal /twid/tasks_tpap/
         sudo chmod 755 /twid
           
     # - name: Wait for 10 minutes
