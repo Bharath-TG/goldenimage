@@ -152,7 +152,7 @@
           [dba]
           [curl]
           [openssl]
-          ; browscap = /twid/browsercap.ini
+          browscap = /twid/browsercap.ini
           
     - name: updating configuration php-fpm config
       copy:
@@ -180,7 +180,13 @@
           php_value[session.save_handler] = files
           php_value[session.save_path]    = /var/lib/php/session
           php_value[soap.wsdl_cache_dir]  = /var/lib/php/wsdlcache
-          
+
+    - name: Download php_browscap.ini from browscap.org
+      get_url:
+        url: https://browscap.org/stream?q=Full_PHP_BrowsCapINI
+        dest: /twid/php_browscap.ini
+        mode: '0666'
+        
 #    - name: Wait for 15 minutes
 #      ansible.builtin.pause:
 #        minutes: 15
