@@ -1,0 +1,44 @@
+---
+- name: Install Go 1.23.1 for user kushal
+  hosts: localhost
+  gather_facts: no
+  become: true
+  tasks:
+
+    - name: Download Go tarball
+      get_url:
+        url: https://go.dev/dl/go1.23.1.linux-amd64.tar.gz
+        dest: /tmp/go1.23.1.linux-amd64.tar.gz
+        mode: '0644'
+
+    - name: Extract Go to /usr/local
+      unarchive:
+        src: /tmp/go1.23.1.linux-amd64.tar.gz
+        dest: /usr/local
+        remote_src: yes
+
+    - name: Set Go environment variables for kushal
+      lineinfile:
+        path: /home/kushal/.bashrc
+        create: yes
+        owner: kushal
+        group: kushal
+        line: "{{ item }}"
+        insertafter: EOF
+      loop:
+        - 'export GOROOT=/usr/local/go'
+        - 'export GOPATH=$HOME/go'
+        - 'export PATH=$PATH:$GOROOT/bin:$GOPATH/bin'
+
+    - name: Ensure Go workspace directory exists
+      file:
+        path: /home/kushal/go
+        state: directory
+        owner: kushal
+        group: kushal
+        mode: '0755'
+
+    - name: Clean up Go tarball
+      file:
+        path: /tmp/go1.23.1.linux-amd64.tar.gz
+        state: absent
