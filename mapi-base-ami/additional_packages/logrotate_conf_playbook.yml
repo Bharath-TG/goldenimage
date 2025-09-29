@@ -7,7 +7,7 @@
   tasks:
     - name: updating configuration mapi
       copy:
-        dest: "/etc/logrotate.d/api"
+        dest: "/etc/logrotate.d/mapi"
         content: |
           /twid/mapi/storage/logs/*log {
             su root kushal
