@@ -1,8 +1,9 @@
 ---
-- name: Install Go 1.23.1 for user kushal
+- name: Install Go
   hosts: localhost
   gather_facts: no
   become: true
+
   tasks:
 
     - name: Download Go tarball
@@ -17,7 +18,14 @@
         dest: /usr/local
         remote_src: yes
 
-    - name: Set Go environment variables for kushal
+    - name: Ensure /usr/bin/go symlink exists
+      file:
+        src: /usr/local/go/bin/go
+        dest: /usr/bin/go
+        state: link
+        force: yes
+
+    - name: Set Go environment variables in .bashrc for kushal
       lineinfile:
         path: /home/kushal/.bashrc
         create: yes
@@ -27,7 +35,7 @@
         insertafter: EOF
       loop:
         - 'export GOROOT=/usr/local/go'
-        - 'export GOPATH=$HOME/go'
+        - 'export GOPATH=/home/kushal/go'
         - 'export PATH=$PATH:$GOROOT/bin:$GOPATH/bin'
 
     - name: Ensure Go workspace directory exists
