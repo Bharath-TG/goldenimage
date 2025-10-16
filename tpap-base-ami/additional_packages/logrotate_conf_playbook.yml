@@ -1,0 +1,85 @@
+---
+- name: update logrotate config file
+  hosts: localhost
+  gather_facts: no
+  become: true
+
+  tasks:
+    - name: updating configuration api
+      copy:
+        dest: "/etc/logrotate.d/api"
+        content: |
+          /twid/tpap_api/storage/logs/*log {
+              su root kushal
+              daily
+              missingok
+              rotate 14
+              compress
+              delaycompress
+              notifempty
+          #    postrotate
+          #                mv /twid/api/storage/logs/*.gz /data/logs/api1/
+          #    endscript
+          }
+
+    - name: updating configuration tasks
+      copy:
+        dest: "/etc/logrotate.d/tasks"
+        content: |
+          /twid/tpap_tasks/storage/logs/*log {
+              su root kushal
+              daily
+              missingok
+              rotate 14
+              compress
+              delaycompress
+              notifempty
+          #    postrotate
+          #                mv /twid/api/storage/logs/*.gz /data/logs/api1/
+          #    endscript
+          }
+
+    - name: updating configuration nginx
+      copy:
+        dest: "/etc/logrotate.d/nginx"
+        content: |
+          /var/log/nginx/*.log {
+              create 0640 nginx root
+              daily
+              rotate 10
+              missingok
+              notifempty
+              compress
+              delaycompress
+              sharedscripts
+              postrotate
+                  /bin/kill -USR1 `cat /run/nginx.pid 2>/dev/null` 2>/dev/null || true
+              endscript
+          }
+
+    - name: updating configuration chrony
+      copy:
+        dest: "/etc/logrotate.d/chrony"
+        content: |
+          /var/log/chrony/*.log {
+              missingok
+              nocreate
+              sharedscripts
+              postrotate
+                  /usr/bin/chronyc cyclelogs > /dev/null 2>&1 || true
+              endscript
+          }
+
+    - name: updating configuration redis
+      copy:
+        dest: "/etc/logrotate.d/redis"
+        content: |
+          /var/log/redis/*.log {
+              weekly
+              rotate 10
+              copytruncate
+              delaycompress
+              compress
+              notifempty
+              missingok
+          }

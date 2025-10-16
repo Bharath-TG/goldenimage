@@ -1,0 +1,158 @@
+---
+- name: update configuration files
+  hosts: localhost
+  gather_facts: no
+  become: true
+
+  tasks:
+    - name: Create directory
+      shell: |
+        sudo mkdir /twid/log
+
+    - name: updating configuration nginx.conf
+      copy:
+        dest: "/etc/nginx/nginx.conf"
+        content: |
+          user nginx;
+          worker_processes auto;
+          error_log /var/log/nginx/error.log notice;
+          pid /run/nginx.pid;
+          include /usr/share/nginx/modules/*.conf;
+          events {
+              worker_connections 1024;
+          }
+          http {
+              log_format  main  '$remote_addr - $remote_user [$time_local] "$request" '
+                                '$status $body_bytes_sent "$http_referer" '
+                                '"$http_user_agent" "$http_x_forwarded_for"';
+              access_log  /var/log/nginx/access.log  main;
+              gzip on;
+              gzip_types      text/plain application/xml text/css application/javascript text/html;
+              gzip_proxied    no-cache no-store private expired auth;
+              sendfile            		on;
+              tcp_nopush          		on;
+              client_header_timeout               60m;
+              client_body_timeout                 60m;
+              client_header_buffer_size           2k;
+              client_body_buffer_size             256k;
+              client_max_body_size                256m;
+              large_client_header_buffers         4   8k;
+              send_timeout                        600;
+              keepalive_timeout   		650;
+              keepalive_requests                  100000;
+              reset_timedout_connection           on;
+              server_name_in_redirect             off;
+              server_names_hash_max_size          512;
+              server_names_hash_bucket_size       512;
+              types_hash_max_size 		4096;
+              include             /etc/nginx/mime.types;
+              default_type        application/octet-stream;
+              include /etc/nginx/conf.d/*.conf;
+              server {
+                  listen       80;
+                  listen       [::]:80;
+                  server_name  _;
+                  root         /usr/share/nginx/html;
+                  include /etc/nginx/default.d/*.conf;
+                  error_page 404 /404.html;
+                  location = /404.html {
+                  }
+                  error_page 500 502 503 504 /50x.html;
+                  location = /50x.html {
+                  }
+              }
+          }
+
+    - name: updating configuration conf.d/00-healthcheck.conf
+      copy:
+        dest: "/etc/nginx/conf.d/00-healthcheck.conf"
+        content: |
+          server {
+            listen 80 default_server;
+            server_name a.tpap.twidpay.com;
+            root /var/www/html/healthcheck;
+            index index.php index.html index.htm;
+            location / {
+                try_files $uri $uri/ /index.php?$args;
+            }
+            location ~ \.php$ {
+              try_files $uri =404;
+              fastcgi_pass unix:/run/php-fpm/www.sock;
+              fastcgi_index index.php;
+              fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
+              include fastcgi_params;
+            }
+          }
+
+    - name: updating configuration conf.d/api.conf
+      copy:
+        dest: "/etc/nginx/conf.d/api.conf"
+        content: |
+          server {
+            listen 80;
+            server_name api.tpap.twidpay.com;
+            root /twid/tpap_api/public;
+            access_log /var/log/nginx/tpap_api_access.log;
+            error_log /var/log/nginx/tpap_api_error.log crit;
+            index index.php index.html index.htm;
+            location / {
+                try_files $uri $uri/ /index.php?$args;
+            }
+            location ~ \.php$ {
+              try_files $uri =404;
+              fastcgi_pass unix:/run/php-fpm/www.sock;
+              fastcgi_index index.php;
+              fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
+              include fastcgi_params;
+              # Hide PHP headers
+              fastcgi_hide_header             X-Powered-By;
+              fastcgi_hide_header             X-CF-Powered-By;
+            }
+            location ~ /\. {
+              deny  all;
+            }
+          }
+
+    - name: updating configuration conf.d/logs.conf
+      copy:
+        dest: "/etc/nginx/conf.d/logs.conf"
+        content: | 
+          server {
+            listen 80;
+            server_name logs.tpap.twidpay.com;
+            root /twid/tpap_logs/public;
+            access_log /var/log/nginx/tpap_logs_access.log;
+            error_log /var/log/nginx/tpap_logs_error.log crit;
+            index index.php index.html index.htm;
+            location / {
+              try_files $uri $uri/ /index.php?$args;
+            }
+            location ~ \.php$ {
+              try_files $uri =404;
+              fastcgi_pass unix:/run/php-fpm/www.sock;
+              fastcgi_index index.php;
+              fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
+              include fastcgi_params;
+              # Hide PHP headers
+              fastcgi_hide_header             X-Powered-By;
+              fastcgi_hide_header             X-CF-Powered-By;
+            }
+            location ~ /\. {
+              deny  all;
+            }
+          }
+          
+    - name: updating configuration conf.d/security.conf
+      copy:
+        dest: "/etc/nginx/conf.d/security.conf"
+        content: |
+          server_tokens off;
+          add_header Strict-Transport-Security "max-age=31536000; includeSubDomains; preload" always;
+          add_header Content-Security-Policy "default-src 'self' *.google.com *.amazon.com;" always;
+          add_header X-XSS-Protection "1; mode=block" always;
+          add_header X-Frame-Options DENY always;
+          add_header X-Content-Type-Options nosniff always;
+          add_header Set-Cookie "Path=/; HttpOnly; Secure" always;
+          add_header Referrer-Policy 'origin' always;
+
+          

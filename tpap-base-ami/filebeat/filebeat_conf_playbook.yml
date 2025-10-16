@@ -1,0 +1,40 @@
+---
+- name: update filebeat config file
+  hosts: localhost
+  gather_facts: no
+  become: true
+
+  tasks:
+    - name: updating configuration filebeat.yml
+      copy:
+        dest: "/etc/filebeat/filebeat.yml"
+        content: |
+          filebeat.inputs:
+          - type: filestream
+            id: my-filestream-id
+            enabled: true
+            paths:
+              - /twid/tpap_api/storage/logs/*log
+              - /twid/tpap_tasks/storage/logs/*log
+              - /twid/tpap_logs/storage/logs/*log
+          filebeat.config.modules:
+            path: ${path.config}/modules.d/*.yml
+            reload.enabled: false
+          setup.template.settings:
+            index.number_of_shards: 1
+          setup.kibana:
+          output.elasticsearch:
+            hosts: ["10.200.132.67:9200"]
+            preset: balanced
+          processors:
+            - add_host_metadata:
+                when.not.contains.tags: forwarded
+            - add_cloud_metadata: ~
+            - add_docker_metadata: ~
+            - add_kubernetes_metadata: ~
+          
+            
+    - name: Restart Filebeat to apply configuration
+      systemd:
+        name: filebeat
+        state: restarted
