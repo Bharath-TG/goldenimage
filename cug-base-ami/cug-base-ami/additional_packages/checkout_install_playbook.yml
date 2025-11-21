@@ -1,0 +1,201 @@
+---
+- name: git checkout TASKS code and install
+  hosts: localhost
+  gather_facts: no
+  become: true
+  vars:
+    system_repo_url: git@github.com:twidpay-global/twid_system.git
+    api_repo_url: git@github.com:twidpay-global/twid_api.git
+    tasks_repo_url: git@github.com:twidpay-global/twid_tasks.git
+    merchant_repo_url: git@github.com:twidpay-global/twid_merchant.git
+    system_dest_dir: /twid/system
+    api_dest_dir: /twid/api
+    tasks_dest_dir: /twid/tasks
+    merchant_dest_dir: /twid/merchant
+    branch: CUG
+    secret_id: twid/git_ssh_key
+    ssh_private_key_path: /home/rocky/.ssh/id_rsa
+    region: ap-south-1
+  tasks:        
+    - name: adding python script to fetch secrets
+      copy:
+        dest: /etc/ansible/fetch_ssh_key.py
+        content: |
+          #!/usr/bin/env python3
+          import boto3
+          import base64
+          import json
+          import sys
+          
+          # Fetch arguments from Ansible playbook
+          secret_id = sys.argv[1]
+          ssh_private_key_path = sys.argv[2]  # File path to store the encoded private key
+          region = sys.argv[3]
+          
+          # Create a Secrets Manager client
+          client = boto3.client('secretsmanager', region_name=region)
+
+          # Fetch the secret value from AWS Secrets Manager
+          response = client.get_secret_value(SecretId=secret_id)
+
+          # Decode the base64 secret
+          secret = json.loads(response['SecretString'])
+
+          # Log the secret content for debugging
+          print("Secret content:", secret)
+
+          # Fetch the correct key from the secret
+          if 'ssh_key' in secret:
+              private_key = secret['ssh_key']
+          else:
+              print("The key 'ssh_key' was not found in the secret.")
+              sys.exit(1)
+
+          # Decode the base64 private key
+          decoded_key = base64.b64decode(private_key)
+
+          # Store the decoded private key into a file
+          with open(ssh_private_key_path, "wb") as decoded_file:
+              decoded_file.write(decoded_key)
+              
+    - name: update permisssions for python file
+      shell: |
+        sudo chmod 777 /etc/ansible/fetch_ssh_key.py
+        
+    - name: Fetch SSH private key from AWS Secrets Manager using boto3
+      command: /etc/ansible/fetch_ssh_key.py "{{ secret_id }}" "{{ ssh_private_key_path }}" "{{ region }}"
+      register: secret
+      
+    - name: update permissions for private keys
+      shell: |
+        sudo chown rocky:rocky /home/rocky/.ssh/id_rsa
+        sudo chmod 600 /home/rocky/.ssh/id_rsa
+        sudo chmod 777 /twid
+        
+    - name: Clone the Git System repository
+      git:
+        repo: "{{ system_repo_url }}"
+        dest: "{{ system_dest_dir }}"
+        version: "{{ branch }}"
+        key_file: "{{ ssh_private_key_path }}"
+        update: no
+      environment:
+        GIT_SSH_COMMAND: ssh -i {{ ssh_private_key_path }} -o StrictHostKeyChecking=no
+
+    - name: Clone the Git Api repository
+      git:
+        repo: "{{ api_repo_url }}"
+        dest: "{{ api_dest_dir }}"
+        version: "{{ branch }}"
+        key_file: "{{ ssh_private_key_path }}"
+        update: no
+      environment:
+        GIT_SSH_COMMAND: ssh -i {{ ssh_private_key_path }} -o StrictHostKeyChecking=no
+
+    - name: Clone the Git Tasks repository
+      git:
+        repo: "{{ tasks_repo_url }}"
+        dest: "{{ tasks_dest_dir }}"
+        version: "{{ branch }}"
+        key_file: "{{ ssh_private_key_path }}"
+        update: no
+      environment:
+        GIT_SSH_COMMAND: ssh -i {{ ssh_private_key_path }} -o StrictHostKeyChecking=no
+
+    - name: Clone the Git Merchant repository
+      git:
+        repo: "{{ merchant_repo_url }}"
+        dest: "{{ merchant_dest_dir }}"
+        version: "{{ branch }}"
+        key_file: "{{ ssh_private_key_path }}"
+        update: no
+      environment:
+        GIT_SSH_COMMAND: ssh -i {{ ssh_private_key_path }} -o StrictHostKeyChecking=no
+
+    - name: Clean up SSH private key file
+      file:
+        path: "{{ ssh_private_key_path }}"
+        state: absent
+
+    - name: Create directory
+      shell: |
+        sudo mkdir /twid/system/storage/framework
+        sudo mkdir /twid/system/storage/framework/cache
+        sudo mkdir /twid/system/storage/framework/sessions
+        sudo mkdir /twid/system/storage/framework/views
+
+    - name: system_install_composer script
+      copy:
+        dest: "/tmp/system_install_composer.sh"
+        content: |
+          #!/bin/bash
+          cd /twid/system
+          composer install --no-dev -n
+        
+    - name: run system_install_composer script
+      shell: |
+        sudo chmod +x /tmp/system_install_composer.sh
+        sudo bash /tmp/system_install_composer.sh
+        sudo rm -f /tmp/system_install_composer.sh
+
+    - name: api_install_composer script
+      copy:
+        dest: "/tmp/api_install_composer.sh"
+        content: |
+          #!/bin/bash
+          cd /twid/api
+          composer install --no-dev -n
+        
+    - name: run api_install_composer script
+      shell: |
+        sudo chmod +x /tmp/api_install_composer.sh
+        sudo bash /tmp/api_install_composer.sh
+        sudo rm -f /tmp/api_install_composer.sh
+
+    - name: tasks_install_composer script
+      copy:
+        dest: "/tmp/tasks_install_composer.sh"
+        content: |
+          #!/bin/bash
+          cd /twid/tasks
+          composer install --no-dev -n
+        
+    - name: run tasks_install_composer script
+      shell: |
+        sudo chmod +x /tmp/tasks_install_composer.sh
+        sudo bash /tmp/tasks_install_composer.sh
+        sudo rm -f /tmp/tasks_install_composer.sh
+
+    - name: merchant_install_composer script
+      copy:
+        dest: "/tmp/merchant_install_composer.sh"
+        content: |
+          #!/bin/bash
+          cd /twid/merchant
+          composer install --no-dev -n
+        
+    - name: run merchant_install_composer script
+      shell: |
+        sudo chmod +x /tmp/merchant_install_composer.sh
+        sudo bash /tmp/merchant_install_composer.sh
+        sudo rm -f /tmp/merchant_install_composer.sh
+
+    - name: update directory permision
+      shell: |
+        sudo chmod -R 775 /twid/system/
+        sudo chown -R apache:kushal /twid/system/
+        git config --global --add safe.directory /twid/system
+        sudo chmod -R 775 /twid/api/
+        sudo chown -R apache:kushal /twid/api/
+        git config --global --add safe.directory /twid/api
+        sudo chmod -R 775 /twid/tasks/
+        sudo chown -R apache:kushal /twid/tasks/
+        git config --global --add safe.directory /twid/tasks
+        sudo chmod -R 775 /twid/merchant/
+        sudo chown -R apache:kushal /twid/merchant/
+        git config --global --add safe.directory /twid/merchant
+        sudo chmod 755 /twid
+          
+    - name: Wait for 5 minutes
+      ansible.builtin.pause:
+        minutes: 10

@@ -1,0 +1,40 @@
+---
+- name: Install dnsmasq
+  hosts: localhost
+  gather_facts: no
+  become: true
+
+  tasks:
+    - name: Ensure dnsmasq is installed
+      dnf:
+        name: dnsmasq
+        state: present
+
+    - name: Enable and start dnsmasq service
+      systemd:
+        name: dnsmasq
+        enabled: yes
+        state: started
+
+    - name: Configure dnsmasq (example configuration)
+      copy:
+        dest: /etc/dnsmasq.conf
+        content: |
+          # Server Configurationlisten-address=127.0.0.1
+          port=53
+          bind-interfaces
+          user=dnsmasq
+          group=dnsmasq
+          pid-file=/var/run/dnsmasq.pid
+
+          # Name resolution options
+          resolv-file=/etc/resolv.dnsmasq
+          cache-size=500
+          neg-ttl=60
+          domain-needed
+          #bogus-priv
+
+    - name: Restart dnsmasq service to apply new config
+      systemd:
+        name: dnsmasq
+        state: restarted
