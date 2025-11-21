@@ -187,6 +187,6 @@
         dest: /twid/php_browscap.ini
         mode: '0666'
         
-#    - name: Wait for 15 minutes
-#      ansible.builtin.pause:
-#        minutes: 15
+    - name: Wait for 10 minutes
+      ansible.builtin.pause:
+        minutes: 10
