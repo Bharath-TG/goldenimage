@@ -1,5 +1,5 @@
 ---
-- name: install PHP 8.2
+- name: install PHP 8.4
   hosts: localhost
   gather_facts: no
   become: true
@@ -15,12 +15,12 @@
         state: present
         key: https://rpms.remirepo.net/RPM-GPG-KEY-remi          
 
-#    - name: Install Remi repository for PHP 8.2
+#    - name: Install Remi repository for PHP 8.4
 #      dnf:
 #        name: http://rpms.remirepo.net/enterprise/remi-release-9.rpm
 #        state: present
 
-    - name: Install Remi repository for PHP 8.2 manually
+    - name: Install Remi repository for PHP 8.4 manually
       shell: |
         dnf install -y http://rpms.remirepo.net/enterprise/remi-release-9.rpm
 
@@ -33,8 +33,8 @@
       command: dnf module disable php -y
       become: true
 
-    - name: Enable Remi PHP 8.2 repository
-      command: dnf module enable php:remi-8.2 -y
+    - name: Enable Remi PHP 8.4 repository
+      command: dnf module enable php:remi-8.4 -y
       become: true
 
     - name: Install PHP 8.2 and common extensions
