@@ -52,7 +52,6 @@
       file:
         path: "{{ item }}"
         state: absent
-        recurse: yes
       loop:
         - /usr/local/cargo
         - /root/.cargo
