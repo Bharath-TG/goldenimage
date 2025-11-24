@@ -184,7 +184,7 @@
     - name: Download php_browscap.ini from browscap.org
       get_url:
         url: https://browscap.org/stream?q=Full_PHP_BrowsCapINI
-        dest: /twid/php_browscap.ini
+        dest: /twid/browsercap.ini
         mode: '0666'
         
     - name: Wait for 10 minutes
