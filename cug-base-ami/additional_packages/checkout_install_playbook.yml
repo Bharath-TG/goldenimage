@@ -159,6 +159,14 @@
           #!/bin/bash
           cd /twid/tasks
           composer install --no-dev -n
+
+
+    - name: Create directory
+      shell: |
+        sudo mkdir /twid/tasks/storage/framework
+        sudo mkdir /twid/tasks/storage/framework/cache
+        sudo mkdir /twid/tasks/storage/framework/sessions
+        sudo mkdir /twid/tasks/storage/framework/views
         
     - name: run tasks_install_composer script
       shell: |
