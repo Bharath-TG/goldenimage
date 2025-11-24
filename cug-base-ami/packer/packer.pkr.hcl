@@ -117,6 +117,10 @@ build {
   }
 
   provisioner "ansible-local" {
+    playbook_file = "../additional_packages/protoc_playbook.yml"
+  }
+
+  provisioner "ansible-local" {
     playbook_file = "../additional_packages/host_conf_playbook.yml"
   }
 
