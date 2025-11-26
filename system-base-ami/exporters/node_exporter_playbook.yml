@@ -12,7 +12,8 @@
 
     - name: Download node_exporter tarball
       get_url:
-        url: "https://github.com/prometheus/node_exporter/releases/download/v1.6.1/node_exporter-1.6.1.linux-amd64.tar.gz"
+#        url: "https://github.com/prometheus/node_exporter/releases/download/v1.6.1/node_exporter-1.6.1.linux-amd64.tar.gz"
+        url: "https://github.com/prometheus/node_exporter/releases/download/v1.10.2/node_exporter-1.10.2.linux-amd64.tar.gz"
         dest: "/tmp/node_exporter.tar.gz"
 
     - name: Extract node_exporter tarball
@@ -22,7 +23,7 @@
         remote_src: yes
 
     - name: Move node_exporter binary to /usr/local/bin
-      command: mv /tmp/node_exporter-1.6.1.linux-amd64/node_exporter /usr/local/bin/
+      command: mv /tmp/node_exporter-1.10.2.linux-amd64/node_exporter /usr/local/bin/
 
     - name: Create systemd service file for node_exporter
       copy:
