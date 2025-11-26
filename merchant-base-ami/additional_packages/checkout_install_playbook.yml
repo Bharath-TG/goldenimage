@@ -141,8 +141,7 @@
       shell: |
         find /usr/local/lib -type d -name '__pycache__' -exec rm -rf {} +
         find /usr/lib -type d -name '__pycache__' -exec rm -rf {} +
-      args:
-        warn: false
+      ignore_errors: yes
 
     - name: Wait for 5 minutes
       ansible.builtin.pause:
