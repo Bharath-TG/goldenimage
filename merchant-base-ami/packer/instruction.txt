@@ -1,0 +1,3 @@
+NOTE: 
+
+    copy the github keys for downloading git repos to path "/home/rocky/.ssh/id_rsa"

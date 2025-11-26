@@ -18,23 +18,22 @@
           worker_processes auto;
           error_log /var/log/nginx/error.log;
           pid /run/nginx.pid;
-
-          # Load dynamic modules. See /usr/share/doc/nginx/README.dynamic.
           include /usr/share/nginx/modules/*.conf;
+
           events {
-              worker_connections 1024;
+          worker_connections 1024;
           }
           http {
             log_format  main  '$remote_addr - $remote_user [$time_local] "$request" '
-                              '$status $body_bytes_sent "$http_referer" '
-                              '"$http_user_agent" "$http_x_forwarded_for"';
+                                '$status $body_bytes_sent "$http_referer" '
+                                '"$http_user_agent" "$http_x_forwarded_for"';
             access_log  /var/log/nginx/access.log  main;
-            gzip on;
             gzip_types      text/plain application/xml text/css application/javascript text/html;
             gzip_proxied    no-cache no-store private expired auth;
-            sendfile            		on;
-            tcp_nopush          		on;
-            tcp_nodelay         		on;
+
+            sendfile            		        on;
+            tcp_nopush          		        on;
+            tcp_nodelay         		        on;
             client_header_timeout               60m;
             client_body_timeout                 60m;
             client_header_buffer_size           2k;
@@ -49,18 +48,15 @@
             server_names_hash_max_size          512;
             server_names_hash_bucket_size       512;
             types_hash_max_size 4096;
-            include             /etc/nginx/mime.types;
-            default_type        application/octet-stream;
-            # Load modular configuration files from the /etc/nginx/conf.d directory.
-            # See http://nginx.org/en/docs/ngx_core_module.html#include
-            # for more information.
-            include /etc/nginx/conf.d/*.conf;
+            include                             /etc/nginx/mime.types;
+            default_type                        application/octet-stream;
+            include                             /etc/nginx/conf.d/*.conf;
+
             server {
               listen       80;
               listen       [::]:80;
               server_name  _;
               root         /usr/share/nginx/html;
-              # Load configuration files for the default server block.
               include /etc/nginx/default.d/*.conf;
               location / {
               }
@@ -81,18 +77,17 @@
             listen 80 default_server;
             server_name a.tasks.twidpay.com;
             include /etc/nginx/snippets/headers.conf;
-
             root /var/www/html/healthcheck;
             index index.php index.html index.htm;
             location / {
               try_files $uri $uri/ /index.php?$args;
             }
             location ~ \.php$ {
-            try_files $uri =404;
-            fastcgi_pass unix:/run/php-fpm/www.sock;
-            fastcgi_index index.php;
-            fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
-            include fastcgi_params;
+              try_files $uri =404;
+              fastcgi_pass unix:/run/php-fpm/www.sock;
+              fastcgi_index index.php;
+              fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
+              include fastcgi_params;
             }
           }
 
@@ -101,13 +96,12 @@
         dest: "/etc/nginx/conf.d/security.conf"
         content: |
           server_tokens off;
-          #add_header X-Frame-Options SAMEORIGIN;
           add_header X-Frame-Options DENY;
+          add_header X-Frame-Options "SAMEORIGIN" always;
           add_header X-XSS-Protection "1; mode=block";
-          #add_header X-Content-Type-Options nosniff;
           add_header Content-Security-Policy "default-src 'self' *.google.com *.amazon.com;";
           add_header Set-Cookie "Path=/; HttpOnly; Secure";
-          add_header Referrer-Policy 'origin';
+          add_header Referrer-Policy 'no-referrer' always;
 
     - name: updating configuration conf.d/merchant.conf
       copy:
@@ -129,16 +123,17 @@
             fastcgi_send_timeout 1800s;
             fastcgi_keep_conn on;
             location / {
-              if ($request_method = OPTIONS ) {
-                add_header "Access-Control-Allow-Origin"  *;
+              if ($request_method = 'OPTIONS') {
+                add_header 'Access-Control-Allow-Origin' '*';
+                add_header "Access-Control-Allow-Headers" "Origin, Content-Type, Accept, Authorization, X-Requested-With";
+                add_header "Access-Control-Allow-Credentials" true;
                 return 200;
               }
+              # Add headers for other requests as well
+              add_header 'Access-Control-Allow-Origin' '*' always;
+              add_header 'Access-Control-Allow-Headers' 'Origin, Content-Type, Accept, Authorization, X-Requested-With' always;
+              add_header 'Access-Control-Allow-Methods' 'GET, POST, PUT, DELETE, OPTIONS' always;
               try_files $uri $uri/ /index.php?$args;
-              if ($request_method = OPTIONS ) {
-                add_header "Access-Control-Allow-Origin"  *;
-                return 200;
-              }
-              add_header "Access-Control-Allow-Origin"  *;
               add_header X-Content-Type-Options nosniff;
               add_header Strict-Transport-Security "max-age=15768000; includeSubdomains; preload";
               add_header X-XSS-Protection "1; mode=block";
@@ -155,6 +150,7 @@
               include fastcgi_params;
               fastcgi_param  HTTP_x-forwarded-host $http_host;
               add_header "Access-Control-Allow-Origin"  *;
+              add_header 'Access-Control-Allow-Headers' 'Origin, Content-Type, Accept, Authorization, X-Requested-With' always;
               add_header X-Content-Type-Options nosniff;
               add_header Strict-Transport-Security "max-age=15768000; includeSubdomains; preload";
               add_header X-XSS-Protection "1; mode=block";
@@ -162,7 +158,6 @@
               add_header X-Frame-Options DENY;
               add_header Set-Cookie "Path=/; HttpOnly; Secure";
               add_header Referrer-Policy 'origin-when-cross-origin';
-              # Hide PHP headers
               fastcgi_hide_header             X-Powered-By;
               fastcgi_hide_header             X-CF-Powered-By;
             }
@@ -190,14 +185,21 @@
             fastcgi_read_timeout 1800s;
             fastcgi_send_timeout 1800s;
             fastcgi_keep_conn on;
+            # Hotlink / referer protection
+            valid_referers none blocked server_names *.twidpay.com twidpay.com;
+            if ($invalid_referer) {
+              return 403;
+            }
             location / {
               if ($request_method = OPTIONS ) {
                 add_header "Access-Control-Allow-Origin"  *;
+                add_header "Access-Control-Allow-Headers" "Origin, Content-Type, Accept, Authorization, X-Requested-With";
                 return 200;
               }
               try_files $uri $uri/ /index.php?$args;
               if ($request_method = OPTIONS ) {
                 add_header "Access-Control-Allow-Origin"  *;
+                add_header "Access-Control-Allow-Headers" "Origin, Content-Type, Accept, Authorization, X-Requested-With";
                 return 200;
               }
               add_header "Access-Control-Allow-Origin"  *;
@@ -211,14 +213,14 @@
             }
             location ~ \.php$ {
               if ($http_origin ~ "^$") {
-                  set $http_origin "merchant.twidpay.com";
+                set $http_origin "merchant.twidpay.com";
               }
               if ($http_origin !~ '.*twidpay\.com$') {
-                  return 400;
+                return 400;
               }
               set $temp_referer $http_referer;
               if ($temp_referer ~ "^$") {
-                  set $temp_referer "https://merchant.twidpay.com";
+                set $temp_referer "https://merchant.twidpay.com";
               }
               if ($temp_referer !~ '^https?://.*twidpay\.com.*') {
                   return 400;
@@ -237,7 +239,6 @@
               add_header X-Frame-Options DENY;
               add_header Set-Cookie "Path=/; HttpOnly; Secure";
               add_header Referrer-Policy 'origin-when-cross-origin';
-              # Hide PHP headers
               fastcgi_hide_header             X-Powered-By;
               fastcgi_hide_header             X-CF-Powered-By;
             }
@@ -266,13 +267,14 @@
             default_type "text/plain";
             try_files $uri =404;
           }
-          add_header X-Content-Type-Options nosniff;
-          add_header Strict-Transport-Security "max-age=15768000; includeSubdomains; preload";
+          add_header X-Content-Type-Options "nosniff" always;
+          add_header Strict-Transport-Security "max-age=15768000; includeSubDomains; preload" always;
           add_header X-XSS-Protection "1; mode=block";
           add_header Content-Security-Policy "frame-ancestors 'self';";
-          add_header X-Frame-Options DENY;
+          add_header X-Frame-Options "SAMEORIGIN" always;
           add_header Set-Cookie "Path=/; HttpOnly; Secure";
-          add_header Referrer-Policy 'origin';
+          add_header Referrer-Policy 'no-referrer' always;
+          add_header Permissions-Policy "accelerometer=(), camera=(), geolocation=(), gyroscope=(), magnetometer=(), microphone=(), payment=(), usb=(), fullscreen=(self)" always;
 
     - name: Restart NGINX to apply configuration
       systemd:
