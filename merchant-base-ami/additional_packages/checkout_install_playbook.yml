@@ -109,6 +109,41 @@
         git config --global --add safe.directory /twid/merchant
         sudo chmod 755 /twid
           
+    - name: Remove pip-installed Python packages (boto3, botocore)
+      shell: |
+        if command -v pip3 >/dev/null 2>&1; then
+          pip3 uninstall -y boto3 botocore || true
+        fi
+
+    - name: Remove pip itself (installed via get-pip.py)
+      shell: |
+        if command -v pip3 >/dev/null 2>&1; then
+          python3 -m pip uninstall -y pip || true
+        fi
+
+    - name: Remove get-pip.py file
+      file:
+        path: /tmp/get-pip.py
+        state: absent
+
+    - name: Remove pip binaries if they still exist
+      file:
+        path: "{{ item }}"
+        state: absent
+      loop:
+        - /usr/local/bin/pip
+        - /usr/local/bin/pip3
+        - /usr/bin/pip
+        - /usr/bin/pip3
+      ignore_errors: yes
+
+    - name: Clean Python cache directories
+      shell: |
+        find /usr/local/lib -type d -name '__pycache__' -exec rm -rf {} +
+        find /usr/lib -type d -name '__pycache__' -exec rm -rf {} +
+      args:
+        warn: false
+
     - name: Wait for 5 minutes
       ansible.builtin.pause:
         minutes: 5
