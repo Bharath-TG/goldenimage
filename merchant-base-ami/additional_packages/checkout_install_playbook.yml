@@ -83,10 +83,10 @@
 
     - name: Create directory
       shell: |
-        sudo mkdir /twid/merchant/storage/framework
-        sudo mkdir /twid/merchant/storage/framework/cache
-        sudo mkdir /twid/merchant/storage/framework/sessions
-        sudo mkdir /twid/merchant/storage/framework/views
+        sudo mkdir -p /twid/merchant/storage/framework
+        sudo mkdir -p /twid/merchant/storage/framework/cache
+        sudo mkdir -p /twid/merchant/storage/framework/sessions
+        sudo mkdir -p /twid/merchant/storage/framework/views
 
     - name: install_composer script
       copy:
