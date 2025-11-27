@@ -13,16 +13,16 @@
     region: ap-south-1
 
   tasks:
-    - name: Fetch SSH key from Secrets Manager using AWS CLI
-      shell: |
-        aws secretsmanager get-secret-value \
-          --secret-id {{ secret_id }} \
-          --region {{ region }} \
-          --query 'SecretString' \
-          --output text \
-        | jq -r '.ssh_key' \
-        | base64 -d > {{ ssh_private_key_path }}
-      register: secret_output
+    # - name: Fetch SSH key from Secrets Manager using AWS CLI
+    #   shell: |
+    #     aws secretsmanager get-secret-value \
+    #       --secret-id {{ secret_id }} \
+    #       --region {{ region }} \
+    #       --query 'SecretString' \
+    #       --output text \
+    #     | jq -r '.ssh_key' \
+    #     | base64 -d > {{ ssh_private_key_path }}
+    #   register: secret_output
 
     - name: Fix permissions on private key
       file:
