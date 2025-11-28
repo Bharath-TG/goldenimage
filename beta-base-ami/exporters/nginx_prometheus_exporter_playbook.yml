@@ -12,7 +12,7 @@
 
     - name: Download nginx-prometheus-exporter tarball
       get_url:
-        url: "https://github.com/nginx/nginx-prometheus-exporter/releases/download/v1.3.0/nginx-prometheus-exporter_1.3.0_linux_amd64.tar.gz"
+        url: "https://github.com/nginx/nginx-prometheus-exporter/releases/download/v1.5.1/nginx-prometheus-exporter_1.5.1_linux_amd64.tar.gz"
         dest: "/tmp/nginx-prometheus-exporter.tar.gz"
 
     - name: Extract nginx-prometheus-exporter tarball
