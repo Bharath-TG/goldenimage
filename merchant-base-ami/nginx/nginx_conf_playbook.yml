@@ -275,9 +275,10 @@
           add_header Set-Cookie "Path=/; HttpOnly; Secure";
           add_header Referrer-Policy 'no-referrer' always;
           add_header Permissions-Policy "accelerometer=(), camera=(), geolocation=(), gyroscope=(), magnetometer=(), microphone=(), payment=(), usb=(), fullscreen=(self)" always;
-    - name: updating configuration snippets/headers.conf
+    
+    - name: updating configuration conf.d/dashboard-twidpay.conf
       copy:
-        dest: "/etc/nginx/snippets/headers.conf"
+        dest: "/etc/nginx/conf.d/dashboard-twidpay.conf"
         content: |
           server {
             listen 80;
