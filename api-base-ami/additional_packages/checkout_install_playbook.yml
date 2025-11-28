@@ -55,7 +55,7 @@
         cd /twid/api
         composer install --no-dev -n
 
-    - name: Set merchant directory permissions
+    - name: Set api directory permissions
       shell: |
         chmod -R 775 /twid/api/
         chown -R apache:kushal /twid/api/
