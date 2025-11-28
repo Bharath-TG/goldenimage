@@ -1,0 +1,67 @@
+---
+- name: git checkout TASKS code and install
+  hosts: localhost
+  gather_facts: no
+  become: true
+  vars:
+    repo_url: git@github.com:twidpay-global/twid_tasks.git
+    dest_dir: /twid/tasks
+    branch: lts-php-84
+    secret_id: twid/git_ssh_key
+    ssh_private_key_path: /home/rocky/.ssh/id_rsa
+    region: ap-south-1
+  tasks:
+    # - name: Fetch SSH key from Secrets Manager using AWS CLI
+    #   shell: |
+    #     aws secretsmanager get-secret-value \
+    #       --secret-id {{ secret_id }} \
+    #       --region {{ region }} \
+    #       --query 'SecretString' \
+    #       --output text \
+    #     | jq -r '.ssh_key' \
+    #     | base64 -d > {{ ssh_private_key_path }}
+    #   register: secret_output
+
+    - name: Fix permissions on private key
+      file:
+        path: "{{ ssh_private_key_path }}"
+        owner: rocky
+        group: rocky
+        mode: '0600'
+
+    - name: Ensure /twid directory exists
+      file:
+        path: /twid
+        state: directory
+        mode: '0777'
+
+    - name: Clone the Git repository
+      git:
+        repo: "{{ repo_url }}"
+        dest: "{{ dest_dir }}"
+        version: "{{ branch }}"
+        key_file: "{{ ssh_private_key_path }}"
+        update: no
+      environment:
+        GIT_SSH_COMMAND: ssh -i {{ ssh_private_key_path }} -o StrictHostKeyChecking=no
+
+    - name: Remove private key after clone
+      file:
+        path: "{{ ssh_private_key_path }}"
+        state: absent
+
+    - name: Run composer install
+      shell: |
+        cd /twid/tasks
+        composer install --no-dev -n
+
+    - name: Set tasks directory permissions
+      shell: |
+        chmod -R 775 /twid/tasks/
+        chown -R apache:kushal /twid/tasks/
+        git config --global --add safe.directory /twid/tasks
+        chmod 755 /twid
+          
+    - name: Wait for 5 minutes
+      ansible.builtin.pause:
+        minutes: 5

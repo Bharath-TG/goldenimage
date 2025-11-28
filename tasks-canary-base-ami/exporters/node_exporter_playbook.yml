@@ -1,0 +1,61 @@
+---
+- name: install node_exporter
+  hosts: localhost
+  gather_facts: no
+  become: true
+
+  tasks:
+    - name: Ensure system is up to date
+      dnf:
+        name: "*"
+        state: latest
+
+    - name: Download node_exporter tarball
+      get_url:
+#        url: "https://github.com/prometheus/node_exporter/releases/download/v1.6.1/node_exporter-1.6.1.linux-amd64.tar.gz"
+        url: "https://github.com/prometheus/node_exporter/releases/download/v1.10.2/node_exporter-1.10.2.linux-amd64.tar.gz"
+        dest: "/tmp/node_exporter.tar.gz"
+
+    - name: Extract node_exporter tarball
+      unarchive:
+        src: "/tmp/node_exporter.tar.gz"
+        dest: "/tmp/"
+        remote_src: yes
+
+    - name: Move node_exporter binary to /usr/local/bin
+      command: mv /tmp/node_exporter-1.10.2.linux-amd64/node_exporter /usr/local/bin/
+
+    - name: Create systemd service file for node_exporter
+      copy:
+        dest: "/etc/systemd/system/node_exporter.service"
+        content: |
+          [Unit]
+          Description=Node Exporter
+          After=network.target
+         
+          [Service]
+          User=nodeexporter
+          Group=nodeexporter
+          ExecStart="/usr/local/bin/node_exporter"
+          Restart=always
+          RestartSec=10
+          TimeoutStartSec=200
+          TimeoutStopSec=100
+          
+          [Install]
+          WantedBy=multi-user.target
+
+    - name: Reload systemd to apply new service
+      systemd:
+        daemon_reload: yes
+
+    - name: Start and enable node_exporter service
+      systemd:
+        name: node_exporter
+        state: started
+        enabled: yes
+
+    - name: Clean up the node_exporter tarball
+      file:
+        path: "/tmp/node_exporter.tar.gz"
+        state: absent
