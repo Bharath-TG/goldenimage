@@ -6,66 +6,35 @@
   vars:
     repo_url: git@github.com:twidpay-global/twid_mapi.git
     dest_dir: /twid/mapi  
-    branch: master_mapi
+    branch: lts-php-84
     secret_id: twid/git_ssh_key
     ssh_private_key_path: /home/rocky/.ssh/id_rsa
     region: ap-south-1
-  tasks:        
-    - name: adding python script to fetch secrets
-      copy:
-        dest: /etc/ansible/fetch_ssh_key.py
-        content: |
-          #!/usr/bin/env python3
-          import boto3
-          import base64
-          import json
-          import sys
-          
-          # Fetch arguments from Ansible playbook
-          secret_id = sys.argv[1]
-          ssh_private_key_path = sys.argv[2]  # File path to store the encoded private key
-          region = sys.argv[3]
-          
-          # Create a Secrets Manager client
-          client = boto3.client('secretsmanager', region_name=region)
+  tasks:
+    # - name: Fetch SSH key from Secrets Manager using AWS CLI
+    #   shell: |
+    #     aws secretsmanager get-secret-value \
+    #       --secret-id {{ secret_id }} \
+    #       --region {{ region }} \
+    #       --query 'SecretString' \
+    #       --output text \
+    #     | jq -r '.ssh_key' \
+    #     | base64 -d > {{ ssh_private_key_path }}
+    #   register: secret_output
 
-          # Fetch the secret value from AWS Secrets Manager
-          response = client.get_secret_value(SecretId=secret_id)
+    - name: Fix permissions on private key
+      file:
+        path: "{{ ssh_private_key_path }}"
+        owner: rocky
+        group: rocky
+        mode: '0600'
 
-          # Decode the base64 secret
-          secret = json.loads(response['SecretString'])
+    - name: Ensure /twid directory exists
+      file:
+        path: /twid
+        state: directory
+        mode: '0777'
 
-          # Log the secret content for debugging
-          print("Secret content:", secret)
-
-          # Fetch the correct key from the secret
-          if 'ssh_key' in secret:
-              private_key = secret['ssh_key']
-          else:
-              print("The key 'ssh_key' was not found in the secret.")
-              sys.exit(1)
-
-          # Decode the base64 private key
-          decoded_key = base64.b64decode(private_key)
-
-          # Store the decoded private key into a file
-          with open(ssh_private_key_path, "wb") as decoded_file:
-              decoded_file.write(decoded_key)
-              
-    - name: update permisssions for python file
-      shell: |
-        sudo chmod 777 /etc/ansible/fetch_ssh_key.py
-        
-    - name: Fetch SSH private key from AWS Secrets Manager using boto3
-      command: /etc/ansible/fetch_ssh_key.py "{{ secret_id }}" "{{ ssh_private_key_path }}" "{{ region }}"
-      register: secret
-      
-    - name: update permissions for private keys
-      shell: |
-        sudo chown rocky:rocky /home/rocky/.ssh/id_rsa
-        sudo chmod 600 /home/rocky/.ssh/id_rsa
-        sudo chmod 777 /twid
-        
     - name: Clone the Git repository
       git:
         repo: "{{ repo_url }}"
@@ -75,25 +44,16 @@
         update: no
       environment:
         GIT_SSH_COMMAND: ssh -i {{ ssh_private_key_path }} -o StrictHostKeyChecking=no
-        
-    - name: Clean up SSH private key file
+
+    - name: Remove private key after clone
       file:
         path: "{{ ssh_private_key_path }}"
         state: absent
-
-    - name: install_composer script
-      copy:
-        dest: "/tmp/install_composer.sh"
-        content: |
-          #!/bin/bash
-          cd /twid/mapi
-          composer install --no-dev -n
         
     - name: run install_composer script
       shell: |
-        sudo chmod +x /tmp/install_composer.sh
-        sudo bash /tmp/install_composer.sh
-        sudo rm -f /tmp/install_composer.sh
+        cd /twid/mapi
+        composer install --no-dev -n
 
     - name: update /twid/mapi directory permision
       shell: |
