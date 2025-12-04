@@ -1,10 +1,10 @@
 ---
-- name: install efs_utils
+- name: Build and install Amazon EFS Utils, then fully clean build environment
   hosts: localhost
   gather_facts: no
   become: true
   tasks:
-    - name: Install required packages for building EFS utils
+    - name: Install build dependencies
       dnf:
         name:
           - git
@@ -15,28 +15,68 @@
           - openssl-devel
         state: present
 
-    - name: Clone the EFS utils repository
+    - name: Clone EFS utils repo
       git:
         repo: "https://github.com/aws/efs-utils.git"
         dest: "/tmp/efs-utils"
-        version: "v2.2.0"
-        clone: yes
+        version: "v2.3.3"
 
-    - name: Build the RPM package for EFS utils
+    - name: Build RPM
       command:
         chdir: /tmp/efs-utils
         cmd: make rpm
-      args:
-        creates: /tmp/efs-utils/build/amazon-efs-utils*rpm
 
-    - name: Install the built RPM package for EFS utils
+    - name: Install EFS utils RPM
       command:
         chdir: /tmp/efs-utils/build
-        cmd: sudo dnf install amazon-efs-utils-2.2.0-1.el9.x86_64.rpm -y  # make sure you have updated right rpm file
+        cmd: dnf install -y amazon-efs-utils-2.3.3-1.el9.x86_64.rpm
 
-    - name: Install botocore and boto3
-      shell: |
-        sudo yum -y install wget
-        sudo wget https://bootstrap.pypa.io/get-pip.py -O /tmp/get-pip.py
-        sudo python3 /tmp/get-pip.py
-        sudo pip3 install botocore boto3 || sudo /usr/local/bin/pip3 install botocore boto3
+    - name: Remove all build dependencies
+      dnf:
+        name:
+          - rpm-build
+          - make
+          - rust
+          - cargo
+          - openssl-devel
+        state: absent
+
+    - name: Autoremove unused dependencies
+      command: dnf autoremove -y
+
+    - name: Remove Rust/Cargo directories
+      file:
+        path: "{{ item }}"
+        state: absent
+      loop:
+        - /usr/local/cargo
+        - /root/.cargo
+        - /root/.rustup
+
+    - name: Remove EFS utils build directory
+      file:
+        path: /tmp/efs-utils
+        state: absent
+        recurse: true
+
+    - name: Remove leftover temporary build/cache files
+      file:
+        path: "{{ item }}"
+        state: absent
+        force: true
+      loop:
+        - /tmp/rust*
+        - /tmp/cargo*
+        - /var/tmp/rpm*
+        - /tmp/tmp.* 
+
+    - name: Clean dnf cache
+      command: dnf clean all
+
+    - name: List installed EFS files
+      command: rpm -ql amazon-efs-utils
+      register: efs_files
+
+    - name: Show installed file list
+      debug:
+        var: efs_files.stdout
