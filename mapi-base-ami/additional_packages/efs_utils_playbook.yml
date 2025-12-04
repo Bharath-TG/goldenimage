@@ -57,7 +57,6 @@
       file:
         path: /tmp/efs-utils
         state: absent
-        recurse: true
 
     - name: Remove leftover temporary build/cache files
       file:
