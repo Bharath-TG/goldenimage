@@ -52,6 +52,7 @@
         
     - name: run install_composer script
       shell: |
+        git config --global --add safe.directory /twid/mapi
         cd /twid/mapi
         composer install --no-dev -n
 
