@@ -73,7 +73,7 @@
 
     - name: set hostname
       shell: |
-        sudo hostnamectl set-hostname canary-tasks
+        sudo hostnamectl set-hostname cug-php84
     # - name: Adding preTerminate script
     #   copy:
     #     dest: "/root/preTerminate.sh"
