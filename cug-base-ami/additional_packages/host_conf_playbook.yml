@@ -71,6 +71,9 @@
         sudo mkdir /data
         echo 'fs-0d128686506baa805:/ /data efs defaults,_netdev 0 0' | sudo tee -a /etc/fstab
 
+    - name: set hostname
+      shell: |
+        sudo hostnamectl set-hostname canary-tasks
     # - name: Adding preTerminate script
     #   copy:
     #     dest: "/root/preTerminate.sh"
