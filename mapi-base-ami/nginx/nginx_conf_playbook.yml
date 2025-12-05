@@ -74,12 +74,13 @@
         content: |
           server {
             listen 80 default_server;
-            server_name a.tasks.twidpay.com;
+            server_name _;
             include /etc/nginx/snippets/headers.conf;
             root /var/www/html/healthcheck;
             index index.php index.html index.htm;
             location / {
-              try_files $uri $uri/ /index.php?$args;
+              return 200 'OK';
+              add_header Content-Type text/plain;
             }
             location ~ \.php$ {
               try_files $uri =404;
