@@ -1,20 +1,30 @@
 ---
-- name: Install Go
+- name: Install Latest Go
   hosts: localhost
   gather_facts: no
   become: true
 
+  vars:
+    go_version: "1.24.3"
+    go_tarball: "go{{ go_version }}.linux-amd64.tar.gz"
+    go_url: "https://go.dev/dl/{{ go_tarball }}"
+
   tasks:
+
+    - name: Remove old Go installation
+      file:
+        path: /usr/local/go
+        state: absent
 
     - name: Download Go tarball
       get_url:
-        url: https://go.dev/dl/go1.23.1.linux-amd64.tar.gz
-        dest: /tmp/go1.23.1.linux-amd64.tar.gz
+        url: "{{ go_url }}"
+        dest: "/tmp/{{ go_tarball }}"
         mode: '0644'
 
     - name: Extract Go to /usr/local
       unarchive:
-        src: /tmp/go1.23.1.linux-amd64.tar.gz
+        src: "/tmp/{{ go_tarball }}"
         dest: /usr/local
         remote_src: yes
 
@@ -38,7 +48,7 @@
         - 'export GOPATH=/home/kushal/go'
         - 'export PATH=$PATH:$GOROOT/bin:$GOPATH/bin'
 
-    - name: Ensure Go workspace directory exists
+    - name: Ensure Go workspace exists
       file:
         path: /home/kushal/go
         state: directory
@@ -46,7 +56,13 @@
         group: kushal
         mode: '0755'
 
-    - name: Clean up Go tarball
+    - name: Clean Go mod cache
+      command: go clean -modcache
+      become: yes
+      environment:
+        GOPATH: /home/kushal/go
+
+    - name: Remove old Go tarball
       file:
-        path: /tmp/go1.23.1.linux-amd64.tar.gz
+        path: "/tmp/{{ go_tarball }}"
         state: absent
