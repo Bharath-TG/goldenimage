@@ -11,7 +11,11 @@
         content: |
           SELINUX=permissive
           SELINUX=disabled
-
+          
+    - name: set hostname
+      shell: |
+        sudo hostnamectl set-hostname canary-tasks
+    
     - name: updating configuration cloud config
       copy:
         dest: "/etc/cloud/cloud.cfg"
