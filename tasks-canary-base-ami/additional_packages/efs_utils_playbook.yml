@@ -1,10 +1,10 @@
 ---
-- name: install efs_utils
+- name: Build and install Amazon EFS Utils, then fully clean build environment
   hosts: localhost
   gather_facts: no
   become: true
   tasks:
-    - name: Install required packages
+    - name: Install build dependencies
       dnf:
         name:
           - git
@@ -15,28 +15,34 @@
           - openssl-devel
         state: present
 
-    - name: Clone the EFS utils repository
+    - name: Clone EFS utils repo
       git:
         repo: "https://github.com/aws/efs-utils.git"
         dest: "/tmp/efs-utils"
         version: "v2.3.3"
 
-    - name: Build RPM package
+    - name: Build RPM
       command:
         chdir: /tmp/efs-utils
         cmd: make rpm
 
-    - name: Install EFS utils
+    - name: Install EFS utils RPM
       command:
         chdir: /tmp/efs-utils/build
         cmd: dnf install -y amazon-efs-utils-2.3.3-1.el9.x86_64.rpm
 
-    - name: Remove Rust/Cargo packages
+    - name: Remove all build dependencies
       dnf:
         name:
+          - rpm-build
+          - make
           - rust
           - cargo
+          - openssl-devel
         state: absent
+
+    - name: Autoremove unused dependencies
+      command: dnf autoremove -y
 
     - name: Remove Rust/Cargo directories
       file:
@@ -46,3 +52,30 @@
         - /usr/local/cargo
         - /root/.cargo
         - /root/.rustup
+
+    - name: Remove EFS utils build directory
+      file:
+        path: /tmp/efs-utils
+        state: absent
+
+    - name: Remove leftover temporary build/cache files
+      file:
+        path: "{{ item }}"
+        state: absent
+        force: true
+      loop:
+        - /tmp/rust*
+        - /tmp/cargo*
+        - /var/tmp/rpm*
+        - /tmp/tmp.* 
+
+    - name: Clean dnf cache
+      command: dnf clean all
+
+    - name: List installed EFS files
+      command: rpm -ql amazon-efs-utils
+      register: efs_files
+
+    - name: Show installed file list
+      debug:
+        var: efs_files.stdout
