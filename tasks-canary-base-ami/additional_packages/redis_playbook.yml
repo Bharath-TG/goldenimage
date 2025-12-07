@@ -1,16 +1,27 @@
----
-- name: Install Redis
+- name: Install and configure Redis on Rocky Linux
   hosts: localhost
-  gather_facts: no
+  gather_facts: yes
   become: true
-  tasks:
-    - name: Install Redis
-      shell: |
-        sudo dnf instal redis
-        sudo systemctl enable redis
 
-    - name: updating configuration redis config
-      copy:
+  tasks:
+    - name: Enable EPEL repository
+      ansible.builtin.dnf:
+        name: epel-release
+        state: present
+
+    - name: Install Redis
+      ansible.builtin.dnf:
+        name: redis
+        state: present
+
+    - name: Enable and start Redis service
+      ansible.builtin.systemd:
+        name: redis
+        enabled: yes
+        state: restarted
+
+    - name: Update Redis configuration
+      ansible.builtin.copy:
         dest: "/etc/redis/redis.conf"
         content: |
           bind 127.0.0.1
@@ -21,7 +32,7 @@
           tcp-keepalive 300
           daemonize no
           supervised no
-          pidfile /var/run/redis_6379.pid
+          pidfile /run/redis_6379.pid
           loglevel notice
           logfile /var/log/redis/redis.log
           databases 16
