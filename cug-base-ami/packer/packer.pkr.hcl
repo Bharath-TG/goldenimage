@@ -14,7 +14,7 @@ packer {
 # Using a Rocky Linux AMI as the base
 source "amazon-ebs" "rocky-linux" {
   region          = "ap-south-1" # ohio region "ap-south-2"
-  ami_name        = "cug-rocky-8.4-ami-version-{{timestamp}}"
+  ami_name        = "cug-php84-ami-version-{{timestamp}}"
   instance_type   = "t3.xlarge"    # Instance type (can adjust as needed)
   source_ami      = "ami-0321f0c22d67f6571" # "ami-05150ea4d8a533099" Replace with the correct Rocky Linux AMI ID
   ssh_username    = "rocky"  # Default SSH username for Rocky Linux
@@ -118,6 +118,10 @@ build {
 
   provisioner "ansible-local" {
     playbook_file = "../additional_packages/protoc_playbook.yml"
+  }
+
+  provisioner "ansible-local" {
+    playbook_file = "../additional_packages/redis_playbook.yml"
   }
 
   provisioner "ansible-local" {
