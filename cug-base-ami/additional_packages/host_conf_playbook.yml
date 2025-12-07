@@ -11,6 +11,84 @@
         content: |
           SELINUX=permissive
           SELINUX=disabled
+    - name: updating configuration cloud config
+      copy:
+        dest: "/etc/cloud/cloud.cfg"
+        content: |
+          users:
+            - default
+          disable_root: true
+          mount_default_fields: [~, ~, 'auto', 'defaults,nofail,x-systemd.requires=cloud-init.service,_netdev', '0', '2']
+          resize_rootfs_tmp: /dev
+          ssh_pwauth: false
+          preserve_hostname: true
+          ssh_deletekeys: true
+          ssh_genkeytypes: ['rsa', 'ecdsa', 'ed25519']
+          syslog_fix_perms: ~
+          disable_vmware_customization: false
+          cloud_init_modules:
+            - migrator
+            - seed_random
+            - bootcmd
+            - write_files
+            - growpart
+            - resizefs
+            - disk_setup
+            - mounts
+            - set_hostname
+            - update_hostname
+            - update_etc_hosts
+            - ca_certs
+            - rsyslog
+            - users_groups
+            - ssh
+          cloud_config_modules:
+            - ssh_import_id
+            - locale
+            - set_passwords
+            - rh_subscription
+            - spacewalk
+            - yum_add_repo
+            - ntp
+            - timezone
+            - disable_ec2_metadata
+            - runcmd
+          cloud_final_modules:
+            - package_update_upgrade_install
+            - write_files_deferred
+            - puppet
+            - chef
+            - ansible
+            - mcollective
+            - salt_minion
+            - reset_rmc
+            - rightscale_userdata
+            - scripts_vendor
+            - scripts_per_once
+            - scripts_per_boot
+            - scripts_per_instance
+            - scripts_user
+            - ssh_authkey_fingerprints
+            - keys_to_console
+            - install_hotplug
+            - phone_home
+            - final_message
+            - power_state_change
+          system_info:
+            distro: rocky
+            default_user:
+              name: rocky
+              lock_passwd: True
+              gecos: rocky Cloud User
+              groups: [adm, systemd-journal]
+              sudo: ["ALL=(ALL) NOPASSWD:ALL"]
+              shell: /bin/bash
+            network:
+              renderers: ['sysconfig', 'eni', 'netplan', 'network-manager', 'networkd']
+            paths:
+              cloud_dir: /var/lib/cloud/
+              templates_dir: /etc/cloud/templates/
+            ssh_svcname: sshd
 
     - name: adding bastion proxy 
       shell: |
@@ -74,6 +152,7 @@
     - name: set hostname
       shell: |
         sudo hostnamectl set-hostname cug-php84
+        
     # - name: Adding preTerminate script
     #   copy:
     #     dest: "/root/preTerminate.sh"
