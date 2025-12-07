@@ -16,61 +16,30 @@
     secret_id: twid/git_ssh_key
     ssh_private_key_path: /home/rocky/.ssh/id_rsa
     region: ap-south-1
-  tasks:        
-    - name: adding python script to fetch secrets
-      copy:
-        dest: /etc/ansible/fetch_ssh_key.py
-        content: |
-          #!/usr/bin/env python3
-          import boto3
-          import base64
-          import json
-          import sys
-          
-          # Fetch arguments from Ansible playbook
-          secret_id = sys.argv[1]
-          ssh_private_key_path = sys.argv[2]  # File path to store the encoded private key
-          region = sys.argv[3]
-          
-          # Create a Secrets Manager client
-          client = boto3.client('secretsmanager', region_name=region)
+  tasks:
+    # - name: Fetch SSH key from Secrets Manager using AWS CLI
+    #   shell: |
+    #     aws secretsmanager get-secret-value \
+    #       --secret-id {{ secret_id }} \
+    #       --region {{ region }} \
+    #       --query 'SecretString' \
+    #       --output text \
+    #     | jq -r '.ssh_key' \
+    #     | base64 -d > {{ ssh_private_key_path }}
+    #   register: secret_output
 
-          # Fetch the secret value from AWS Secrets Manager
-          response = client.get_secret_value(SecretId=secret_id)
+    - name: Fix permissions on private key
+      file:
+        path: "{{ ssh_private_key_path }}"
+        owner: rocky
+        group: rocky
+        mode: '0600'
 
-          # Decode the base64 secret
-          secret = json.loads(response['SecretString'])
-
-          # Log the secret content for debugging
-          print("Secret content:", secret)
-
-          # Fetch the correct key from the secret
-          if 'ssh_key' in secret:
-              private_key = secret['ssh_key']
-          else:
-              print("The key 'ssh_key' was not found in the secret.")
-              sys.exit(1)
-
-          # Decode the base64 private key
-          decoded_key = base64.b64decode(private_key)
-
-          # Store the decoded private key into a file
-          with open(ssh_private_key_path, "wb") as decoded_file:
-              decoded_file.write(decoded_key)
-              
-    - name: update permisssions for python file
-      shell: |
-        sudo chmod 777 /etc/ansible/fetch_ssh_key.py
-        
-    - name: Fetch SSH private key from AWS Secrets Manager using boto3
-      command: /etc/ansible/fetch_ssh_key.py "{{ secret_id }}" "{{ ssh_private_key_path }}" "{{ region }}"
-      register: secret
-      
-    - name: update permissions for private keys
-      shell: |
-        sudo chown rocky:rocky /home/rocky/.ssh/id_rsa
-        sudo chmod 600 /home/rocky/.ssh/id_rsa
-        sudo chmod 777 /twid
+    - name: Ensure /twid directory exists
+      file:
+        path: /twid
+        state: directory
+        mode: '0777'
         
     - name: Clone the Git System repository
       git:
@@ -112,81 +81,52 @@
       environment:
         GIT_SSH_COMMAND: ssh -i {{ ssh_private_key_path }} -o StrictHostKeyChecking=no
 
-    - name: Clean up SSH private key file
+    - name: Remove private key after clone
       file:
         path: "{{ ssh_private_key_path }}"
         state: absent
 
-    - name: Create directory
-      shell: |
-        sudo mkdir /twid/system/storage/framework
-        sudo mkdir /twid/system/storage/framework/cache
-        sudo mkdir /twid/system/storage/framework/sessions
-        sudo mkdir /twid/system/storage/framework/views
+    - name: Create framework folders for System
+      file:
+        path: "{{ item }}"
+        state: directory
+        mode: '0775'
+      loop:
+        - /twid/system/storage/framework
+        - /twid/system/storage/framework/cache
+        - /twid/system/storage/framework/sessions
+        - /twid/system/storage/framework/views
 
-    - name: system_install_composer script
-      copy:
-        dest: "/tmp/system_install_composer.sh"
-        content: |
-          #!/bin/bash
-          cd /twid/system
-          composer install --no-dev -n
+    - name: Create framework folders for Tasks
+      file:
+        path: "{{ item }}"
+        state: directory
+        mode: '0775'
+      loop:
+        - /twid/tasks/storage/framework
+        - /twid/tasks/storage/framework/cache
+        - /twid/tasks/storage/framework/sessions
+        - /twid/tasks/storage/framework/views
         
-    - name: run system_install_composer script
+    - name: Run composer install System
       shell: |
-        sudo chmod +x /tmp/system_install_composer.sh
-        sudo bash /tmp/system_install_composer.sh
-        sudo rm -f /tmp/system_install_composer.sh
+        cd /twid/system
+        composer install --no-dev -n
 
-    - name: api_install_composer script
-      copy:
-        dest: "/tmp/api_install_composer.sh"
-        content: |
-          #!/bin/bash
-          cd /twid/api
-          composer install --no-dev -n
-        
-    - name: run api_install_composer script
+    - name: Run composer install Api
       shell: |
-        sudo chmod +x /tmp/api_install_composer.sh
-        sudo bash /tmp/api_install_composer.sh
-        sudo rm -f /tmp/api_install_composer.sh
+        cd /twid/api
+        composer install --no-dev -n
 
-    - name: tasks_install_composer script
-      copy:
-        dest: "/tmp/tasks_install_composer.sh"
-        content: |
-          #!/bin/bash
-          cd /twid/tasks
-          composer install --no-dev -n
-
-
-    - name: Create directory
+    - name: Run composer install Tasks
       shell: |
-        sudo mkdir /twid/tasks/storage/framework
-        sudo mkdir /twid/tasks/storage/framework/cache
-        sudo mkdir /twid/tasks/storage/framework/sessions
-        sudo mkdir /twid/tasks/storage/framework/views
-        
-    - name: run tasks_install_composer script
-      shell: |
-        sudo chmod +x /tmp/tasks_install_composer.sh
-        sudo bash /tmp/tasks_install_composer.sh
-        sudo rm -f /tmp/tasks_install_composer.sh
+        cd /twid/tasks
+        composer install --no-dev -n
 
-    - name: merchant_install_composer script
-      copy:
-        dest: "/tmp/merchant_install_composer.sh"
-        content: |
-          #!/bin/bash
-          cd /twid/merchant
-          composer install --no-dev -n
-        
-    - name: run merchant_install_composer script
+    - name: Run composer install Merchant
       shell: |
-        sudo chmod +x /tmp/merchant_install_composer.sh
-        sudo bash /tmp/merchant_install_composer.sh
-        sudo rm -f /tmp/merchant_install_composer.sh
+        cd /twid/merchant
+        composer install --no-dev -n
 
     - name: update directory permision
       shell: |
