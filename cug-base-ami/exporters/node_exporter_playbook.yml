@@ -14,7 +14,14 @@
       get_url:
         url: "https://github.com/prometheus/node_exporter/releases/download/v1.10.2/node_exporter-1.10.2.linux-amd64.tar.gz"
         dest: "/tmp/node_exporter.tar.gz"
-
+    - name: Create node_exporter directory
+      file:
+        path: /usr/local/bin/nodeexporter
+        state: directory
+        owner: nodeexporter
+        group: nodeexporter
+        mode: '0755'
+    
     - name: Extract node_exporter tarball
       unarchive:
         src: "/tmp/node_exporter.tar.gz"
@@ -22,7 +29,7 @@
         remote_src: yes
 
     - name: Move node_exporter binary to /usr/local/bin
-      command: mv /tmp/node_exporter-1.10.2.linux-amd64/node_exporter /usr/local/bin/
+      command: mv /tmp/node_exporter-1.10.2.linux-amd64/node_exporter /usr/local/bin/nodeexporter/
 
     - name: Create systemd service file for node_exporter
       copy:
@@ -35,7 +42,7 @@
           [Service]
           User=nodeexporter
           Group=nodeexporter
-          ExecStart="/usr/local/bin/node_exporter"
+          ExecStart="/usr/local/bin/nodeexporter/node_exporter"
           Restart=always
           RestartSec=10
           TimeoutStartSec=200
@@ -58,6 +65,14 @@
       file:
         path: "/tmp/node_exporter.tar.gz"
         state: absent
+
+    - name: Create custom_metrics directory
+      file:
+        path: /usr/local/bin/nodeexporter/custom_metrics
+        state: directory
+        owner: nodeexporter
+        group: nodeexporter
+        mode: '0777'
     
     - name: Create Node Custom Metrics Script
       copy:
