@@ -12,7 +12,7 @@
 
     - name: Download node_exporter tarball
       get_url:
-        url: "https://github.com/prometheus/node_exporter/releases/download/v1.6.1/node_exporter-1.6.1.linux-amd64.tar.gz"
+        url: "https://github.com/prometheus/node_exporter/releases/download/v1.10.2/node_exporter-1.10.2.linux-amd64.tar.gz"
         dest: "/tmp/node_exporter.tar.gz"
 
     - name: Extract node_exporter tarball
@@ -21,14 +21,8 @@
         dest: "/tmp/"
         remote_src: yes
 
-    - name: Create Directory
-      shell: |
-        sudo mkdir /usr/local/bin/nodeexporter
-        sudo mkdir /usr/local/bin/nodeexporter/custom_metrics
-        sudo touch /usr/local/bin/nodeexporter/custom_metrics/temp_eth
-
     - name: Move node_exporter binary to /usr/local/bin
-      command: mv /tmp/node_exporter-1.6.1.linux-amd64/node_exporter /usr/local/bin/nodeexporter/
+      command: mv /tmp/node_exporter-1.10.2.linux-amd64/node_exporter /usr/local/bin/
 
     - name: Create systemd service file for node_exporter
       copy:
@@ -41,7 +35,7 @@
           [Service]
           User=nodeexporter
           Group=nodeexporter
-          ExecStart=/usr/local/bin/nodeexporter/node_exporter --collector.textfile.directory /usr/local/bin/nodeexporter/custom_metrics
+          ExecStart="/usr/local/bin/node_exporter"
           Restart=always
           RestartSec=10
           TimeoutStartSec=200
@@ -64,7 +58,7 @@
       file:
         path: "/tmp/node_exporter.tar.gz"
         state: absent
-
+    
     - name: Create Node Custom Metrics Script
       copy:
         dest: "/bin/export_eth.sh"
@@ -97,5 +91,3 @@
         job: "/bin/bash /bin/export_eth.sh >> /var/log/export_eth.log 2>&1"
         state: present
         user: root
-
-    
