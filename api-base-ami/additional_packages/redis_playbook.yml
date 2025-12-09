@@ -15,10 +15,10 @@
         name: redis
         state: present
 
-    - name: Enable and start Redis service
+    - name: Start Redis service
       ansible.builtin.systemd:
         name: redis
-        enabled: yes
+        # enabled: yes
         state: restarted
 
     - name: Update Redis configuration
@@ -48,7 +48,7 @@
           repl-diskless-sync-delay 5
           repl-disable-tcp-nodelay no
           slave-priority 100
-           maxmemory 524288000
+          maxmemory 524288000
           appendonly no
           appendfilename "appendonly.aof"
           appendfsync everysec
