@@ -6,7 +6,7 @@
   vars:
     repo_url: git@github.com:twidpay-global/twid_tasks.git
     dest_dir: /twid/tasks
-    branch: master_tasks
+    branch: lts-php-84
     secret_id: twid/git_ssh_key
     ssh_private_key_path: /home/rocky/.ssh/id_rsa
     region: ap-south-1
@@ -54,6 +54,17 @@
       shell: |
         cd /twid/tasks
         composer install --no-dev -n
+
+    - name: Create framework folders
+      file:
+        path: "{{ item }}"
+        state: directory
+        mode: '0775'
+      loop:
+        - /twid/tasks/storage/framework
+        - /twid/tasks/storage/framework/cache
+        - /twid/tasks/storage/framework/sessions
+        - /twid/tasks/storage/framework/views
 
     - name: Set tasks directory permissions
       shell: |
