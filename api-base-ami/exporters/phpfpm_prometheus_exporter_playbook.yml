@@ -1,3 +1,4 @@
+---
 - name: install phpfpm prometheus exporter
   hosts: localhost
   gather_facts: no
