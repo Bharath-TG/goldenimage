@@ -12,6 +12,89 @@
           SELINUX=permissive
           SELINUX=disabled
 
+    - name: set hostname
+      shell: |
+        sudo hostnamectl set-hostname canary-api
+    
+    - name: updating configuration cloud config
+      copy:
+        dest: "/etc/cloud/cloud.cfg"
+        content: |
+          users:
+            - default
+          disable_root: true
+          mount_default_fields: [~, ~, 'auto', 'defaults,nofail,x-systemd.requires=cloud-init.service,_netdev', '0', '2']
+          resize_rootfs_tmp: /dev
+          ssh_pwauth: false
+          preserve_hostname: true
+          ssh_deletekeys: true
+          ssh_genkeytypes: ['rsa', 'ecdsa', 'ed25519']
+          syslog_fix_perms: ~
+          disable_vmware_customization: false
+          cloud_init_modules:
+            - migrator
+            - seed_random
+            - bootcmd
+            - write_files
+            - growpart
+            - resizefs
+            - disk_setup
+            - mounts
+            - set_hostname
+            - update_hostname
+            - update_etc_hosts
+            - ca_certs
+            - rsyslog
+            - users_groups
+            - ssh
+          cloud_config_modules:
+            - ssh_import_id
+            - locale
+            - set_passwords
+            - rh_subscription
+            - spacewalk
+            - yum_add_repo
+            - ntp
+            - timezone
+            - disable_ec2_metadata
+            - runcmd
+          cloud_final_modules:
+            - package_update_upgrade_install
+            - write_files_deferred
+            - puppet
+            - chef
+            - ansible
+            - mcollective
+            - salt_minion
+            - reset_rmc
+            - rightscale_userdata
+            - scripts_vendor
+            - scripts_per_once
+            - scripts_per_boot
+            - scripts_per_instance
+            - scripts_user
+            - ssh_authkey_fingerprints
+            - keys_to_console
+            - install_hotplug
+            - phone_home
+            - final_message
+            - power_state_change
+          system_info:
+            distro: rocky
+            default_user:
+              name: rocky
+              lock_passwd: True
+              gecos: rocky Cloud User
+              groups: [adm, systemd-journal]
+              sudo: ["ALL=(ALL) NOPASSWD:ALL"]
+              shell: /bin/bash
+            network:
+              renderers: ['sysconfig', 'eni', 'netplan', 'network-manager', 'networkd']
+            paths:
+              cloud_dir: /var/lib/cloud/
+              templates_dir: /etc/cloud/templates/
+            ssh_svcname: sshd
+    
     - name: adding bastion proxy 
       shell: |
         echo 'proxy=http://172.31.21.180:3128/' >> /etc/yum.conf
@@ -71,90 +154,222 @@
         sudo mkdir /data
         echo 'fs-0d128686506baa805:/ /data efs defaults,_netdev 0 0' | sudo tee -a /etc/fstab
 
-    # - name: Adding preTerminate script
-    #   copy:
-    #     dest: "/root/preTerminate.sh"
-    #     content: |
-    #       #!/bin/bash
-    #       set -e
-    #       export asg_name="PLACEHOLDERASG"
-    #       export instanceId="PLACEHOLDERINSTANCE"
-    #       export HTTPS_PROXY="http://172.31.21.180:3128/"
-    #       while true
-    #       do
-    #       	currentState=`curl http://169.254.169.254/latest/meta-data/autoscaling/target-lifecycle-state`
-    #       	echo $currentState
-    #       	if [ "$currentState" = "Terminated" ]
-    #       	then
-    #       		/bin/systemctl stop serf
-    #       		echo "Entering sleep for 600sec for target deregistration"
-    #       		sleep 600
-    #       		/bin/bash /root/final_backup.sh
-    #       		if [[ $? -eq 0 ]]
-    #       		then
-    #       			/usr/sbin/logwatch --output mail --hostname api --range today || true
-    #       			/usr/bin/aws autoscaling complete-lifecycle-action --lifecycle-hook-name preterminate --auto-scaling-group-name "$asg_name" --lifecycle-action-result CONTINUE  --region ap-south-1 --instance-id "$instanceId"
-    #       			sleep 100
-    #       			systemctl stop nginx
-    #       			systemctl stop php-fpm
-          
-    #       		fi
-    #       	fi
-    #       	sleep 10
-    #       done
-          
-    # - name: Adding preTerminate script
-    #   copy:
-    #     dest: "/etc/systemd/system/preterminate.service"
-    #     content: |
-    #       [Unit]
-    #       Description=Lifecycle hook respond script
-    #       After=network.target
-    #       After=network-online.target
-    #       Wants=network-online.target
-          
-    #       [Service]
-    #       ExecStart=/bin/bash /root/preTerminate.sh
-    #       Restart=always
-    #       RestartSec=10
-    #       [Install]
-    #       WantedBy=multi-user.target
-          
-    # - name: Adding final_backup script
-    #   copy:
-    #     dest: "/root/final_backup.sh"
-    #     content: |
-    #       #!/bin/bash
-    #       set -e
-    #       zip -r /data/logs/PLACEHOLDER/api/final_api.zip /twid/api/storage/logs
-    #       if [[ $? -eq 0 ]]
-    #       then
-    #               echo "Zipped tasks logs succesfully"
-    #       else
-    #               exit 1
-    #       fi
-          
-    #       [root@ip-172-31-25-134 /]# cat /root/final_backup.sh 
-    #       #!/bin/bash
-    #       set -e
-    #       zip -r /data/logs/PLACEHOLDER/api/final_api.zip /twid/api/storage/logs
-    #       if [[ $? -eq 0 ]]
-    #       then
-    #               echo "Zipped tasks logs succesfully"
-    #       else
-    #               exit 1
-    #       fi
+    - name: Adding resizeVolume.sh script
+      copy:
+        dest: "/root/resizeVolume.sh"
+        content: |
+          export persistentVolume="vol-0c28dff91328a7550"
+          export HTTPS_PROXY="http://172.31.21.180:3128/"
+          while true
+          do
+          export usedPercentageTwid=`df -h | grep '/twid' | awk '{print $5}' | tr -d '%'`
+          echo $usedPercentageTwid
+          if [[ $usedPercentageTwid -gt 90 ]]
+          then
+          	echo "Volume threshold exceeded"
+          export currentSize=`aws ec2 describe-volumes --volume-ids $persistentVolume --region ap-south-1 | grep -oP '(?<="Size": ).*'`
+          export newSize=$(( $currentSize * 2 ))
+          echo $newSize
+          echo "Modifying volume to $newSize"
+          aws ec2 modify-volume --size $newSize --volume-id $persistentVolume --region ap-south-1
+          sleep 5
+          while true
+          do
+          modifiedSize=`lsblk | grep '/twid' | awk '{print $4}' | tr -d 'G'`
+          if [[ $modifiedSize -eq $newSize ]]
+          then
+          	echo "Resizing filesystem"
+          	xfs_growfs /twid 
+          	break
+          fi
+          sleep 5
+          done
+          fi
+          sleep 5
+          done
 
-    # - name: Adding final_backup script
-    #   copy:
-    #     dest: "/root/final_backup.sh"
-    #     content: |
-    #       #!/bin/bash
-    #       set -e
-    #       zip -r /data/logs/PLACEHOLDER/api/final_api.zip /twid/api/storage/logs
-    #       if [[ $? -eq 0 ]]
-    #       then
-    #               echo "Zipped tasks logs succesfully"
-    #       else
-    #               exit 1
-    #       fi
+    - name: Adding resizeVolume systemd service script
+      copy:
+        dest: "/etc/systemd/system/resizevolume.service"
+        content: |
+          [Unit]
+            Description=Resize volume systemd
+            After=network.target
+            After=network-online.target
+            Wants=network-online.target
+            
+            [Service]
+            ExecStart=/bin/bash /root/resizeVolume.sh
+            Restart=on-failure
+            RestartSec=1s
+            
+            [Install]
+            WantedBy=multi-user.target
+
+    - name: Adding preTerminate script
+      copy:
+        dest: "/root/preTerminate.sh"
+        content: |
+          #!/bin/bash
+          set -e
+          export asg_name="api-spot-asg"
+          export instanceId="i-07c1b6d41c0e5737d"
+          export persistentVolume="vol-0c28dff91328a7550"
+          export HTTPS_PROXY="http://172.31.21.180:3128/"
+          while true
+          do
+            currentState=`curl http://169.254.169.254/latest/meta-data/autoscaling/target-lifecycle-state`
+            echo $currentState
+            if [ "$currentState" != "InService" ]
+            then
+                          /usr/bin/aws ec2 create-tags  --resources ${persistentVolume} --tags Key=backupAndDeleteTasks,Value=true --region ap-south-1
+          
+              echo "Entering sleep for 40sec for target deregistration"
+              sleep 40
+              if [[ $? -eq 0 ]]
+              then
+                /usr/bin/aws autoscaling complete-lifecycle-action --lifecycle-hook-name preterminate --auto-scaling-group-name "$asg_name" --lifecycle-action-result CONTINUE  --region ap-south-1 --instance-id "$instanceId"
+                sleep 100
+                systemctl stop nginx
+                systemctl stop php-fpm
+          
+              fi
+            fi
+            sleep 10
+          done
+          
+    - name: Adding preTerminate systemd service script
+      copy:
+        dest: "/etc/systemd/system/preterminate.service"
+        content: |
+          [Unit]
+          Description=Lifecycle hook respond script
+          After=network.target
+          After=network-online.target
+          Wants=network-online.target
+          
+          [Service]
+          ExecStart=/bin/bash /root/preTerminate.sh
+          Restart=always
+          RestartSec=10
+          [Install]
+          WantedBy=multi-user.target
+
+    - name: Adding preInterrupt script
+      copy:
+        dest: "/root/preInterrupt.sh"
+        content: |
+          #!/bin/bash
+          set -e
+          export asg_name="api-spot-asg"
+          export instanceId="i-07c1b6d41c0e5737d"
+          export persistentVolume="vol-0c28dff91328a7550"
+          export HTTPS_PROXY="http://172.31.21.180:3128/"
+          while true
+          do
+          	currentState=`curl -w %{http_code} -s --output /dev/null http://169.254.169.254/latest/meta-data/spot/termination-time`
+          	if [ $currentState -eq 200 ]
+          	then
+          		/usr/bin/aws ec2 create-tags  --resources ${persistentVolume} --tags Key=backupAndDeleteTasks,Value=true --region ap-south-1 
+          	        sleep 40
+          	        systemctl stop nginx
+          	        systemctl stop php-fpm	
+          		if [[ $? -eq 0 ]]
+          		then
+          			sleep 200
+          			exit 0
+          		fi
+          	fi
+          	sleep 5
+          done
+          
+    - name: Adding preInterrupt systemd service script
+      copy:
+        dest: "/etc/systemd/system/preInterrupt.service"
+        content: |
+          [Unit]
+          Description=Lifecycle hook respond script
+          After=network.target
+          After=network-online.target
+          Wants=network-online.target
+          
+          [Service]
+          ExecStart=/bin/bash /root/preInterrupt.sh
+          Restart=on-failure
+          RestartSec=1s
+          
+          [Install]
+          WantedBy=multi-user.target
+          
+    - name: Adding final_backup script
+      copy:
+        dest: "/root/final_backup.sh"
+        content: |
+          #!/bin/bash
+          set -e
+          zip -r /data/logs/api_asg/1723138237/1765259385/api_spot/final_api.zip /twid/api/storage/logs
+          if [[ $? -eq 0 ]]
+          then
+                  echo "Zipped api logs succesfully"
+          else
+                  exit 1
+          fi
+
+    - name: Adding initscript.sh script
+      copy:
+        dest: "/root/initscript.sh"
+        content: |
+          #!/bin/bash
+          set -e
+          export HTTPS_PROXY="http://172.31.21.180:3128/"
+          export currentTimeStamp=`date +%s`
+          export instanceIp=`ip a  | grep inet | grep eth0 | awk '{print $2}' | awk -F/ '{print $1}' | tr -d "."`
+          export uniqueString="api_asg/${instanceIp}/${currentTimeStamp}"
+          echo $uniqueString
+          #Hack to get around efs not being properly mounted at this point.
+          while true
+          do
+          	sleep 5
+          	count=`ls  /data/logs | wc -l`
+          	echo $count
+          	if [[ $count -gt 5 ]]
+          	then
+          echo "creating mkdir -p  /data/logs/${uniqueString}/api_spot"
+          mkdir -p  /data/logs/${uniqueString}/api_spot
+          if [ ! -d /data/logs/${uniqueString}/api_spot ]
+          then
+          	sleep 1
+          	continue
+          fi
+          	fi
+          break
+          done
+          sed -i "s;PLACEHOLDER;${uniqueString};g" /etc/logrotate.d/api
+          sed -i "s;PLACEHOLDER;${uniqueString};g" /root/final_backup.sh
+          cp /root/final_backup.sh /twid/final_backup.sh
+          export instanceId=`curl http://169.254.169.254/latest/meta-data/instance-id`
+          while true
+          do
+          	sleep 5
+          export service=`/usr/bin/aws ec2 describe-tags --filters "Name=resource-id,Values=${instanceId}" "Name=key,Values=service" --region ap-south-1 | grep -oP '(?<="Value": ").*?(?=")'`
+          export asg=`/usr/bin/aws ec2 describe-tags --filters "Name=resource-id,Values=${instanceId}" "Name=key,Values=aws:autoscaling:groupName" --region ap-south-1 | grep -oP '(?<="Value": ").*?(?=")'`
+          export persistentVolume=`/usr/bin/aws ec2 describe-volumes --filters Name=attachment.instance-id,Values=${instanceId} Name=attachment.delete-on-termination,Values=false --region ap-south-1 | grep -oP '(?<="VolumeId": ").*?(?=")' | uniq`
+          if [[ -z $asg ]] || [[ -z $service ]]
+          then
+          	continue
+          else
+          	break
+          fi
+          done
+          sed -i "s;PLACEHOLDERASG;${asg};g" /root/preTerminate.sh
+          sed -i "s;PLACEHOLDERINSTANCE;${instanceId};g" /root/preTerminate.sh
+          sed -i "s;PLACEHOLDERPERSISTENTVOLUME;${persistentVolume};g" /root/preTerminate.sh
+          sed -i "s;PLACEHOLDERASG;${asg};g" /root/preInterrupt.sh
+          sed -i "s;PLACEHOLDERINSTANCE;${instanceId};g" /root/preInterrupt.sh
+          sed -i "s;PLACEHOLDERPERSISTENTVOLUME;${persistentVolume};g" /root/preInterrupt.sh
+          sed -i "s;PLACEHOLDERPERSISTENTVOLUME;${persistentVolume};g" /root/resizeVolume.sh
+          systemctl start preinterrupt
+          systemctl start preterminate
+          systemctl start resizevolume
+          systemctl start redis || true
+          echo $service
