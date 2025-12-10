@@ -65,6 +65,7 @@
         - /twid/tasks/storage/framework/cache
         - /twid/tasks/storage/framework/sessions
         - /twid/tasks/storage/framework/views
+        - /twid/tasks/storage/public
 
     - name: Set tasks directory permissions
       shell: |
