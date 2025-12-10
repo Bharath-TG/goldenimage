@@ -23,3 +23,8 @@
       dnf:
         name: awscli
         state: present
+        
+    - name: Install Zip
+      package:
+        name: zip
+        state: present
