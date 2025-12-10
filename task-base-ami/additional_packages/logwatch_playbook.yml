@@ -43,7 +43,7 @@
           Service = All
           mailer = "/usr/sbin/sendmail -t"
 
-    - name: updating configuration postfix main.cf
+    - name: updating configuration filebeat.yml
       copy:
         dest: "/etc/postfix/main.cf"
         content: |
@@ -52,13 +52,9 @@
           daemon_directory = /usr/libexec/postfix
           data_directory = /var/lib/postfix
           mail_owner = postfix
-          myhostname = api.twidpay.com
-          mydomain = twidpay.com
-          myorigin = $mydomain
           inet_interfaces = localhost
           inet_protocols = all
           mydestination = $myhostname, localhost.$mydomain, localhost
-          local_recipient_maps =
           unknown_local_recipient_reject_code = 550
           relayhost = [172.31.21.180]
           alias_maps = hash:/etc/aliases
@@ -69,9 +65,10 @@
           	 ddd $daemon_directory/$process_name $process_id & sleep 5
           sendmail_path = /usr/sbin/sendmail.postfix
           newaliases_path = /usr/bin/newaliases.postfix
+          message_size_limit = 30720000
           mailq_path = /usr/bin/mailq.postfix
           setgid_group = postdrop
           html_directory = no
           manpage_directory = /usr/share/man
-          sample_directory = /usr/share/doc/postfix/samples
-          readme_directory = /usr/share/doc/postfix/README_FILES
+          sample_directory = /usr/share/doc/postfix-2.10.1/samples
+          readme_directory = /usr/share/doc/postfix-2.10.1/README_FILES
