@@ -22,4 +22,9 @@
     - name: Install awscli
       dnf:
         name: awscli
-        state: present # Ensures that awscli is installed
+        state: present
+
+    - name: Install Zip
+      package:
+        name: zip
+        state: present
