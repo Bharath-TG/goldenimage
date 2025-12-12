@@ -3,9 +3,14 @@
   hosts: all  
   become: yes                
   tasks:
-    - name: Install only security and bugfix updates
+    - name: Upgrade all packages (equivalent to dnf upgrade)
       dnf:
         name: "*"
-        state: latest         
-        security: yes         # For security updates
-        update_only: yes      # For bugfix updates
+        state: latest
+        
+    # - name: Install only security and bugfix updates
+    #   dnf:
+    #     name: "*"
+    #     state: latest         
+    #     security: yes         # For security updates
+    #     update_only: yes      # For bugfix updates
