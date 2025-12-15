@@ -9,7 +9,6 @@
       copy:
         dest: "/etc/selinux/config"
         content: |
-          SELINUX=permissive
           SELINUX=disabled
           
     - name: set hostname
@@ -158,29 +157,28 @@
       copy:
         dest: "/root/preTerminate.sh"
         content: |
-          #!/bin/bash
           set -e
-          export asg_name="PLACEHOLDERASG"
-          export instanceId="PLACEHOLDERINSTANCE"
-          export persistentVolume="PLACEHOLDERPERSISTENTVOLUME"
+          export asg_name="system-codedeploy"
+          export instanceId="i-0d2d2a9c677ca9bc5"
+          export persistentVolume=""
           export HTTPS_PROXY="http://172.31.21.180:3128/"
           while true
           do
-            currentState=`curl http://169.254.169.254/latest/meta-data/autoscaling/target-lifecycle-state`
-            if [ "$currentState" != "InService" ]
-            then
-                    /usr/bin/aws ec2 create-tags  --resources ${persistentVolume} --tags Key=backupAndDeleteTasks,Value=true --region ap-south-1
-
-              /bin/systemctl stop supervisord
-              if [[ $? -eq 0 ]]
-              then
-                # Added for issue when aws lifecycle hook is removed after being sent. We have no reason to keep the instance up at this point regardless of the response from below call.
-                /usr/bin/aws autoscaling complete-lifecycle-action --lifecycle-hook-name preterminate --auto-scaling-group-name "$asg_name" --lifecycle-action-result CONTINUE  --region ap-south-1 --instance-id "$instanceId" || true
-                sleep 400
-                init 0
-              fi
-            fi
-            sleep 10
+          	currentState=`curl http://169.254.169.254/latest/meta-data/autoscaling/target-lifecycle-state`
+          	if [ "$currentState" != "InService" ]
+          	then
+          	        /usr/bin/aws ec2 create-tags  --resources ${persistentVolume} --tags Key=backupAndDeleteTasks,Value=true --region ap-south-1
+                          
+          		if [[ $? -eq 0 ]]
+          		then
+          			sleep 1000
+          			# Added for issue when aws lifecycle hook is removed after being sent. We have no reason to keep the instance up at this point regardless of the response from below call.
+          			/usr/bin/aws autoscaling complete-lifecycle-action --lifecycle-hook-name preterminate --auto-scaling-group-name "$asg_name" --lifecycle-action-result CONTINUE  --region ap-south-1 --instance-id "$instanceId" || true
+          			sleep 400
+          			init 0
+          		fi
+          	fi
+          	sleep 10
           done
 
     - name: Create systemd service file for preTerminate script
@@ -192,55 +190,11 @@
           After=network.target
           After=network-online.target
           Wants=network-online.target
-
+          
           [Service]
           ExecStart=/bin/bash /root/preTerminate.sh
           Restart=always
           RestartSec=10
-          [Install]
-          WantedBy=multi-user.target
-
-    - name: Adding preInterrupt script
-      copy:
-        dest: "/root/preInterrupt.sh"
-        content: |
-          #!/bin/bash
-          set -e
-          export asg_name="PLACEHOLDERASG"
-          export instanceId="PLACEHOLDERINSTANCE"
-          export persistentVolume="PLACEHOLDERPERSISTENTVOLUME"
-          export HTTPS_PROXY="http://172.31.21.180:3128/"
-          while true
-          do
-            currentState=`curl -w %{http_code} -s --output /dev/null http://169.254.169.254/latest/meta-data/spot/termination-time`
-            if [ $currentState -eq 200 ]
-            then
-              /usr/bin/aws ec2 create-tags  --resources ${persistentVolume} --tags Key=backupAndDeleteTasks,Value=true --region ap-south-1 
-              /bin/systemctl stop supervisord
-              if [[ $? -eq 0 ]]
-              then
-                sleep 200
-                exit 0
-              fi
-            fi
-            sleep 5
-          done
-
-    - name: Create systemd service file for preInterrupt script
-      copy:
-        dest: "/etc/systemd/system/preinterrupt.service"
-        content: |
-          [Unit]
-          Description=Lifecycle hook respond script
-          After=network.target
-          After=network-online.target
-          Wants=network-online.target
-
-          [Service]
-          ExecStart=/bin/bash /root/preInterrupt.sh
-          Restart=on-failure
-          RestartSec=1s
-
           [Install]
           WantedBy=multi-user.target
     
@@ -248,7 +202,8 @@
       copy:
         dest: "/root/resizeVolume.sh"
         content: |
-          export persistentVolume="PLACEHOLDERPERSISTENTVOLUME"
+          #!/bin/bash
+          export persistentVolume=""
           export HTTPS_PROXY="http://172.31.21.180:3128/"
           while true
           do
@@ -256,7 +211,7 @@
           echo $usedPercentageTwid
           if [[ $usedPercentageTwid -gt 90 ]]
           then
-            echo "Volume threshold exceeded"
+          	echo "Volume threshold exceeded"
           export currentSize=`aws ec2 describe-volumes --volume-ids $persistentVolume --region ap-south-1 | grep -oP '(?<="Size": ).*'`
           export newSize=$(( $currentSize * 2 ))
           echo $newSize
@@ -268,9 +223,9 @@
           modifiedSize=`lsblk | grep '/twid' | awk '{print $4}' | tr -d 'G'`
           if [[ $modifiedSize -eq $newSize ]]
           then
-            echo "Resizing filesystem"
-            xfs_growfs /twid 
-            break
+          	echo "Resizing filesystem"
+          	xfs_growfs /twid 
+          	break
           fi
           sleep 5
           done
@@ -278,7 +233,6 @@
           sleep 5
           done
           
-
     - name: Create systemd service file for resizevolume script
       copy:
         dest: "/etc/systemd/system/resizevolume.service"
@@ -288,12 +242,12 @@
           After=network.target
           After=network-online.target
           Wants=network-online.target
-
+          
           [Service]
           ExecStart=/bin/bash /root/resizeVolume.sh
           Restart=on-failure
           RestartSec=1s
-
+          
           [Install]
           WantedBy=multi-user.target
 
@@ -306,7 +260,7 @@
           export HTTPS_PROXY="http://172.31.21.180:3128/"
           export currentTimeStamp=`date +%s`
           export instanceIp=`ip a  | grep inet | grep eth0 | awk '{print $2}' | awk -F/ '{print $1}' | tr -d "."`
-          export uniqueString="tasks_asg/${instanceIp}/${currentTimeStamp}"
+          export uniqueString="tasks_system_codedeploy/${instanceIp}/${currentTimeStamp}"
           echo $uniqueString
           #Hack to get around efs not being properly mounted at this point.
           while true
@@ -316,6 +270,7 @@
           	echo $count
           	if [[ $count -gt 5 ]]
           	then
+          echo "creating mkdir -p  /data/logs/${uniqueString}/system"
           mkdir -p /data/logs/${uniqueString}/tasks
           if [ ! -d /data/logs/${uniqueString}/tasks ]
           then
@@ -325,7 +280,8 @@
           break
           	fi
           done
-          sed -i "s;PLACEHOLDER;${uniqueString};g" /etc/logrotate.d/tasks
+          sed -i "s;PLACEHOLDER;${uniqueString};g" /etc/logrotate.d/system || true
+          sed -i "s;PLACEHOLDER;${uniqueString};g" /etc/logrotate.d/tasks || true
           sed -i "s;PLACEHOLDER;${uniqueString};g" /root/final_backup.sh
           cp /root/final_backup.sh /twid/final_backup.sh
           export instanceId=`curl http://169.254.169.254/latest/meta-data/instance-id`
@@ -345,14 +301,15 @@
           sed -i "s;PLACEHOLDERASG;${asg};g" /root/preTerminate.sh
           sed -i "s;PLACEHOLDERINSTANCE;${instanceId};g" /root/preTerminate.sh
           sed -i "s;PLACEHOLDERPERSISTENTVOLUME;${persistentVolume};g" /root/preTerminate.sh
-          sed -i "s;PLACEHOLDERASG;${asg};g" /root/preInterrupt.sh
-          sed -i "s;PLACEHOLDERINSTANCE;${instanceId};g" /root/preInterrupt.sh
-          sed -i "s;PLACEHOLDERPERSISTENTVOLUME;${persistentVolume};g" /root/preInterrupt.sh
+          sed -i "s;PLACEHOLDERASG;${asg};g" /root/preInterrupt.sh || true
+          sed -i "s;PLACEHOLDERINSTANCE;${instanceId};g" /root/preInterrupt.sh || true
+          sed -i "s;PLACEHOLDERPERSISTENTVOLUME;${persistentVolume};g" /root/preInterrupt.sh || true
           sed -i "s;PLACEHOLDERPERSISTENTVOLUME;${persistentVolume};g" /root/resizeVolume.sh
-          systemctl start preinterrupt
+          
+          #systemctl start preinterrupt
           systemctl start preterminate
-          systemctl start resizevolume
           systemctl start redis
+          systemctl start resizevolume
           echo $service
 
     - name: Create final backup script
@@ -361,7 +318,7 @@
         content: |
           #!/bin/bash
           set -e
-          zip -r /data/logs/PLACEHOLDER/tasks/final_tasks.zip /twid/tasks/storage/logs
+          zip -r /data/logs/tasks_system_codedeploy/172312134/1764002999/tasks/final_tasks.zip /twid/tasks/storage/logs
           if [[ $? -eq 0 ]]
           then
                   echo "Zipped tasks logs succesfully"
@@ -372,7 +329,6 @@
     - name: update script exexution permissions
       shell: |
         sudo chmod +x /root/preTerminate.sh
-        sudo chmod +x /root/preInterrupt.sh
         sudo chmod +x /root/resizeVolume.sh
         sudo chmod +x /root/initscript.sh
         sudo chmod +x /root/final_backup.sh
