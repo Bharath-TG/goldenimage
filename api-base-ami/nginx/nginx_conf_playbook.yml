@@ -92,7 +92,9 @@
             include /etc/nginx/snippets/headers.conf;
             root /var/www/html/healthcheck;
             index index.php index.html index.htm;
-
+            location = / {
+              return 200 "OK\n";
+            }
             location / {
               try_files $uri $uri/ /index.php?$args;
             }
