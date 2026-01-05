@@ -7,17 +7,22 @@
     - name: Install Git
       package:
         name: git
-        state: present  # Ensures that Git is installed
+        state: present 
 
     - name: Install Curl
       package:
         name: curl
-        state: present  # Ensures that Curl is installed
+        state: present 
 
     - name: Install Vim
       package:
         name: vim
-        state: present  # Ensures that Vim is installed
+        state: present 
+
+    - name: Install Zip
+      package:
+        name: zip
+        state: present
 
     - name: Install awscli
       dnf:
