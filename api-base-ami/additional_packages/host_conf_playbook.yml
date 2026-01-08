@@ -373,3 +373,11 @@
           systemctl start resizevolume
           systemctl start redis || true
           echo $service
+
+    - name: update file permissions
+      shell: |
+        sudo chmod +x /root/initscript.sh
+        sudo chmod +x /root/final_backup.sh
+        sudo chmod +x /root/preTerminate.sh
+        sudo chmod +x /root/preInterrupt.sh
+        sudo chmod +x /root/resizeVolume.sh
