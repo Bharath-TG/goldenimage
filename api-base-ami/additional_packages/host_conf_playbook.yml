@@ -9,7 +9,6 @@
       copy:
         dest: "/etc/selinux/config"
         content: |
-          SELINUX=permissive
           SELINUX=disabled
 
     - name: set hostname
