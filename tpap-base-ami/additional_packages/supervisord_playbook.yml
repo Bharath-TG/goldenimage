@@ -1,0 +1,54 @@
+---
+- name: Install Supervisord
+  hosts: localhost
+  gather_facts: no
+  become: yes
+  tasks:
+
+    - name: Ensure EPEL repository is installed
+      dnf:
+        name: epel-release
+        state: present
+
+    - name: Install Supervisor
+      dnf:
+        name: supervisor
+        state: present
+
+    - name: updating configuration supervisord.conf
+      copy:
+        dest: "/etc/supervisord.conf"
+        content: |
+          [unix_http_server]
+          file=/tmp/supervisor.sock   ; the path to the socket file
+          [supervisord]
+          logfile=/twid/logs/supervisord.log ; main log file; default $CWD/supervisord.log
+          logfile_maxbytes=50MB        ; max main logfile bytes b4 rotation; default 50MB
+          logfile_backups=10           ; # of main logfile backups; 0 means none, default 10
+          loglevel=info                ; log level; default info; others: debug,warn,trace
+          pidfile=/tmp/supervisord.pid ; supervisord pidfile; default supervisord.pid
+          nodaemon=false               ; start in foreground if true; default false
+          silent=false                 ; no logs to stdout if true; default false
+          minfds=1024                  ; min. avail startup file descriptors; default 1024
+          minprocs=200                 ; min. avail process descriptors;default 200
+          [rpcinterface:supervisor]
+          supervisor.rpcinterface_factory = supervisor.rpcinterface:make_main_rpcinterface
+          [supervisorctl]
+          serverurl=unix:///tmp/supervisor.sock ; use a unix:// URL  for a unix socket
+          [include]
+          files = supervisord.d/*.conf
+         
+    - name: updating configuration supervisord tpap tasks config
+      copy:
+        dest: "/etc/supervisord.d/laravel-worker-tpap-tasks.conf"
+        content: |
+          [program:laravel-worker-1]
+          process_name=%(program_name)s_%(process_num)02d
+          command=php /twid/tpap_tasks/artisan queue:work redis_queue --queue=tpap_task --sleep=5 --tries=2 --max-jobs=100 --max-time=3600
+          autostart=true
+          autorestart=true
+          user=kushal
+          numprocs=2
+          redirect_stderr=true
+          stdout_logfile=/twid/tpap_tasks/storage/logs/redis_tpap_task_worker.log
+
