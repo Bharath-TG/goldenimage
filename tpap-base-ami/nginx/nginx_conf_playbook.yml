@@ -115,31 +115,30 @@
 
     - name: updating configuration conf.d/logs.conf
       copy:
-        dest: "/etc/nginx/conf.d/logs.conf"
+        dest: "/etc/nginx/conf.d/tasks.conf"
         content: | 
           server {
-            listen 80;
-            server_name logs.tpap.twidpay.com;
-            root /twid/tpap_logs/public;
-            access_log /var/log/nginx/tpap_logs_access.log;
-            error_log /var/log/nginx/tpap_logs_error.log crit;
-            index index.php index.html index.htm;
-            location / {
-              try_files $uri $uri/ /index.php?$args;
-            }
-            location ~ \.php$ {
-              try_files $uri =404;
-              fastcgi_pass unix:/run/php-fpm/www.sock;
-              fastcgi_index index.php;
-              fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
-              include fastcgi_params;
-              # Hide PHP headers
-              fastcgi_hide_header             X-Powered-By;
-              fastcgi_hide_header             X-CF-Powered-By;
-            }
-            location ~ /\. {
-              deny  all;
-            }
+              listen 80;
+              server_name tasks.tpap.twidpay.com;
+              root /twid/tpap_tasks/public;
+              access_log /var/log/nginx/tpap_tasks_access.log;
+              error_log /var/log/nginx/tpap_tasks_error.log crit;
+              index index.php index.html index.htm;
+              location / {
+                  try_files $uri $uri/ /index.php?$args;
+              }
+              location ~ \.php$ {
+                  try_files $uri =404;
+                  fastcgi_pass unix:/run/php-fpm/www.sock;
+                  fastcgi_index index.php;
+                  fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
+                  include fastcgi_params;
+                  fastcgi_hide_header             X-Powered-By;
+                  fastcgi_hide_header             X-CF-Powered-By;
+              }
+              location ~ /\. {
+                  deny  all;
+              }
           }
           
     - name: updating configuration conf.d/security.conf
