@@ -18,7 +18,7 @@
               delaycompress
               notifempty
           #    postrotate
-          #                mv /twid/api/storage/logs/*.gz /data/logs/api1/
+          #                mv /twid/tpap_api/storage/logs/*.gz /data/logs/tpap_api/
           #    endscript
           }
 
@@ -35,7 +35,7 @@
               delaycompress
               notifempty
           #    postrotate
-          #                mv /twid/api/storage/logs/*.gz /data/logs/api1/
+          #                mv /twid/tpap_tasks/storage/logs/*.gz /data/logs/tpap_tasks/
           #    endscript
           }
 
