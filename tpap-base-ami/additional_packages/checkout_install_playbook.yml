@@ -8,7 +8,7 @@
     tpap_api_repo_url: git@github.com:twidpay-global/twid_tpap.git
     tpap_tasks_dest_dir: /twid/tpap_tasks
     tpap_api_dest_dir: /twid/tpap_api
-    branch: master
+    branch: lts-php-84
     secret_id: twid/git_ssh_key
     ssh_private_key_path: /home/rocky/.ssh/id_rsa
     region: ap-south-1
