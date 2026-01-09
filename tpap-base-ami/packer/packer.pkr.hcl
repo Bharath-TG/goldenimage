@@ -107,7 +107,11 @@ build {
   provisioner "ansible-local" {
     playbook_file = "../code_deploy_agent/code_deploy_agent_conf_playbook.yml"
   }
-  
+
+  provisioner "ansible-local" {
+    playbook_file = "../additional_packages/supervisord_playbook.yml"
+  }
+
   provisioner "ansible-local" {
     playbook_file = "../additional_packages/host_conf_playbook.yml"
   }
