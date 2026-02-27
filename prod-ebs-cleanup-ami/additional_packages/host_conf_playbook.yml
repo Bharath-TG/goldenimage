@@ -126,7 +126,7 @@
 
     - name: Create systemd service file for delete volumes script
       copy:
-        dest: "/etc/systemd/system/delete_volumes_oneshot.service "
+        dest: "/etc/systemd/system/delete_volumes_oneshot.service"
         content: |
           [Unit]
           Description=Unit to backup and delete all volumes within availability zone
