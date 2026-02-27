@@ -1,0 +1,229 @@
+---
+- name: update configuration files
+  hosts: localhost
+  gather_facts: no
+  become: true
+
+  tasks:
+    - name: updating configuration selinux config
+      copy:
+        dest: "/etc/selinux/config"
+        content: |
+          SELINUX=disabled
+
+    - name: set hostname
+      shell: |
+        sudo hostnamectl set-hostname prod-ebs-cleanup-1a
+    
+    - name: updating configuration cloud config
+      copy:
+        dest: "/etc/cloud/cloud.cfg"
+        content: |
+          users:
+            - default
+          disable_root: true
+          mount_default_fields: [~, ~, 'auto', 'defaults,nofail,x-systemd.requires=cloud-init.service,_netdev', '0', '2']
+          resize_rootfs_tmp: /dev
+          ssh_pwauth: false
+          preserve_hostname: true
+          ssh_deletekeys: true
+          ssh_genkeytypes: ['rsa', 'ecdsa', 'ed25519']
+          syslog_fix_perms: ~
+          disable_vmware_customization: false
+          cloud_init_modules:
+            - migrator
+            - seed_random
+            - bootcmd
+            - write_files
+            - growpart
+            - resizefs
+            - disk_setup
+            - mounts
+            - set_hostname
+            - update_hostname
+            - update_etc_hosts
+            - ca_certs
+            - rsyslog
+            - users_groups
+            - ssh
+          cloud_config_modules:
+            - ssh_import_id
+            - locale
+            - set_passwords
+            - rh_subscription
+            - spacewalk
+            - yum_add_repo
+            - ntp
+            - timezone
+            - disable_ec2_metadata
+            - runcmd
+          cloud_final_modules:
+            - package_update_upgrade_install
+            - write_files_deferred
+            - puppet
+            - chef
+            - ansible
+            - mcollective
+            - salt_minion
+            - reset_rmc
+            - rightscale_userdata
+            - scripts_vendor
+            - scripts_per_once
+            - scripts_per_boot
+            - scripts_per_instance
+            - scripts_user
+            - ssh_authkey_fingerprints
+            - keys_to_console
+            - install_hotplug
+            - phone_home
+            - final_message
+            - power_state_change
+          system_info:
+            distro: rocky
+            default_user:
+              name: rocky
+              lock_passwd: True
+              gecos: rocky Cloud User
+              groups: [adm, systemd-journal]
+              sudo: ["ALL=(ALL) NOPASSWD:ALL"]
+              shell: /bin/bash
+            network:
+              renderers: ['sysconfig', 'eni', 'netplan', 'network-manager', 'networkd']
+            paths:
+              cloud_dir: /var/lib/cloud/
+              templates_dir: /etc/cloud/templates/
+            ssh_svcname: sshd
+
+    - name: adding bastion proxy 
+      shell: |
+        echo 'proxy=http://172.31.21.180:3128/' >> /etc/yum.conf
+
+    - name: adding proxy 
+      shell: |
+        echo '172.31.21.180 bastion.twidpay.com' >> /etc/hosts
+
+    - name: Adding ebs_volume_backup_delete script
+      copy:
+        dest: "/root/backup_and_delete_ebs.sh"
+        content: |
+          #!/bin/bash
+          set -e
+          export HTTPS_PROXY="http://172.31.21.180:3128/"
+          #Adding sleep till we figure out how to do proper orderving via systemd. There definitely is a much better way to do this.
+          #sleep 90
+          export instanceId=`curl http://169.254.169.254/latest/meta-data/instance-id`
+          export az=`curl http://169.254.169.254/latest/meta-data/placement/availability-zone`
+          if [[ -z $instanceId ]] || [[ -z $az ]]
+          then
+                  echo "Unable to get instanceid/az"
+                  exit 1
+          fi
+
+          send_slack_notification() {
+            local MSG="$1"
+            payload="{
+              \"text\": \"Spot Instance Cleanup FAILED: $MSG\"
+            }"
+            curl -X POST -H 'Content-type: application/json' \
+              --data "$payload" "$SLACK_WEBHOOK_URL"
+          }
+
+
+          /bin/aws ec2 describe-volumes --filters Name=tag:backupAndDeleteTasks,Values=true Name=availability-zone,Values=${az} Name=status,Values=available --region ap-south-1 | grep -oP '(?<="VolumeId": ").*?(?=")' | sort -nr | uniq | while read vol
+          do
+          /bin/aws ec2 attach-volume --volume-id ${vol} --instance-id ${instanceId}  --device /dev/sdf --region ap-south-1
+          sleep 20
+          mkdir -p /mnt/twid
+              # Detect actual device name (nvme vs xvdf)
+              if lsblk | grep -q "nvme1n1"; then
+                  device="/dev/nvme1n1"
+              elif lsblk | grep -q "xvdf"; then
+                  device="/dev/xvdf"
+              else
+                  echo "Could not detect attached device name"
+            send_slack_notification "Could not detect attached device name at - ${instanceId}"
+                  exit 1
+              fi
+            echo "Mounting $device at /mnt/twid"
+              mount $device /mnt/twid
+
+          rm -fR /twid || true
+          ln -s /mnt/twid /twid
+          sleep 10
+          export found_volume=0
+          for i in {1..10}
+          do
+          if [[ ! -f /twid/final_backup.sh ]]
+          then
+                  echo "Unable to Find backup file"
+          else
+                  found_volume=1
+                  break
+          fi
+          sleep 10
+          done
+          if [[ $found_volume -eq 0 ]]
+          then
+                  echo "Unable to find backup"
+            send_slack_notification "Unable to find backup file - ${instanceId}"
+                  exit 1
+          fi
+          # sed -i "s;api/final_api.zip;api_spot/final_api.zip;g" /twid/final_backup.sh
+          # Extract the ZIP path from the original script
+          # This looks for the argument right after 'zip -r'
+          ZIP_PATH=$(grep -oP '(?<=zip -r )\S+' /twid/final_backup.sh)
+
+          if [[ -z "$ZIP_PATH" ]]; then
+              echo "Could not extract ZIP path from /twid/final_backup.sh"
+              send_slack_notification "Could not extract zip path - ${instanceId}"
+              exit 1
+          fi
+
+          # Ensure parent directory exists
+          ZIP_DIR=$(dirname "$ZIP_PATH")
+          if [[ ! -d "$ZIP_DIR" ]]; then
+              echo "Creating directory $ZIP_DIR"
+              mkdir -p "$ZIP_DIR"
+          fi
+
+          /bin/bash /twid/final_backup.sh
+          if [[ $? -eq 0 ]]
+          then
+              if [[ -f /twid/s3_final_backup.sh ]]; then
+                  echo "Running s3_final_backup.sh"
+                  /bin/bash /twid/s3_final_backup.sh || echo "S3 backup failed, continuing..."
+              else
+                  echo "s3_final_backup.sh not found, skipping S3 upload"
+              fi
+          umount /mnt/twid
+          /bin/aws ec2 detach-volume --volume-id ${vol} --region ap-south-1
+          sleep 20
+          /bin/aws ec2 delete-volume --volume-id ${vol} --region ap-south-1
+          else
+            send_slack_notification "Failed to detach volume - ${instanceId}"
+                  exit 1
+          fi
+          done
+          sleep 60
+          init 0
+
+    - name: Create systemd service file for delete volumes script
+      copy:
+        dest: "/etc/systemd/system/delete_volumes_oneshot.service "
+        content: |
+          [Unit]
+          Description=Unit to backup and delete all volumes within availability zone
+          After=network.target
+          After=network-online.target
+          Wants=network-online.target
+
+          [Service]
+          Type=oneshot
+          ExecStart=/bin/bash /root/backup_and_delete_ebs.sh
+
+          [Install]
+          WantedBy=multi-user.target
+
+    - name: update script exexution permissions
+      shell: |
+        sudo chmod +x /root/backup_and_delete_ebs.sh

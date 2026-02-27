@@ -1,0 +1,16 @@
+---
+- name: Update only security and bugfix updates on Rocky Linux
+  hosts: all  
+  become: yes                
+  tasks:
+    - name: Upgrade all packages (equivalent to dnf upgrade)
+      dnf:
+        name: "*"
+        state: latest
+        
+    # - name: Install only security and bugfix updates
+    #   dnf:
+    #     name: "*"
+    #     state: latest         
+    #     security: yes         # For security updates
+    #     update_only: yes      # For bugfix updates

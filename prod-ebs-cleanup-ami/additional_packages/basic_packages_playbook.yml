@@ -1,0 +1,35 @@
+---
+- name: install git, curl, vim and awscli
+  hosts: localhost
+  gather_facts: no
+  become: true  
+  tasks:
+    - name: Install Git
+      package:
+        name: git
+        state: present
+
+    - name: Install Curl
+      package:
+        name: curl
+        state: present 
+
+    - name: Install Vim
+      package:
+        name: vim
+        state: present
+
+    - name: Install awscli
+      dnf:
+        name: awscli
+        state: present
+        
+    - name: Install Zip
+      package:
+        name: zip
+        state: present
+
+    - name: Install htop
+      package:
+        name: htop
+        state: present
