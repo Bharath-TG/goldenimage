@@ -1,0 +1,52 @@
+---
+- name: Install protoc 21.12
+  hosts: localhost
+  gather_facts: yes
+  become: true
+
+  vars:
+    protoc_version: "21.12"
+    protoc_zip: "protoc-{{ protoc_version }}-linux-x86_64.zip"
+    protoc_url: "https://github.com/protocolbuffers/protobuf/releases/download/v{{ protoc_version }}/{{ protoc_zip }}"
+    install_dir: "/usr/local"
+
+  tasks:
+    - name: Install required packages
+      dnf:
+        name:
+          - wget
+          - unzip
+        state: present
+
+    - name: Download protoc zip
+      get_url:
+        url: "{{ protoc_url }}"
+        dest: "/tmp/{{ protoc_zip }}"
+        mode: '0644'
+
+    - name: Unzip protoc into /usr/local
+      unarchive:
+        src: "/tmp/{{ protoc_zip }}"
+        dest: "{{ install_dir }}"
+        remote_src: yes
+        mode: '0755'
+
+    - name: Ensure /usr/local/bin is in PATH for root
+      lineinfile:
+        path: /root/.bashrc
+        line: 'export PATH="/usr/local/bin:$PATH"'
+        state: present
+
+    - name: Reload root's bashrc to update PATH
+      shell: source /root/.bashrc
+      args:
+        executable: /bin/bash
+
+    - name: Verify protoc installation
+      command: "/usr/local/bin/protoc --version"
+      register: protoc_version_output
+
+    - name: Remove downloaded protoc zip
+      file:
+        path: "/tmp/{{ protoc_zip }}"
+        state: absent
