@@ -125,10 +125,6 @@ build {
   }
 
   provisioner "ansible-local" {
-    playbook_file = "../nginx/nginx_conf_playbook.yml"
-  }
-
-  provisioner "ansible-local" {
     playbook_file = "../php-fpm/phpfpm_conf_playbook.yml"
   }
 

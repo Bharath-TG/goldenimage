@@ -20,15 +20,16 @@
         dest: "/etc/supervisord.conf"
         content: |
           [supervisord]
-          logfile_maxbytes=50MB        ; (max main logfile bytes b4 rotation;default 50MB)
-          logfile_backups=10           ; (num of main logfile rotation backups;default 10)
-          loglevel=info                ; (log level;default info; others: debug,warn,trace)
-          pidfile=/tmp/supervisord.pid ; (supervisord pidfile;default supervisord.pid)
-          nodaemon=false               ; (start in foreground if true;default false)
-          minfds=1024                  ; (min. avail startup file descriptors;default 1024)
-          minprocs=200                 ; (min. avail process descriptors;default 200)
-          user=kushal                  ; (default is current user, required if root)
-          directory=/tmp               ; (default is not to cd during start)
+          logfile=/twid/api/storage/logs/supervisord.log    ; (supervisor logs path)
+          logfile_maxbytes=50MB                             ; (max main logfile bytes b4 rotation;default 50MB)
+          logfile_backups=10                                ; (num of main logfile rotation backups;default 10)
+          loglevel=info                                     ; (log level;default info; others: debug,warn,trace)
+          pidfile=/tmp/supervisord.pid                      ; (supervisord pidfile;default supervisord.pid)
+          nodaemon=false                                    ; (start in foreground if true;default false)
+          minfds=1024                                       ; (min. avail startup file descriptors;default 1024)
+          minprocs=200                                      ; (min. avail process descriptors;default 200)
+          user=kushal                                       ; (default is current user, required if root)
+          directory=/tmp                                    ; (default is not to cd during start)
           
           [rpcinterface:supervisor]
           supervisor.rpcinterface_factory = supervisor.rpcinterface:make_main_rpcinterface
