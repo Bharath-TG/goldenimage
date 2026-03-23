@@ -6,7 +6,7 @@
   vars:
     repo_url: git@github.com:twidpay-global/twid_api.git
     dest_dir: /twid/api  
-    branch: master_concurrent
+    branch: master-concurrent
     secret_id: twid/git_ssh_key
     ssh_private_key_path: /home/rocky/.ssh/id_rsa
     region: ap-south-1

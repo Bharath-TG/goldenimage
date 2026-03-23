@@ -54,6 +54,7 @@
           default_socket_timeout = 3600
           extension=igbinary.so
           extension=apcu.so
+          extension=swoole.so
           apc.enabled=1
           apc.enable_cli=1
           extension=redis.so

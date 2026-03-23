@@ -34,3 +34,7 @@
     - name: Install igbinary extension via PECL
       command: pecl install igbinary
 #      creates: /usr/lib/php/modules/igbinary.so  # Only install if the extension isn't already present
+
+    - name: Install swoole extension via PECL
+      command: pecl install swoole
+#      creates: /usr/lib/php/modules/swoole.so  # Only install if the extension isn't already present
