@@ -123,10 +123,6 @@ build {
   }
 
   provisioner "ansible-local" {
-    playbook_file = "../additional_packages/phpmyadmin_playbook.yml"
-  }
-
-  provisioner "ansible-local" {
     playbook_file = "../additional_packages/logrotate_conf_playbook.yml"
   }
 
@@ -140,10 +136,6 @@ build {
 
   provisioner "ansible-local" {
     playbook_file = "../php-fpm/phpfpm_conf_playbook.yml"
-  }
-
-  provisioner "ansible-local" {
-    playbook_file = "../squid/squid_conf_playbook.yml"
   }
 
   provisioner "ansible-local" {
